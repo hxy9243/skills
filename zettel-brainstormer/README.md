@@ -2,11 +2,19 @@ Zettel Brainstormer — public package
 
 This package contains the zettel-brainstormer skill.
 
-Overview
+# Overview
+
 - Two-stage pipeline: preprocess (configurable, e.g. OpenRouter kimi-k2.5) -> draft (pro model, configurable) -> optional humanizer.
 - Scripts provided are safe by default: they run in "stub" mode unless environment variables are set to enable real API calls.
 
-Quick start (safe mode)
+# Install
+
+```bash
+npx skills install https://github.com/hxy9243/skills/tree/main/zettel-brainstormer
+```
+
+# Quick start (safe mode)
+
 1. Inspect the sample input: examples/sample-note.md
 2. Run preprocess:
    ./scripts/preprocess.py --input examples/sample-note.md --output /tmp/outline.json

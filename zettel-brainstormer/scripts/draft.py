@@ -5,6 +5,7 @@ Usage: draft.py --outline outline.json --model openai/gpt-5.2 --out draft.md
 """
 import sys, json, argparse
 from pathlib import Path
+from config_manager import ConfigManager
 
 def read_json(p):
     return json.loads(Path(p).read_text(encoding='utf-8'))
@@ -13,9 +14,13 @@ def write_text(p, s):
     Path(p).write_text(s, encoding='utf-8')
 
 if __name__ == '__main__':
+    # Load configuration
+    config = ConfigManager.load()
+    default_model = config.get('pro_model', 'openai/gpt-5.2')
+
     p = argparse.ArgumentParser()
     p.add_argument('--outline', required=True)
-    p.add_argument('--model', default='openai/gpt-5.2')
+    p.add_argument('--model', default=default_model)
     p.add_argument('--out', required=True)
     args = p.parse_args()
 

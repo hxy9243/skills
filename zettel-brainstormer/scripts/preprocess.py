@@ -8,6 +8,7 @@ Usage: preprocess.py --input note.md --output outline.json
 """
 import sys, json, argparse, subprocess, shlex
 from pathlib import Path
+from config_manager import ConfigManager
 
 def simple_read(path):
     return Path(path).read_text(encoding='utf-8')
@@ -21,6 +22,9 @@ if __name__ == '__main__':
     p.add_argument('--input', required=True)
     p.add_argument('--output', required=True)
     args = p.parse_args()
+
+    # Load configuration to ensure setup is complete
+    config = ConfigManager.load()
 
     text = simple_read(args.input)
 
