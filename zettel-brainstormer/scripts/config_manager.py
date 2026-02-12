@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import sys
+import os
 from pathlib import Path
 
 CONFIG_FILE = Path(__file__).parent.parent / "config" / "models.json"
@@ -8,14 +9,36 @@ EXAMPLE_CONFIG = Path(__file__).parent.parent / "config" / "models.example.json"
 
 class ConfigManager:
     @staticmethod
+    def get_default_model():
+        """Get a sensible default model, checking common env vars"""
+        # Check common environment variables used by different agent systems
+        return (
+            os.environ.get('DEFAULT_MODEL') or
+            os.environ.get('MODEL') or
+            'google/gemini-3-flash-preview'  # Fallback to a widely available model
+        )
+
+    @staticmethod
     def load():
+        # If config file doesn't exist, use sensible defaults
         if not CONFIG_FILE.exists():
-            print(f"Error: Configuration file not found at {CONFIG_FILE}")
-            print("Please run 'python scripts/setup.py' to configure the skill.")
-            sys.exit(1)
+            default_model = ConfigManager.get_default_model()
+            return {
+                "pro_model": default_model,
+                "preprocess_model": default_model,
+                "zettel_dir": "~/Documents/Obsidian/Zettelkasten",
+                "output_dir": "~/Documents/Obsidian/Inbox"
+            }
 
         try:
-            return json.loads(CONFIG_FILE.read_text(encoding='utf-8'))
+            config = json.loads(CONFIG_FILE.read_text(encoding='utf-8'))
+            # Fallback to default model if specific models aren't configured
+            default_model = ConfigManager.get_default_model()
+            if not config.get('pro_model'):
+                config['pro_model'] = default_model
+            if not config.get('preprocess_model'):
+                config['preprocess_model'] = default_model
+            return config
         except json.JSONDecodeError:
             print(f"Error: Invalid JSON in configuration file at {CONFIG_FILE}")
             sys.exit(1)
