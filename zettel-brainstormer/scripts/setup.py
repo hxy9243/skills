@@ -41,6 +41,24 @@ def main():
         default_output
     )
 
+    # Search & Research
+    print("\n--- Research Configuration ---")
+    config['search_skill'] = get_input(
+        "Search skill (web_search, brave_search, or none)",
+        defaults.get('search_skill', 'web_search')
+    )
+
+    # Wikilink extraction settings
+    print("\n--- Wikilink Extraction ---")
+    config['link_depth'] = int(get_input(
+        "Link depth (N levels deep to follow wikilinks)",
+        str(defaults.get('link_depth', 2))
+    ))
+    config['max_links'] = int(get_input(
+        "Max links (M total linked notes to include)",
+        str(defaults.get('max_links', 10))
+    ))
+
     # Save
     print("\nSaving configuration...")
     ConfigManager.save(config)

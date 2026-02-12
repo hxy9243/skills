@@ -29,10 +29,11 @@ This skill now supports a two-stage pipeline to balance cost and quality:
 
 This skill includes the following resources under the skill folder:
 
-- scripts/preprocess.py  -- call kimi-k2.5, extract key points, write JSON
+- scripts/preprocess.py  -- call preprocess model, extract key points, write JSON
 - scripts/draft.py       -- call pro model with outline + references, produce final Markdown
+- scripts/wikilink_extractor.py -- extract [[wikilinks]] from notes recursively
 - references/templates.md -- output templates, headline/lead examples, tone guide
-- config/models.json     -- user-selectable pro model setting
+- config/models.json     -- user-selectable model and research settings
 
 ## Configuration & Setup
 
@@ -46,24 +47,32 @@ python scripts/setup.py
 This will create `config/models.json` with your preferences. You can press ENTER to accept defaults.
 
 **Configuration Fields**:
-- `pro_model`: The model used for drafting (default: `openai/gpt-5.2`)
-- `preprocess_model`: Cheap model for extraction (default: `openrouter/x-ai/kimi-k2.5`)
+- `pro_model`: The model used for drafting (defaults to agent's current model)
+- `preprocess_model`: Cheap model for extraction (defaults to agent's current model)
 - `zettel_dir`: Path to your Zettelkasten notes
 - `output_dir`: Path where drafts should be saved
+- `search_skill`: Which search skill to use for web/X research (web_search, brave_search, or none)
+- `link_depth`: How many levels deep to follow [[wikilinks]] (N levels, default: 2)
+- `max_links`: Maximum total linked notes to include (M links, default: 10)
 
 To change settings later, you can edit `config/models.json` directly or re-run `scripts/setup.py`.
+
+**Note**: When using this skill, the agent will inform you of the current link_depth and max_links settings in the final result.
 
 
 ## Usage
 
 - Trigger when user asks: "brainstorm X", "expand this draft", "research and add notes to <path>".
-- Example command (pseudo):
-  1. If not configured, run `python scripts/setup.py` first.
-  2. read <path_to_note>
-  3. scripts/preprocess.py --input <path> --output /tmp/outline.json
-  4. scripts/draft.py --outline /tmp/outline.json --model openai/gpt-5.2 --out /tmp/draft.md
-  5. humanizer --in /tmp/draft.md --out /tmp/draft.human.md
-  6. edit <path_to_note> append /tmp/draft.human.md under header `## 🧠 Brainstorming (YYYY-MM-DD)`
+- Example workflow (pseudo):
+  1. If not configured, config will use agent's current model by default (or run `python scripts/setup.py` for custom settings)
+  2. Pick a random seed note from zettelkasten
+  3. Extract wikilinks: `scripts/wikilink_extractor.py --seed <seed_note> --depth N --max M --zettel-dir <zettel_dir> --output /tmp/links.txt`
+  4. Preprocess: `scripts/preprocess.py --input <seed_note> --output /tmp/outline.json`
+  5. Research using configured search_skill (if not "none")
+  6. Draft: `scripts/draft.py --outline /tmp/outline.json --model <pro_model> --out /tmp/draft.md`
+  7. (Optional) Humanize: `humanizer --in /tmp/draft.md --out /tmp/draft.human.md`
+  8. Append result to seed note or save to output_dir
+  9. **Inform user**: "Extracted wikilinks with depth=N, max_links=M using search_skill=<skill>"
 
 ## Notes for maintainers
 
