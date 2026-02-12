@@ -13,11 +13,13 @@ This skill now supports a two-stage pipeline to balance cost and quality:
 
 1) Preprocess & Extraction (cheap model)
 
-- Run a lightweight extraction step using OpenRouter's kimi-k2.5 to produce:
+- Run a lightweight extraction step to produce:
   - Short bullet-point keypoints
   - Candidate headings and tags
   - Minimal bibliography/search queries
-- Output format (JSON): `{"headlines":[], "points":[], "queries":[]}`.
+  - **Wikilinked documents** (follows [[wikilinks]] N levels deep, up to M total docs)
+  - **Tag-similar documents** (finds notes with overlapping tags)
+- Output format (JSON): `{"headlines":[], "points":[], "queries":[], "linked_docs":[], "tag_similar_docs":[]}`.
 
 2) Draft & Humanize (pro model)
 
@@ -29,9 +31,9 @@ This skill now supports a two-stage pipeline to balance cost and quality:
 
 This skill includes the following resources under the skill folder:
 
-- scripts/preprocess.py  -- call preprocess model, extract key points, write JSON
+- scripts/preprocess.py  -- extract key points, wikilinks, and tag-similar docs; write JSON
 - scripts/draft.py       -- call pro model with outline + references, produce final Markdown
-- scripts/wikilink_extractor.py -- extract [[wikilinks]] from notes recursively
+- scripts/wikilink_extractor.py -- (standalone) extract [[wikilinks]] from notes recursively
 - references/templates.md -- output templates, headline/lead examples, tone guide
 - config/models.json     -- user-selectable model and research settings
 
@@ -66,13 +68,13 @@ To change settings later, you can edit `config/models.json` directly or re-run `
 - Example workflow (pseudo):
   1. If not configured, config will use agent's current model by default (or run `python scripts/setup.py` for custom settings)
   2. Pick a random seed note from zettelkasten
-  3. Extract wikilinks: `scripts/wikilink_extractor.py --seed <seed_note> --depth N --max M --zettel-dir <zettel_dir> --output /tmp/links.txt`
-  4. Preprocess: `scripts/preprocess.py --input <seed_note> --output /tmp/outline.json`
-  5. Research using configured search_skill (if not "none")
-  6. Draft: `scripts/draft.py --outline /tmp/outline.json --model <pro_model> --out /tmp/draft.md`
-  7. (Optional) Humanize: `humanizer --in /tmp/draft.md --out /tmp/draft.human.md`
-  8. Append result to seed note or save to output_dir
-  9. **Inform user**: "Extracted wikilinks with depth=N, max_links=M using search_skill=<skill>"
+  3. Preprocess: `scripts/preprocess.py --input <seed_note> --output /tmp/outline.json`
+     - This automatically extracts wikilinks (depth=N, max=M) and tag-similar docs
+  4. Research using configured search_skill (if not "none")
+  5. Draft: `scripts/draft.py --outline /tmp/outline.json --model <pro_model> --out /tmp/draft.md`
+  6. (Optional) Humanize: `humanizer --in /tmp/draft.md --out /tmp/draft.human.md`
+  7. Append result to seed note or save to output_dir
+  8. **Inform user**: "Extracted wikilinks with depth=N, max_links=M using search_skill=<skill>"
 
 ## Notes for maintainers
 
