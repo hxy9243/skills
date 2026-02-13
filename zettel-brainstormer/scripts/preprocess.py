@@ -23,75 +23,7 @@ def simple_read(path):
 def write_json(path, data):
     Path(path).write_text(json.dumps(data, indent=2), encoding='utf-8')
 
-# --- Wikilink extraction logic (from wikilink_extractor.py) ---
-
-def extract_wikilinks(content: str) -> List[str]:
-    """Extract all [[wikilinks]] from markdown content"""
-    pattern = r'\[\[([^\]]+)\]\]'
-    return re.findall(pattern, content)
-
-def find_note_path(link_name: str, zettel_dir: Path) -> Path:
-    """Find the actual file path for a wikilink name"""
-    # Try exact match first
-    exact = zettel_dir / f"{link_name}.md"
-    if exact.exists():
-        return exact
-    
-    # Try case-insensitive search
-    for note in zettel_dir.rglob("*.md"):
-        if note.stem.lower() == link_name.lower():
-            return note
-    
-    return None
-
-def extract_links_recursive(
-    seed_path: Path,
-    zettel_dir: Path,
-    max_depth: int,
-    max_links: int
-) -> List[Dict]:
-    """
-    Recursively extract wikilinks up to max_depth levels, collecting up to max_links total.
-    Returns list of dicts: [{'path': str, 'level': int, 'content': str}]
-    """
-    visited = {}
-    to_process = [(seed_path, 0)]  # (path, current_depth)
-    
-    while to_process and len(visited) < max_links:
-        current_path, depth = to_process.pop(0)
-        
-        if current_path in visited or depth > max_depth:
-            continue
-        
-        # Read content
-        try:
-            content = current_path.read_text(encoding='utf-8')
-        except Exception as e:
-            print(f"Warning: Could not read {current_path}: {e}", file=sys.stderr)
-            continue
-        
-        # Extract links
-        links = extract_wikilinks(content)
-        
-        visited[current_path] = {
-            'path': str(current_path),
-            'level': depth,
-            'content': content,
-            'links': links
-        }
-        
-        # Add linked notes to process queue (if we haven't hit max depth)
-        if depth < max_depth and len(visited) < max_links:
-            for link in links:
-                linked_path = find_note_path(link, zettel_dir)
-                if linked_path and linked_path not in visited:
-                    to_process.append((linked_path, depth + 1))
-    
-    # Convert to list format
-    return [
-        {'path': data['path'], 'level': data['level'], 'content': data['content']}
-        for data in visited.values()
-    ]
+from obsidian_utils import extract_links_recursive
 
 # --- Tag extraction and similarity logic ---
 
@@ -101,11 +33,11 @@ def extract_tags(content: str) -> Set[str]:
     Supports: #tag, tags: [tag1, tag2], and YAML frontmatter tags.
     """
     tags = set()
-    
+
     # Inline #tags
     inline_tags = re.findall(r'#([\w\-]+)', content)
     tags.update(inline_tags)
-    
+
     # YAML frontmatter tags
     frontmatter_match = re.match(r'^---\n(.*?)\n---', content, re.DOTALL)
     if frontmatter_match:
@@ -120,7 +52,7 @@ def extract_tags(content: str) -> Set[str]:
             if tags_match:
                 yaml_tags = [t.strip() for t in tags_match.group(1).split(',')]
                 tags.update(yaml_tags)
-    
+
     return tags
 
 def find_tag_similar_docs(
@@ -134,16 +66,16 @@ def find_tag_similar_docs(
     Returns list of dicts: [{'path': str, 'tags': [str], 'content': str, 'overlap': int}]
     """
     similar = []
-    
+
     for note_path in zettel_dir.rglob("*.md"):
         if note_path == seed_path:
             continue
-        
+
         try:
             content = note_path.read_text(encoding='utf-8')
             note_tags = extract_tags(content)
             overlap = len(seed_tags & note_tags)
-            
+
             if overlap > 0:
                 similar.append({
                     'path': str(note_path),
@@ -154,7 +86,7 @@ def find_tag_similar_docs(
         except Exception as e:
             print(f"Warning: Could not read {note_path}: {e}", file=sys.stderr)
             continue
-    
+
     # Sort by overlap descending, take top max_similar
     similar.sort(key=lambda x: x['overlap'], reverse=True)
     return [
@@ -194,7 +126,11 @@ if __name__ == '__main__':
     # Extract wikilinked documents
     linked_docs = []
     if zettel_dir.exists():
-        linked_docs = extract_links_recursive(seed_path, zettel_dir, link_depth, max_links)
+        raw_linked_docs = extract_links_recursive(seed_path, zettel_dir, link_depth, max_links)
+        linked_docs = [
+            {'path': str(path), 'level': data['level'], 'content': data['content']}
+            for path, data in raw_linked_docs.items()
+        ]
         print(f"Extracted {len(linked_docs)} linked documents (depth={link_depth}, max={max_links})", file=sys.stderr)
     else:
         print(f"Warning: Zettelkasten directory not found: {zettel_dir}", file=sys.stderr)

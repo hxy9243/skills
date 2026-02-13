@@ -33,7 +33,7 @@ This skill includes the following resources under the skill folder:
 
 - scripts/preprocess.py  -- extract key points, wikilinks, and tag-similar docs; write JSON
 - scripts/draft.py       -- call pro model with outline + references, produce final Markdown
-- scripts/wikilink_extractor.py -- (standalone) extract [[wikilinks]] from notes recursively
+- scripts/obsidian_utils.py -- shared utilities for wikilink extraction
 - references/templates.md -- output templates, headline/lead examples, tone guide
 - config/models.json     -- user-selectable model and research settings
 
