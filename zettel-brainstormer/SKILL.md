@@ -31,9 +31,10 @@ This skill now supports a two-stage pipeline to balance cost and quality:
 
 This skill includes the following resources under the skill folder:
 
-- scripts/preprocess.py  -- extract key points, wikilinks, and tag-similar docs; write JSON
+- scripts/preprocess.py  -- extract key points, wikilinks, queries, and filters relevance
 - scripts/draft.py       -- call pro model with outline + references, produce final Markdown
 - scripts/obsidian_utils.py -- shared utilities for wikilink extraction
+- scripts/llm_utils.py   -- shared utilities for LLM API calls
 - references/templates.md -- output templates, headline/lead examples, tone guide
 - config/models.json     -- user-selectable model and research settings
 
@@ -68,8 +69,10 @@ To change settings later, you can edit `config/models.json` directly or re-run `
 - Example workflow (pseudo):
   1. If not configured, config will use agent's current model by default (or run `python scripts/setup.py` for custom settings)
   2. Pick a random seed note from zettelkasten
-  3. Preprocess: `scripts/preprocess.py --input <seed_note> --output /tmp/outline.json`
-     - This automatically extracts wikilinks (depth=N, max=M) and tag-similar docs
+  3. Preprocess: `scripts/preprocess.py --input <seed_note> --output /tmp/outline.json --filter`
+     - This automatically extracts wikilinks (depth=N, max=M) and tag-similar docs.
+     - Generates search queries using `preprocess_model`.
+     - Filters out irrelevant docs using `preprocess_model` (if `--filter` is used).
   4. Research using configured search_skill (if not "none")
   5. Draft: `scripts/draft.py --outline /tmp/outline.json --model <pro_model> --out /tmp/draft.md`
   6. (Optional) Humanize: `humanizer --in /tmp/draft.md --out /tmp/draft.human.md`
@@ -88,17 +91,19 @@ To change settings later, you can edit `config/models.json` directly or re-run `
 ... [Original Draft Content] ...
 
 ---
-## 🧠 Brainstorming & Research (2026-02-07)
 
-### 🧊 Core Metaphor: The Iceberg
+# 🧠 Brainstorming on [Title] (2026-02-07)
+
+## 🧊 Core Metaphor: The Iceberg
+[Core idea...]
+
+## Follow Up Titles
 [Expansion of the idea...]
 
-### 📚 References
+## 📚 References
 *   **James C. Scott:** *Seeing Like a State* — Discusses Metis vs Techne...
-*   **Gall's Law:** [Link/Summary]
-
-### 🐦 Signals
-*   **@user on X:** Argues that [point] ... [Link]
+*   **Gall's Law:** [[Link]]
+*   **@user on X:** Argues that [point] ... [[Link]]
 
 Tags: #brainstorming #research #zettelkasten
 ```

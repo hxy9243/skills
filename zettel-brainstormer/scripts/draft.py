@@ -7,9 +7,9 @@ import sys
 import json
 import argparse
 import os
-import requests
 from pathlib import Path
 from config_manager import ConfigManager
+from llm_utils import call_llm
 
 def read_json(p):
     return json.loads(Path(p).read_text(encoding='utf-8'))
@@ -20,8 +20,6 @@ def write_text(p, s):
 def generate_draft(outline, model_name, templates_content=None):
     """
     Generate a draft using an LLM API.
-    Currently supports OpenAI-compatible APIs (OpenAI, OpenRouter, etc.)
-    Expected env vars: OPENAI_API_KEY (or model specific key if configured)
     """
 
     title = outline.get('headlines', ["Untitled"])[0]
@@ -68,42 +66,13 @@ It is okay to not include everything. Your goal is a coherent, focused draft."""
     Output Format: Markdown.
     """
 
-    api_key = os.environ.get("OPENAI_API_KEY")
-    if not api_key:
-        print("Warning: OPENAI_API_KEY not found. Outputting prompt for manual use.\n", file=sys.stderr)
+    response = call_llm(system_prompt, user_prompt, model_name)
+
+    if response:
+        return response
+    else:
+        print("Warning: LLM call failed or no API Key. Outputting prompt for manual use.\n", file=sys.stderr)
         return f"# PROMPT FOR AGENT\n\n**System**:\n{system_prompt}\n\n**User**:\n{user_prompt}"
-
-    # Call API (simplified for standard OpenAI compatible)
-    try:
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
-        # Default to OpenRouter if model looks like one, or OpenAI otherwise.
-        # This basic logic can be improved.
-        base_url = "https://api.openai.com/v1"
-        if "openrouter" in model_name or "/" in model_name:
-             # Just a heuristic, user might need to configure base_url in future
-             base_url = "https://openrouter.ai/api/v1"
-
-        payload = {
-            "model": model_name,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ],
-            "temperature": 0.7
-        }
-
-        response = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=120)
-        response.raise_for_status()
-        result = response.json()
-        return result['choices'][0]['message']['content']
-
-    except Exception as e:
-        print(f"Error calling LLM: {e}", file=sys.stderr)
-        # Fallback to prompt output
-        return f"# ERROR generating draft: {e}\n\n# PROMPT FOR MANUAL USE\n\n**System**:\n{system_prompt}\n\n**User**:\n{user_prompt}"
 
 if __name__ == '__main__':
     # Load configuration
