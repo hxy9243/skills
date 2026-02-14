@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 """
 Draft script: expand outline into a Markdown draft using a pro model.
-Usage: draft.py --outline outline.json --model openai/gpt-5.2 --out draft.md
+Usage: draft.py --outline outline.json --model openai/gpt-4o --out draft.md
 """
-import sys, json, argparse
+import sys
+import json
+import argparse
+import os
+import requests
 from pathlib import Path
 from config_manager import ConfigManager
 
@@ -13,30 +17,116 @@ def read_json(p):
 def write_text(p, s):
     Path(p).write_text(s, encoding='utf-8')
 
+def generate_draft(outline, model_name, templates_content=None):
+    """
+    Generate a draft using an LLM API.
+    Currently supports OpenAI-compatible APIs (OpenAI, OpenRouter, etc.)
+    Expected env vars: OPENAI_API_KEY (or model specific key if configured)
+    """
+
+    title = outline.get('headlines', ["Untitled"])[0]
+    points = outline.get('points', [])
+    linked_docs = outline.get('linked_docs', [])
+    tag_similar = outline.get('tag_similar_docs', [])
+
+    # Construct context from linked docs
+    context_str = ""
+    if linked_docs:
+        context_str += "## Referenced Notes\n"
+        for doc in linked_docs:
+            # Simple truncation to avoid blowing up context
+            content_snippet = doc.get('content', '')[:1000]
+            context_str += f"### Note: {Path(doc.get('path', 'unknown')).stem}\n{content_snippet}\n...\n\n"
+
+    if tag_similar:
+        context_str += "## Related Ideas (Context)\n"
+        for doc in tag_similar:
+            content_snippet = doc.get('content', '')[:500]
+            context_str += f"### Note: {Path(doc.get('path', 'unknown')).stem}\n{content_snippet}\n...\n\n"
+
+    # Construct system prompt
+    system_prompt = "You are an expert writer and researcher."
+    if templates_content:
+        system_prompt += f"\n\nUse the following templates and style guide:\n{templates_content}"
+
+    system_prompt += """\n\nIMPORTANT: Focus on the core idea presented in the outline.
+Filter out irrelevant or tangential information from the context notes.
+It is okay to not include everything. Your goal is a coherent, focused draft."""
+
+    # Construct user prompt
+    user_prompt = f"""
+    Please write a comprehensive draft based on the following outline and context.
+
+    # Title: {title}
+
+    # Key Points to Cover:
+    {json.dumps(points, indent=2)}
+
+    # Context Material:
+    {context_str}
+
+    Output Format: Markdown.
+    """
+
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        print("Warning: OPENAI_API_KEY not found. Outputting prompt for manual use.\n", file=sys.stderr)
+        return f"# PROMPT FOR AGENT\n\n**System**:\n{system_prompt}\n\n**User**:\n{user_prompt}"
+
+    # Call API (simplified for standard OpenAI compatible)
+    try:
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        # Default to OpenRouter if model looks like one, or OpenAI otherwise.
+        # This basic logic can be improved.
+        base_url = "https://api.openai.com/v1"
+        if "openrouter" in model_name or "/" in model_name:
+             # Just a heuristic, user might need to configure base_url in future
+             base_url = "https://openrouter.ai/api/v1"
+
+        payload = {
+            "model": model_name,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            "temperature": 0.7
+        }
+
+        response = requests.post(f"{base_url}/chat/completions", headers=headers, json=payload, timeout=120)
+        response.raise_for_status()
+        result = response.json()
+        return result['choices'][0]['message']['content']
+
+    except Exception as e:
+        print(f"Error calling LLM: {e}", file=sys.stderr)
+        # Fallback to prompt output
+        return f"# ERROR generating draft: {e}\n\n# PROMPT FOR MANUAL USE\n\n**System**:\n{system_prompt}\n\n**User**:\n{user_prompt}"
+
 if __name__ == '__main__':
     # Load configuration
     config = ConfigManager.load()
-    default_model = config.get('pro_model', 'openai/gpt-5.2')
+    default_model = config.get('pro_model', 'openai/gpt-4o')
 
     p = argparse.ArgumentParser()
     p.add_argument('--outline', required=True)
     p.add_argument('--model', default=default_model)
     p.add_argument('--out', required=True)
+    p.add_argument('--templates', help="Path to templates.md", default="references/templates.md")
     args = p.parse_args()
 
     outline = read_json(args.outline)
 
-    # Placeholder expansion logic: create a simple markdown from the outline.
-    title = outline.get('headlines',["Untitled"])[0]
-    points = outline.get('points',[])
+    templates_content = None
+    if args.templates and Path(args.templates).exists():
+        templates_content = Path(args.templates).read_text(encoding='utf-8')
 
-    md = f"# {title}\n\n"
-    md += "Generated Draft\n\n"
-    md += "## Key Points\n\n"
-    for i,pnt in enumerate(points,1):
-        md += f"{i}. {pnt}\n\n"
+    draft_md = generate_draft(outline, args.model, templates_content)
 
-    md += "---\n\n" + "*Generated by writing-brainstormer (preprocessed with kimi-k2.5; draft model: %s)*\n" % args.model
+    # Add metadata footer
+    draft_md += f"\n\n---\n*Generated by writing-brainstormer (model: {args.model})*"
 
-    write_text(args.out, md)
-    print('Wrote', args.out)
+    write_text(args.out, draft_md)
+    print(f'Wrote draft to {args.out}')

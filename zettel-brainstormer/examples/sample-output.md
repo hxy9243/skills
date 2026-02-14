@@ -1,45 +1,144 @@
-# Expected Output (after brainstorming)
+# PROMPT FOR AGENT
 
-## The Documentation Paradox
+**System**:
+You are an expert writer and researcher.
 
-Quick observation: Projects with comprehensive docs often have less adoption than projects with minimal "just works" examples.
+Use the following templates and style guide:
+# Templates & Tone Guide
 
-Why?
+## Headline examples
+- "Digital Entropy and the Case for the New Commons"
+- "Why Agent Social Networks Break the Old Rules"
 
-- Comprehensive docs signal complexity
-- People want to copy-paste and go
-- Reading is harder than doing
-- Good defaults beat configuration options
+## Lead paragraph patterns
+- Problem lead: Start with a concrete failure or paradox, then zoom out to systemic causes.
+- Anecdotal lead: Begin with a small story, then connect to the thesis.
 
-Counter-intuitive but observable in the wild.
+## Tone
+- Concise, slightly irreverent, curious.
+- Prioritize clarity over rhetorical flourish.
+
+## Append format
+Always append under `## 🧠 Brainstorming (YYYY-MM-DD)` with a provenance line.
+
+
+IMPORTANT: Focus on the core idea presented in the outline.
+Filter out irrelevant or tangential information from the context notes.
+It is okay to not include everything. Your goal is a coherent, focused draft.
+
+**User**:
+
+    Please write a comprehensive draft based on the following outline and context.
+
+    # Title: ---
+
+    # Key Points to Cover:
+    [
+  "# Seed Note: The Power of Connected Thought",
+  "I want to explore how connecting ideas leads to better thinking.",
+  "I have some notes on [[Example Note A]] and [[Example Note B]].",
+  "I fundamentally believe that writing is thinking."
+]
+
+    # Context Material:
+    ## Referenced Notes
+### Note: Seed Note
+---
+tags: [seed, example]
+---
+# Seed Note: The Power of Connected Thought
+
+I want to explore how connecting ideas leads to better thinking.
+I have some notes on [[Example Note A]] and [[Example Note B]].
+I fundamentally believe that writing is thinking.
+
+...
+
+### Note: Example Note A
+---
+tags: [example, zettel]
+---
+# Example Note A
+
+This is an example note about the **Zettelkasten method**.
+It focuses on the idea of linking atomic notes together to form a web of knowledge.
+One key concept is the "entry point" or index note.
+
+See also [[Example Note B]] for benefits.
+
+...
+
+### Note: Example Note B
+---
+tags: [example, benefits]
+---
+# Example Note B
+
+This note discusses the **benefits of linking**.
+Linking allows for serendipitous discovery of ideas.
+It mimics how the human brain works, by association rather than hierarchy.
+
+See [[Example Note C]] for a counter-argument.
+
+...
+
+### Note: Example Note C
+---
+tags: [example, critique]
+---
+# Example Note C
+
+some critics argue that Zettelkasten can become a **time sink**.
+Maintaining the connections requires significant effort.
+If the notes are not high quality, the network becomes noisy.
+
+...
+
+## Related Ideas (Context)
+### Note: Example Note A
+---
+tags: [example, zettel]
+---
+# Example Note A
+
+This is an example note about the **Zettelkasten method**.
+It focuses on the idea of linking atomic notes together to form a web of knowledge.
+One key concept is the "entry point" or index note.
+
+See also [[Example Note B]] for benefits.
+
+...
+
+### Note: Example Note C
+---
+tags: [example, critique]
+---
+# Example Note C
+
+some critics argue that Zettelkasten can become a **time sink**.
+Maintaining the connections requires significant effort.
+If the notes are not high quality, the network becomes noisy.
+
+...
+
+### Note: Example Note B
+---
+tags: [example, benefits]
+---
+# Example Note B
+
+This note discusses the **benefits of linking**.
+Linking allows for serendipitous discovery of ideas.
+It mimics how the human brain works, by association rather than hierarchy.
+
+See [[Example Note C]] for a counter-argument.
+
+...
+
+
+
+    Output Format: Markdown.
+    
 
 ---
-
-## 🧠 Brainstorming & Research (2026-02-11)
-
-### 🧊 Core Insight: Signal vs. Noise
-
-The documentation paradox reflects a deeper pattern: **comprehensiveness often creates cognitive overhead**. Users don't want to become experts—they want to solve their immediate problem.
-
-This mirrors the "worse is better" philosophy from Richard Gabriel: systems that prioritize simplicity and ease of use beat technically superior but complex alternatives.
-
-### 📚 References & Context
-
-- **Richard Gabriel's "Worse is Better"**: Argues that simple, easily adoptable systems outcompete technically superior but complex ones
-- **README-driven development**: Philosophy of starting with a minimal README that shows the happy path
-- **Stripe API docs**: Famous for putting the most common use case front-and-center before diving into edge cases
-
-### 🔍 Modern Examples
-
-- **Vite vs. Webpack**: Vite's "works out of the box" approach vs Webpack's configuration hell
-- **Next.js adoption**: Succeeded partly because early docs focused on "create-next-app" with zero config
-- **Rust's ownership docs**: Initially scared people away; later versions added "start here" quick-start paths
-
-### 💡 Design Principle
-
-**Progressive disclosure**: Show the 80% use case first, hide the complexity until needed. Don't front-load cognitive load.
-
----
-
-Tags: #brainstorming #research #zettelkasten #engineering #ux
-*Generated by zettel-brainstormer*
+*Generated by writing-brainstormer (model: openai/gpt-5.2)*

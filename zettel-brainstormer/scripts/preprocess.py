@@ -100,11 +100,15 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser()
     p.add_argument('--input', required=True, help='Input note path')
     p.add_argument('--output', required=True, help='Output JSON path')
+    p.add_argument('--zettel-dir', help='Override Zettelkasten directory')
     args = p.parse_args()
 
     # Load configuration
     config = ConfigManager.load()
-    zettel_dir = Path(config.get('zettel_dir', '~/Documents/Obsidian/Zettelkasten')).expanduser()
+    if args.zettel_dir:
+        zettel_dir = Path(args.zettel_dir).expanduser()
+    else:
+        zettel_dir = Path(config.get('zettel_dir', '~/Documents/Obsidian/Zettelkasten')).expanduser()
     link_depth = config.get('link_depth', 2)
     max_links = config.get('max_links', 10)
 
