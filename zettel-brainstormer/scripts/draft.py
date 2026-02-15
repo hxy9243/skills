@@ -27,20 +27,32 @@ def generate_draft(outline, model_name, templates_content=None):
     linked_docs = outline.get('linked_docs', [])
     tag_similar = outline.get('tag_similar_docs', [])
 
+    seen_paths = set()
+
     # Construct context from linked docs
     context_str = ""
     if linked_docs:
         context_str += "## Referenced Notes\n"
         for doc in linked_docs:
+            path = doc.get('path', 'unknown')
+            if path in seen_paths:
+                continue
+            seen_paths.add(path)
+
             # Simple truncation to avoid blowing up context
             content_snippet = doc.get('content', '')[:1000]
-            context_str += f"### Note: {Path(doc.get('path', 'unknown')).stem}\n{content_snippet}\n...\n\n"
+            context_str += f"### Note: {Path(path).stem}\n{content_snippet}\n...\n\n"
 
     if tag_similar:
         context_str += "## Related Ideas (Context)\n"
         for doc in tag_similar:
+            path = doc.get('path', 'unknown')
+            if path in seen_paths:
+                continue
+            seen_paths.add(path)
+
             content_snippet = doc.get('content', '')[:500]
-            context_str += f"### Note: {Path(doc.get('path', 'unknown')).stem}\n{content_snippet}\n...\n\n"
+            context_str += f"### Note: {Path(path).stem}\n{content_snippet}\n...\n\n"
 
     # Construct system prompt
     system_prompt = "You are an expert writer and researcher."
