@@ -12,6 +12,8 @@ def find_note_path(link_name: str, zettel_dir: Path) -> Optional[Path]:
     """Find the actual file path for a wikilink name"""
     # Try exact match first
     exact = zettel_dir / f"{link_name}.md"
+
+    print('exact is:', exact)
     if exact.exists():
         return exact
 
@@ -21,6 +23,34 @@ def find_note_path(link_name: str, zettel_dir: Path) -> Optional[Path]:
             return note
 
     return None
+
+def extract_tags(content: str) -> Set[str]:
+    """
+    Extract tags from markdown content.
+    Supports: #tag, tags: [tag1, tag2], and YAML frontmatter tags.
+    """
+    tags = set()
+
+    # Inline #tags
+    inline_tags = re.findall(r'#([\w\-]+)', content)
+    tags.update(inline_tags)
+
+    # YAML frontmatter tags
+    frontmatter_match = re.match(r'^---\n(.*?)\n---', content, re.DOTALL)
+    if frontmatter_match:
+        fm = frontmatter_match.group(1)
+        # Look for tags: [...] or tags: tag1, tag2
+        tags_match = re.search(r'tags:\s*\[([^\]]+)\]', fm)
+        if tags_match:
+            yaml_tags = [t.strip().strip('"\'') for t in tags_match.group(1).split(',')]
+            tags.update(yaml_tags)
+        else:
+            tags_match = re.search(r'tags:\s*(.+)', fm)
+            if tags_match:
+                yaml_tags = [t.strip() for t in tags_match.group(1).split(',')]
+                tags.update(yaml_tags)
+
+    return tags
 
 def extract_links_recursive(
     seed_path: Path,

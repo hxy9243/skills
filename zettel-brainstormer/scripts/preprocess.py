@@ -14,10 +14,10 @@ Usage: preprocess.py --input note.md --output outline.json
 """
 import sys, json, argparse, re
 from pathlib import Path
-from typing import Set, List, Dict, Tuple
+from typing import Set, List, Dict
 
 from config_manager import ConfigManager
-from llm_utils import call_llm
+from obsidian_utils import extract_links_recursive, extract_tags
 
 
 def simple_read(path):
@@ -25,38 +25,6 @@ def simple_read(path):
 
 def write_json(path, data):
     Path(path).write_text(json.dumps(data, indent=2), encoding='utf-8')
-
-from obsidian_utils import extract_links_recursive
-
-# --- Tag extraction and similarity logic ---
-
-def extract_tags(content: str) -> Set[str]:
-    """
-    Extract tags from markdown content.
-    Supports: #tag, tags: [tag1, tag2], and YAML frontmatter tags.
-    """
-    tags = set()
-
-    # Inline #tags
-    inline_tags = re.findall(r'#([\w\-]+)', content)
-    tags.update(inline_tags)
-
-    # YAML frontmatter tags
-    frontmatter_match = re.match(r'^---\n(.*?)\n---', content, re.DOTALL)
-    if frontmatter_match:
-        fm = frontmatter_match.group(1)
-        # Look for tags: [...] or tags: tag1, tag2
-        tags_match = re.search(r'tags:\s*\[([^\]]+)\]', fm)
-        if tags_match:
-            yaml_tags = [t.strip().strip('"\'') for t in tags_match.group(1).split(',')]
-            tags.update(yaml_tags)
-        else:
-            tags_match = re.search(r'tags:\s*(.+)', fm)
-            if tags_match:
-                yaml_tags = [t.strip() for t in tags_match.group(1).split(',')]
-                tags.update(yaml_tags)
-
-    return tags
 
 def find_tag_similar_docs(
     seed_tags: Set[str],
@@ -97,121 +65,13 @@ def find_tag_similar_docs(
         for s in similar[:max_similar]
     ]
 
-def generate_queries(title, points, model_name):
-    if not model_name:
-        return [f"{title} background", f"{title} criticism", f"{title} examples"]
-
-    system_prompt = "You are a research assistant. Generate 3 specific search queries."
-    user_prompt = f"""
-    Topic: {title}
-    Key Points: {json.dumps(points)}
-
-    Task: Generate 3 specific search queries to find supporting evidence, counter-arguments, or missing context.
-    Output format: JSON list of strings (e.g. ["query 1", "query 2", "query 3"])
-    """
-    response = call_llm(system_prompt, user_prompt, model_name)
-    if not response:
-        return [f"{title} background", f"{title} criticism", f"{title} examples"]
-
-    try:
-        # cleanup markdown json codes if present
-        cleaned = response.replace('```json', '').replace('```', '').strip()
-        queries = json.loads(cleaned)
-        if isinstance(queries, list):
-            return queries[:3]
-        return [f"{title} background", f"{title} criticism", f"{title} examples"]
-    except:
-        return [f"{title} background", f"{title} criticism", f"{title} examples"]
-
-# --- Filter Logic ---
-
-def check_relevance(doc_content, title, points, model_name):
-    """
-    Ask LLM to score relevance 0-10.
-    """
-    system_prompt = "You are a research assistant. Evaluate the relevance of a document to a draft topic."
-    user_prompt = f"""
-    Draft Title: {title}
-    Key Points: {json.dumps(points)}
-
-    Document Content:
-    {doc_content[:2000]}
-
-    Task: Is this document relevant to the draft?
-    Reply with ONLY a single number from 0 to 10.
-    0 = Completely irrelevant
-    10 = Crucial, directly supports the points
-    """
-
-    response = call_llm(system_prompt, user_prompt, model_name)
-    try:
-        score = int(response.strip())
-        return score
-    except:
-        return 5 # Default on error
-
-def summarize_doc(doc_content, title, model_name):
-    """
-    Summarize document to < 300 words.
-    """
-    system_prompt = "You are a research assistant. Summarize the following text."
-    user_prompt = f"""
-    Context: We are writing about "{title}".
-
-    Document:
-    {doc_content[:8000]}
-
-    Task: Summarize the key information relevant to the topic in under 200 words.
-    """
-
-    response = call_llm(system_prompt, user_prompt, model_name)
-    return response if response else doc_content[:1000] + "..."
-
-def process_docs(docs_list, title, points, model_name, relevance_threshold=5, max_length=2000):
-    filtered = []
-    for doc in docs_list:
-        content = doc.get('content', '')
-        path = doc.get('path', 'unknown')
-
-        # 1. Check Relevance
-        score = check_relevance(content, title, points, model_name)
-        if score < relevance_threshold:
-            print(f"Skipping {Path(path).stem} (Score: {score})", file=sys.stderr)
-            continue
-
-        print(f"Keeping {Path(path).stem} (Score: {score})", file=sys.stderr)
-
-        # 2. Summarize if too long
-        if len(content) > max_length:
-            print(f"Summarizing {Path(path).stem}...", file=sys.stderr)
-            summary = summarize_doc(content, title, model_name)
-            doc['content'] = f"**Summary (Relevance: {score}/10)**:\n{summary}"
-        else:
-            doc['content'] = f"**Relevance: {score}/10**\n\n{content}"
-
-        filtered.append(doc)
-    return filtered
-
-# --- Main preprocessing logic ---
-
-if __name__ == '__main__':
-    p = argparse.ArgumentParser()
-    p.add_argument('--input', required=True, help='Input note path')
-    p.add_argument('--output', required=True, help='Output JSON path')
-    p.add_argument('--zettel-dir', help='Override Zettelkasten directory')
-    # Filter args
-    p.add_argument('--filter', action='store_true', help='Enable LLM-based relevance filtering')
-    p.add_argument('--threshold', type=int, default=4, help='Relevance score threshold (0-10)')
-    p.add_argument('--max-length', type=int, default=2000, help='Max content length before summarization')
-
-    args = p.parse_args()
-
+def preprocess(args):
     # Load configuration
     config = ConfigManager.load()
     if args.zettel_dir:
         zettel_dir = Path(args.zettel_dir).expanduser()
     else:
-        zettel_dir = Path(config.get('zettel_dir', '~/Documents/Obsidian/Zettelkasten')).expanduser()
+        zettel_dir = Path(config.get('zettel_dir')).expanduser()
     link_depth = config.get('link_depth', 2)
     max_links = config.get('max_links', 10)
     # Use preprocess model for queries and filtering
@@ -254,23 +114,31 @@ if __name__ == '__main__':
         else:
             print(f"No tags found in seed note", file=sys.stderr)
 
-    # Generate queries
-    print(f"Generating queries using {preprocess_model}...", file=sys.stderr)
-    queries = generate_queries(title, points, preprocess_model)
-
-    # Apply filtering if enabled
-    if args.filter:
-        print(f"Filtering docs (threshold={args.threshold}, max_len={args.max_length}) using {preprocess_model}...", file=sys.stderr)
-        linked_docs = process_docs(linked_docs, title, points, preprocess_model, args.threshold, args.max_length)
-        tag_similar_docs = process_docs(tag_similar_docs, title, points, preprocess_model, args.threshold, args.max_length)
+    linked_docs_set = set(d['path'] for d in linked_docs)
+    tag_similar_docs = list(
+        t for t in tag_similar_docs if t['path'] not in linked_docs_set
+    )
 
     outline = {
         'headlines': [title] if title else [],
         'points': points,
-        'queries': queries,
-        'linked_docs': linked_docs,
+        'linked_docs': list(linked_docs),
         'tag_similar_docs': tag_similar_docs
     }
 
     write_json(args.output, outline)
     print(f'Wrote {args.output}', file=sys.stderr)
+
+if __name__ == '__main__':
+    p = argparse.ArgumentParser()
+    p.add_argument('--input', required=True, help='Input note path')
+    p.add_argument('--output', required=True, help='Output JSON path')
+    p.add_argument('--zettel-dir', help='Override Zettelkasten directory')
+    # Filter args
+    p.add_argument('--filter', action='store_true', help='Enable LLM-based relevance filtering')
+    p.add_argument('--threshold', type=int, default=4, help='Relevance score threshold (0-10)')
+    p.add_argument('--max-length', type=int, default=2000, help='Max content length before summarization')
+
+    args = p.parse_args()
+
+    preprocess(args)

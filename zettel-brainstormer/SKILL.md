@@ -9,7 +9,7 @@ This skill formalizes the process of taking a rough idea or draft and enriching 
 
 ## New Dual-Stage Workflow
 
-This skill now supports a two-stage pipeline to balance cost and quality:
+This skill now supports a 3-stage pipeline to balance cost and quality:
 
 1) Preprocess & Extraction (cheap model)
 
@@ -19,11 +19,20 @@ This skill now supports a two-stage pipeline to balance cost and quality:
   - Minimal bibliography/search queries
   - **Wikilinked documents** (follows [[wikilinks]] N levels deep, up to M total docs)
   - **Tag-similar documents** (finds notes with overlapping tags)
-- Output format (JSON): `{"headlines":[], "points":[], "queries":[], "linked_docs":[], "tag_similar_docs":[]}`.
+- Output format (JSON): `{"headlines":[], "points":[], "linked_docs":[], "tag_similar_docs":[]}`.
 
-2) Draft & Humanize (pro model)
+2) Subagent: Read and preprocess each documents
 
-- Use a pro model (configurable; default: openai/gpt-5.2) to expand the best outline into a full draft.
+Use a fast model to read and preprocess each document gathered from Stage 1. For each document in the linked_docs:
+
+- Read the document.
+- Find out the relevance of the document to the seed note, discard if not relevant.
+- Summarize the document if too long.
+- Output format in Markdown text.
+
+3) Draft & Humanize (pro model)
+
+- Use a pro model (configurable; default: openai/gpt-5.2) to gather the markdown output from all pre-processed documents from subagents in stage 2.
 - Post-process the draft with if exists, to make voice natural. Use the `humanizer` skill if available.
 - Add proper Obsidian properties, tags, and links. Use the `obsidian` skill if available. Pick up properties and follow examples from other obsidian notes to keep the style consistent.
 
@@ -34,9 +43,8 @@ This skill includes the following resources under the skill folder:
 - scripts/preprocess.py  -- extract key points, wikilinks, queries, and filters relevance
 - scripts/draft.py       -- call pro model with outline + references, produce final Markdown
 - scripts/obsidian_utils.py -- shared utilities for wikilink extraction
-- scripts/llm_utils.py   -- shared utilities for LLM API calls
 - references/templates.md -- output templates, headline/lead examples, tone guide
-- config/models.json     -- user-selectable model and research settings
+- config/models.example.json  -- example configuration file for user-selectable model and research settings
 
 ## Configuration & Setup
 
@@ -61,14 +69,6 @@ This will create `config/models.json` with your preferences. You can press ENTER
 To change settings later, you can edit `config/models.json` directly or re-run `scripts/setup.py`.
 
 **Note**: When using this skill, the agent will inform you of the current link_depth and max_links settings in the final result.
-
-### 🔑 API Key Configuration
-The `scripts/draft.py` and `scripts/preprocess.py` (with `--filter`) scripts rely on an OpenAI-compatible API to generate content.
-You must set the `OPENAI_API_KEY` environment variable before running these scripts.
-
-- **OpenAI**: Set `OPENAI_API_KEY` to your OpenAI key.
-- **OpenRouter**: Set `OPENAI_API_KEY` to your OpenRouter key. The scripts will automatically detect if the model name contains "openrouter" or "/" and adjust the base URL accordingly.
-
 
 
 ## Usage
