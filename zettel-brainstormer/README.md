@@ -1,28 +1,44 @@
-Zettel Brainstormer — public package
+# Zettel Brainstormer
 
-This package contains the zettel-brainstormer skill.
+An AI-powered skill for expanding **Zettelkasten** notes into comprehensive writing drafts.
 
-# Overview
+## Overview
 
-- Two-stage pipeline: preprocess (configurable, e.g. OpenRouter kimi-k2.5) -> draft (pro model, configurable) -> optional humanizer.
-- Scripts provided are safe by default: they run in "stub" mode unless environment variables are set to enable real API calls.
+This skill provides a **two-stage pipeline** to transform your atomic notes into a coherent draft:
+1.  **Preprocess**: Scans a seed note, extracts wikilinks, finds similar notes via tags, filters for relevance using an LLM, and generates a structured outline.
+2.  **Draft**: Consumes the outline and context to generate a high-quality Markdown draft using a Pro LLM (e.g., GPT-4o, Claude 3.5 Sonnet).
 
-# Install
+## Documentation
 
+**👉 See [SKILL.md](SKILL.md) for full installation, configuration, and usage instructions.**
+
+## Quick Start
+
+### Prerequisites
+-   Python 3.10+
+-   `OPENAI_API_KEY` (or OpenRouter key) set in environment.
+
+### Installation
 ```bash
-npx skills install https://github.com/hxy9243/skills/tree/main/zettel-brainstormer
+# Clone repository
+git clone https://github.com/hxy9243/skills.git
+cd skills/zettel-brainstormer
 ```
 
-# Quick start (safe mode)
+### Usage
+```bash
+# 1. Generate Outline (and filter context)
+python3 scripts/preprocess.py \
+  --input "path/to/my-seed-note.md" \
+  --output "outline.json" \
+  --zettel-dir "path/to/my-vault" \
+  --filter --threshold 5
 
-1. Inspect the sample input: examples/sample-note.md
-2. Run preprocess:
-   ./scripts/preprocess.py --input examples/sample-note.md --output /tmp/outline.json
-3. Run draft:
-   ./scripts/draft.py --outline /tmp/outline.json --model openai/gpt-5.2 --out /tmp/draft.md
+# 2. Generate Draft
+python3 scripts/draft.py \
+  --outline "outline.json" \
+  --out "draft.md"
+```
 
-Enabling real API calls
-- To enable OpenRouter/OpenAI calls, set the environment variables OPENROUTER_API_KEY and OPENAI_API_KEY and also set REAL_API=1 in the environment. The scripts will refuse to run with live credentials otherwise.
-
-License
-- MIT. See LICENSE file.
+## License
+MIT
