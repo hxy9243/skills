@@ -7,11 +7,13 @@ description: It reads from your local zettelkasten notes, find a random idea, an
 
 This skill formalizes the process of taking a rough idea or draft and enriching it with deep research, diverse perspectives, and structured brainstorming.
 
-## New Dual-Stage Workflow
+The configuration file is `config/models.json`, which can be edited manually or using the `setup.py` script.
+
+## New 3-Stage Workflow
 
 This skill now supports a 3-stage pipeline to balance cost and quality:
 
-1) Preprocess & Extraction (cheap model)
+1) Preprocess & Extraction (with preprocess_model)
 
 - Run a lightweight extraction step to produce:
   - Short bullet-point keypoints
@@ -21,16 +23,15 @@ This skill now supports a 3-stage pipeline to balance cost and quality:
   - **Tag-similar documents** (finds notes with overlapping tags)
 - Output format (JSON): `{"headlines":[], "points":[], "linked_docs":[], "tag_similar_docs":[]}`.
 
-2) Subagent: Read and preprocess each documents
+2) Subagent: Read and preprocess each documents (with preprocess_model)
 
-Use a fast model to read and preprocess each document gathered from Stage 1. For each document in the linked_docs:
-
+- Use a fast model to read and preprocess each document gathered from Stage 1. For each document in the linked_docs:
 - Read the document.
 - Find out the relevance of the document to the seed note, discard if not relevant.
 - Summarize the document if too long.
 - Output format in Markdown text.
 
-3) Draft & Humanize (pro model)
+3) Draft & Humanize (with pro_model)
 
 - Use a pro model (configurable; default: openai/gpt-5.2) to gather the markdown output from all pre-processed documents from subagents in stage 2.
 - Post-process the draft with if exists, to make voice natural. Use the `humanizer` skill if available.
@@ -41,7 +42,7 @@ Use a fast model to read and preprocess each document gathered from Stage 1. For
 This skill includes the following resources under the skill folder:
 
 - scripts/preprocess.py  -- extract key points, wikilinks, queries, and filters relevance
-- scripts/draft.py       -- call pro model with outline + references, produce final Markdown
+- scripts/draft_prompt.py -- generate prompt for agent with outline + references
 - scripts/obsidian_utils.py -- shared utilities for wikilink extraction
 - references/templates.md -- output templates, headline/lead examples, tone guide
 - config/models.example.json  -- example configuration file for user-selectable model and research settings
@@ -82,7 +83,7 @@ To change settings later, you can edit `config/models.json` directly or re-run `
      - Generates search queries using `preprocess_model`.
      - Filters out irrelevant docs using `preprocess_model` (if `--filter` is used).
   4. Research using configured search_skill (if not "none")
-  5. Draft: `scripts/draft.py --outline /tmp/outline.json --model <pro_model> --out /tmp/draft.md`
+  5. Prompt Gen: `scripts/draft_prompt.py --outline /tmp/outline.json --out /tmp/prompt.md`
   6. (Optional) Humanize: `humanizer --in /tmp/draft.md --out /tmp/draft.human.md`
   7. Append result to seed note or save to output_dir
   8. **Inform user**: "Extracted wikilinks with depth=N, max_links=M using search_skill=<skill>"

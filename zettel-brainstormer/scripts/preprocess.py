@@ -74,7 +74,7 @@ def preprocess(args):
         zettel_dir = Path(config.get('zettel_dir')).expanduser()
     link_depth = config.get('link_depth', 2)
     max_links = config.get('max_links', 10)
-    # Use preprocess model for queries and filtering
+
     preprocess_model = config.get('preprocess_model', 'openrouter/x-ai/kimi-k2.5')
 
     seed_path = Path(args.input).expanduser()
@@ -134,9 +134,6 @@ if __name__ == '__main__':
     p.add_argument('--input', required=True, help='Input note path')
     p.add_argument('--output', required=True, help='Output JSON path')
     p.add_argument('--zettel-dir', help='Override Zettelkasten directory')
-    # Filter args
-    p.add_argument('--filter', action='store_true', help='Enable LLM-based relevance filtering')
-    p.add_argument('--threshold', type=int, default=4, help='Relevance score threshold (0-10)')
     p.add_argument('--max-length', type=int, default=2000, help='Max content length before summarization')
 
     args = p.parse_args()
