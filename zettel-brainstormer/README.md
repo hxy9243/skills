@@ -4,9 +4,10 @@ An AI-powered skill for expanding **Zettelkasten** notes into comprehensive writ
 
 ## Overview
 
-This skill provides a **two-stage pipeline** to transform your atomic notes into a coherent draft:
-1.  **Preprocess**: Scans a seed note, extracts wikilinks, finds similar notes via tags, filters for relevance using an LLM, and generates a structured outline.
-2.  **Draft**: Consumes the outline and context to generate a high-quality Markdown draft using a Pro LLM (e.g., GPT-4o, Claude 3.5 Sonnet).
+This skill provides a **3-stage pipeline** to transform your atomic notes into a coherent draft:
+1.  **Find Links**: Scans a seed note, extracts wikilinks, finds similar notes via tags, and generates a list of file paths.
+2.  **Preprocess**: Reads the files and context to generate a high-quality Markdown outline using subagent.
+3.  **Draft**: Reads the outline and context to generate a high-quality Markdown draft using a Pro LLM.
 
 ## Documentation
 
@@ -24,6 +25,12 @@ This skill provides a **two-stage pipeline** to transform your atomic notes into
 # Clone repository
 npx skills install https://github.com/hxy9243/skills/blob/main/zettel-brainstormer/
 ```
+
+### Usage
+
+1. Prompt your AI Agent to configure the skill.
+2. Prompt your AI Agent to run the skill.
+
 
 ## License
 MIT

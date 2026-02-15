@@ -1,4 +1,3 @@
-```
 # Templates & Tone Guide
 
 ## Goal
@@ -16,6 +15,8 @@ Organize the draft with clear, descriptive headlines for each major keypoint or 
 1.  **Comprehensive Coverage**: Ensure every distinct point, argument, and piece of evidence from the references is included.
 2.  **Detail Optimization**: Be detailed but not verbose. Use precise language to explain complex ideas fully without fluff.
 3.  **Synthesis**: Connect ideas between different references where applicable, but maintain the integrity of the original points.
+4.  **Reflections**: Add your own reflections on the topic.
+5.  **References**: Always include a `## References` section at the end of the draft, listing all the notes that were referenced in the draft.
 
 ## Tone
 - **Authoritative yet Curious**: Write with confidence but remain open to the nuances of the topics.
@@ -26,4 +27,4 @@ Always append under `## 🧠 Brainstorming (YYYY-MM-DD)` with a provenance line.
 
 ## References
 Always include a `## References` section at the end of the draft, listing all the notes that were referenced in the draft.
-```
+This is very important and is the whole point of the zettelkasten exercise.

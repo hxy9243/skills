@@ -13,38 +13,39 @@ The configuration file is `config/models.json`, which can be edited manually or 
 
 This skill now supports a 3-stage pipeline to balance cost and quality:
 
-1) Preprocess & Extraction (with preprocess_model)
+1) Find References (with `find_links.py`)
 
-- Run a lightweight extraction step to produce:
-  - Short bullet-point keypoints
-  - Candidate headings and tags
-  - Minimal bibliography/search queries
+- Run `scripts/find_links.py` to identify relevant existing notes.
   - **Wikilinked documents** (follows [[wikilinks]] N levels deep, up to M total docs)
   - **Tag-similar documents** (finds notes with overlapping tags)
-- Output format (JSON): `{"headlines":[], "points":[], "linked_docs":[], "tag_similar_docs":[]}`.
+- Output: A JSON list of absolute file paths to relevant notes.
 
-2) Subagent: Read and preprocess each documents (with preprocess_model)
+2) Subagent: Preprocess contents (with `preprocess_model`)
 
-- Use a fast model to read and preprocess each document gathered from Stage 1. For each document in the linked_docs:
-- Read the document.
-- Find out the relevance of the document to the seed note, discard if not relevant.
-- Summarize the document if too long.
-- Output format in Markdown text.
+- The agent iterates through the list of files found in Stage 1.
+- For each file:
+  - Read the file content.
+  - Apply `templates/preprocess.md` using the `preprocess_model`, pass the seed note keypoints and file content as context.
+  - Extract: Relevance score, Summary, Key Points, and Quotes.
+  - Output: A structured markdown summary of the note.
 
-3) Draft & Humanize (with pro_model)
+3) Draft & Humanize (with `pro_model`)
 
-- Use a pro model (configurable; default: openai/gpt-5.2) to gather the markdown output from all pre-processed documents from subagents in stage 2.
-- Add proper Obsidian properties, tags, and links. Use the `obsidian` skill if available. Pick up properties and follow examples from other obsidian notes to keep the style consistent.
+- Gather all preprocessed markdown outputs from Stage 2.
+- Apply `templates/draft.md` using the `pro_model`.
+- Synthesize points, add proper Obsidian properties, tags, and links.
+- Uses the `obsidian` skill if available to match style.
 
 ## Files & Scripts
 
 This skill includes the following resources under the skill folder:
 
-- scripts/preprocess.py  -- extract key points, wikilinks, queries, and filters relevance
-- scripts/draft_prompt.py -- generate prompt for agent with outline + references
-- scripts/obsidian_utils.py -- shared utilities for wikilink extraction
-- references/templates.md -- output templates, headline/lead examples, tone guide
-- config/models.example.json  -- example configuration file for user-selectable model and research settings
+- `scripts/find_links.py`  -- finds relevant note paths (linked + tag similar)
+- `scripts/draft_prompt.py` -- (Deprecated) generate prompt for agent
+- `scripts/obsidian_utils.py` -- shared utilities for wikilink extraction
+- `templates/preprocess.md` -- Instructions for subagent to extract info from single note
+- `templates/draft.md` -- Instructions for final draft generation
+- `config/models.example.json`  -- example configuration file
 
 ## Configuration & Setup
 
@@ -66,61 +67,24 @@ This will create `config/models.json` with your preferences. You can press ENTER
 - `link_depth`: How many levels deep to follow [[wikilinks]] (N levels, default: 2)
 - `max_links`: Maximum total linked notes to include (M links, default: 10)
 
-To change settings later, you can edit `config/models.json` directly or re-run `scripts/setup.py`.
-
-**Note**: When using this skill, the agent will inform you of the current link_depth and max_links settings in the final result.
-
-
 ## Usage
 
 - Trigger when user asks: "brainstorm X", "expand this draft", "research and add notes to <path>".
 - Example workflow (pseudo):
-  1. If not configured, config will use agent's current model by default (or run `python scripts/setup.py` for custom settings)
-  2. Pick a random seed note from zettelkasten
-  3. Preprocess: `scripts/preprocess.py --input <seed_note> --output /tmp/outline.json --filter`
-     - This automatically extracts wikilinks (depth=N, max=M) and tag-similar docs.
-     - Generates search queries using `preprocess_model`.
-     - Filters out irrelevant docs using `preprocess_model` (if `--filter` is used).
-  4. Research using configured search_skill (if not "none")
-  5. Prompt Gen: `scripts/draft_prompt.py --outline /tmp/outline.json --out /tmp/prompt.md`
-  6. Append result to seed note or save to output_dir
-  7. **Inform user**: "Extracted wikilinks with depth=N, max_links=M using search_skill=<skill>"
+  1. Pick a seed note.
+  2. Find Links: `python scripts/find_links.py --input <seed_note> --output /tmp/paths.json`
+  3. Preprocess Subagent Loop:
+     - Load `/tmp/paths.json`.
+     - For each path, read content.
+     - Prompt `preprocess_model` with `templates/preprocess.md` + content.
+     - Store result.
+  4. Final Draft:
+     - Concatenate seed note + all preprocess results.
+     - Prompt `pro_model` with `templates/draft.md` + concatenated context.
+  5. Save result to note.
 
 ## Notes for maintainers
 
 - Keep preprocess outputs small (200-600 tokens) to save cost.
 - Ensure all external links are included in the `References` section with full titles and URLs.
-- When appending, always include a timestamp and short provenance line (e.g., "Generated by writing-brainstormer; preprocessed with kimi-k2.5; draft with gpt-5.2").
-
-## Example Output Format (unchanged)
-
-```markdown
-# PROMPT FOR AGENT
-
-**System**:
-You are an expert writer and researcher.
-
-...
-
-**User**:
-
-    Please write a comprehensive draft based on the following outline and context.
-
-    # Title: The Power of Connected Thought
-
-    # Key Points to Cover:
-    [
-      "# Seed Note: The Power of Connected Thought",
-      "I want to explore how connecting ideas leads to better thinking.",
-      "I have some notes on [[Example Note A]] and [[Example Note B]].",
-      ...
-    ]
-
-    # Context Material:
-    ## Referenced Notes
-    ### Note: Example Note A
-    **Relevance: 5/10**
-    ...
-```
-
-*If API key is present, the output will be a full Markdown draft.*
+- When appending, always include a timestamp and short provenance line.
