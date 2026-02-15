@@ -34,7 +34,6 @@ This skill now supports a 3-stage pipeline to balance cost and quality:
 3) Draft & Humanize (with pro_model)
 
 - Use a pro model (configurable; default: openai/gpt-5.2) to gather the markdown output from all pre-processed documents from subagents in stage 2.
-- Post-process the draft with if exists, to make voice natural. Use the `humanizer` skill if available.
 - Add proper Obsidian properties, tags, and links. Use the `obsidian` skill if available. Pick up properties and follow examples from other obsidian notes to keep the style consistent.
 
 ## Files & Scripts
@@ -84,9 +83,8 @@ To change settings later, you can edit `config/models.json` directly or re-run `
      - Filters out irrelevant docs using `preprocess_model` (if `--filter` is used).
   4. Research using configured search_skill (if not "none")
   5. Prompt Gen: `scripts/draft_prompt.py --outline /tmp/outline.json --out /tmp/prompt.md`
-  6. (Optional) Humanize: `humanizer --in /tmp/draft.md --out /tmp/draft.human.md`
-  7. Append result to seed note or save to output_dir
-  8. **Inform user**: "Extracted wikilinks with depth=N, max_links=M using search_skill=<skill>"
+  6. Append result to seed note or save to output_dir
+  7. **Inform user**: "Extracted wikilinks with depth=N, max_links=M using search_skill=<skill>"
 
 ## Notes for maintainers
 

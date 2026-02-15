@@ -54,9 +54,10 @@ def generate_prompt(outline, templates_content=None):
     if templates_content:
         system_prompt += f"\n\nUse the following templates and style guide:\n{templates_content}"
 
-    system_prompt += """\n\nIMPORTANT: Focus on the core idea presented in the outline.
-Filter out irrelevant or tangential information from the context notes.
-It is okay to not include everything. Your goal is a coherent, focused draft."""
+    system_prompt += """\n\nIMPORTANT:
+1. Synthesize ALL relevant information from the context notes.
+2. Follow the structure and formatting defined in the templates.
+3. Your goal is a comprehensive, detailed draft that leaves no key insight behind."""
 
     # Construct user prompt
     user_prompt = f"""
@@ -96,8 +97,7 @@ if __name__ == '__main__':
     prompt_content = generate_prompt(outline, templates_content)
 
     if args.out:
-        Path(p).write_text(s, encoding='utf-8')
+        Path(args.out).write_text(prompt_content, encoding='utf-8')
+        print(f'Wrote prompt to file: {args.out}')
     else:
         print(prompt_content)
-
-    print(f'Wrote prompt to {args.out}')
