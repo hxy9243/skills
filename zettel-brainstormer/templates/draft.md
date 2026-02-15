@@ -14,7 +14,7 @@ Organize the draft with clear, descriptive headlines for each major keypoint or 
 ## Content Requirements
 1.  **Comprehensive Coverage**: Ensure every distinct point, argument, and piece of evidence from the references is included.
 2.  **Detail Optimization**: Be detailed but not verbose. Use precise language to explain complex ideas fully without fluff.
-3.  **Synthesis**: Connect ideas between different references where applicable, but maintain the integrity of the original points.
+3.  **Synthesis**: Connect ideas between different references where applicable, but maintain the integrity of the original points. When writing a keypoint that is derived from a note, always include use the format `[[note_title]]`. This is **very important** for a brainstorming note to trace ideas back to original references.
 4.  **Reflections**: Add your own reflections on the topic.
 5.  **References**: Always include a `## References` section at the end of the draft, listing all the notes that were referenced in the draft.
 
@@ -26,5 +26,5 @@ Organize the draft with clear, descriptive headlines for each major keypoint or 
 Always append under `## 🧠 Brainstorming (YYYY-MM-DD)` with a provenance line.
 
 ## References
-Always include a `## References` section at the end of the draft, listing all the notes that were referenced in the draft.
-This is very important and is the whole point of the zettelkasten exercise.
+**Always** include a `## References` section at the end of the draft, listing all the notes that were referenced in the draft.
+This is **very important** and is the whole point of the zettelkasten exercise.
