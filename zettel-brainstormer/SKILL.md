@@ -62,6 +62,14 @@ To change settings later, you can edit `config/models.json` directly or re-run `
 
 **Note**: When using this skill, the agent will inform you of the current link_depth and max_links settings in the final result.
 
+### 🔑 API Key Configuration
+The `scripts/draft.py` and `scripts/preprocess.py` (with `--filter`) scripts rely on an OpenAI-compatible API to generate content.
+You must set the `OPENAI_API_KEY` environment variable before running these scripts.
+
+- **OpenAI**: Set `OPENAI_API_KEY` to your OpenAI key.
+- **OpenRouter**: Set `OPENAI_API_KEY` to your OpenRouter key. The scripts will automatically detect if the model name contains "openrouter" or "/" and adjust the base URL accordingly.
+
+
 
 ## Usage
 
@@ -88,22 +96,32 @@ To change settings later, you can edit `config/models.json` directly or re-run `
 ## Example Output Format (unchanged)
 
 ```markdown
-... [Original Draft Content] ...
+# PROMPT FOR AGENT
 
----
+**System**:
+You are an expert writer and researcher.
 
-# 🧠 Brainstorming on [Title] (2026-02-07)
+...
 
-## 🧊 Core Metaphor: The Iceberg
-[Core idea...]
+**User**:
 
-## Follow Up Titles
-[Expansion of the idea...]
+    Please write a comprehensive draft based on the following outline and context.
 
-## 📚 References
-*   **James C. Scott:** *Seeing Like a State* — Discusses Metis vs Techne...
-*   **Gall's Law:** [[Link]]
-*   **@user on X:** Argues that [point] ... [[Link]]
+    # Title: The Power of Connected Thought
 
-Tags: #brainstorming #research #zettelkasten
+    # Key Points to Cover:
+    [
+      "# Seed Note: The Power of Connected Thought",
+      "I want to explore how connecting ideas leads to better thinking.",
+      "I have some notes on [[Example Note A]] and [[Example Note B]].",
+      ...
+    ]
+
+    # Context Material:
+    ## Referenced Notes
+    ### Note: Example Note A
+    **Relevance: 5/10**
+    ...
 ```
+
+*If API key is present, the output will be a full Markdown draft.*
