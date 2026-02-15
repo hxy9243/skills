@@ -16,28 +16,13 @@ This skill provides a **two-stage pipeline** to transform your atomic notes into
 
 ### Prerequisites
 -   Python 3.10+
--   `OPENAI_API_KEY` (or OpenRouter key) set in environment.
+-   Your favorite AI Agent system (OpenCode, Cursor, OpenClaw, etc.)
+-   Optionally, `OPENAI_API_KEY` (or OpenRouter key) set in environment.
 
 ### Installation
 ```bash
 # Clone repository
-git clone https://github.com/hxy9243/skills.git
-cd skills/zettel-brainstormer
-```
-
-### Usage
-```bash
-# 1. Generate Outline (and filter context)
-python3 scripts/preprocess.py \
-  --input "path/to/my-seed-note.md" \
-  --output "outline.json" \
-  --zettel-dir "path/to/my-vault" \
-  --filter --threshold 5
-
-# 2. Generate Draft
-python3 scripts/draft.py \
-  --outline "outline.json" \
-  --out "draft.md"
+npx skills install https://github.com/hxy9243/skills/blob/main/zettel-brainstormer/
 ```
 
 ## License
