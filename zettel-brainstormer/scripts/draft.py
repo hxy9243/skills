@@ -6,7 +6,6 @@ Usage: draft.py --outline outline.json --model openai/gpt-4o --out draft.md
 import sys
 import json
 import argparse
-import os
 from pathlib import Path
 from config_manager import ConfigManager
 from llm_utils import call_llm
