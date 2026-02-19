@@ -8,12 +8,20 @@ def mix_audio(voice_file, bg_music, output_file, volume=0.08):
     """
     Mix voice audio with background music using ffmpeg.
     """
+    # Resolve relative paths to absolute paths
+    voice_file = os.path.abspath(os.path.expanduser(voice_file))
+    bg_music = os.path.abspath(os.path.expanduser(bg_music))
+    output_file = os.path.abspath(os.path.expanduser(output_file))
+
     if not os.path.exists(voice_file):
         print(f"Error: Voice file {voice_file} not found.")
         return False
     if not os.path.exists(bg_music):
         print(f"Error: Background music {bg_music} not found.")
         return False
+
+    # Ensure output directory exists
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
     # Filter complex: 
     # [1:a]volume=0.08[bg]; mix the background music at low volume
