@@ -7,6 +7,10 @@ description: This skill maintains the Note Embeddings for Zettelkasten, to searc
 
 This skill provides a suite of idempotent Python scripts to embed, search, and link notes in an Obsidian vault using semantic similarity. All scripts live in `scripts/` and support multiple embedding providers.
 
+The skill should be triggered when the user wants to search notes, retrieve notes, or discover connections between notes.
+
+If the search directory is indexed with embeddings, the skill should prompt the user if they want to create new embeddings.
+
 ## Dependencies
 
 - uv 0.10.0+
