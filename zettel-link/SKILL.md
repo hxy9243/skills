@@ -5,79 +5,121 @@ description: This skill maintains the Note Embeddings for Zettelkasten, to searc
 
 # Zettel Link Skill
 
-This skill provides a suite of idempotent Python scripts to audit and improve an Obsidian vault. All scripts live in `scripts/` and are designed to be installed in the agent's skill directory.
+This skill provides a suite of idempotent Python scripts to embed, search, and link notes in an Obsidian vault using semantic similarity. All scripts live in `scripts/` and support multiple embedding providers.
 
 ## Dependencies
 
 - uv 0.10.0+
 - Python 3.10+
-- Optional: [Ollama](https://ollama.com) with `mxbai-embed-large` (for local embedding  only)
+- One of the following embedding providers:
+  - [Ollama](https://ollama.com) with `mxbai-embed-large` (local, default)
+  - [OpenAI API](https://platform.openai.com/) with `text-embedding-3-small`
+  - [Google Gemini API](https://ai.google.dev/) with `text-embedding-004`
 
 ## Overview of Commands
 
 - `uv run scripts/config.py`: Configure the embedding model and other settings.
-- `uv run scripts/embed.py`: Embed notes via Ollama, cache to `.embeddings/`
-- `uv run scripts/link.py`: Find conceptually related notes regardless of shared vocabulary, using local vector embeddings.
-- `uv run scripts/search.py`: Search notes via Ollama, cache to `.embeddings/`
+- `uv run scripts/embed.py`: Embed notes and cache to `.embeddings/embeddings.json`
+- `uv run scripts/search.py`: Semantic search over embedded notes
+- `uv run scripts/link.py`: Discover semantic connections, output to `.embeddings/links.json`
 
 ## Workflow
 
-### Step 0 - Setup and Config
+### Step 0 — Setup and Config
 
-If the `config/config.json` file does not exist, create it with the following command:
+If the `config/config.json` file does not exist, create it:
 
 ```bash
 uv run scripts/config.py
 ```
 
-It will create a `config/config.json` file, for example:
+This creates `config/config.json` with defaults:
 
 ```json
 {
     "model": "mxbai-embed-large",
     "provider": {
         "name": "ollama",
-        "host": "http://localhost:11434"
+        "url": "http://localhost:11434"
     },
-    "max_length": 8192,
+    "max_input_length": 8192,
     "cache_dir": ".embeddings",
     "default_threshold": 0.65,
-    "top_k": 5
+    "top_k": 5,
+    "skip_dirs": [".obsidian", ".trash", ".embeddings", "Spaces", "templates"],
+    "skip_files": ["CLAUDE.md", "Vault.md", "Dashboard.md", "templates.md"]
 }
 ```
 
-### Step 1 - Create Embeddings
+To use a remote provider:
 
 ```bash
-uv run scripts/embed.py --config config/config.json --input <directory>
+# OpenAI
+uv run scripts/config.py --provider openai
+
+# Gemini
+uv run scripts/config.py --provider gemini
+
+# Custom model
+uv run scripts/config.py --provider openai --model text-embedding-3-large
 ```
 
-It will create a `<directory>/.embeddings/embeddings.json` file with the embedding cache.
-
-### Step 2 - Semantic Search
+To adjust tuning parameters:
 
 ```bash
-uv run scripts/search.py --config config/config.json --input <directory> --query "<query>"
+uv run scripts/config.py --top-k 10 --threshold 0.7 --max-input-length 4096
 ```
 
-It will embed the query and compare it with the cached embeddings of all notes. It will return the top-k most similar notes.
-
-### Step 3 - Semantic Connection Discovery
-
-Find conceptually related notes regardless of shared vocabulary, using local vector embeddings.
+### Step 1 — Create Embeddings
 
 ```bash
-uv run scripts/link.py --config config/config.json --input <directory>
+uv run scripts/embed.py --input <directory>
 ```
 
-It will create a `<directory>/.embeddings/links.json` file with the link cache.
+This creates `<directory>/.embeddings/embeddings.json` with the embedding cache.
 
-**How it works:**
-- Each note is converted to a vector via the given embedding model.
-- Cosine similarity is computed for all pairs.
+- **Incremental updates**: Only re-embeds files that have been modified since the last run (based on file modification time).
+- **Text truncation**: Automatically truncates text to `max_input_length` before embedding.
+- **Stale pruning**: Removes entries for files that no longer exist.
+- **Force re-embed**: Use `--force` to re-embed everything.
 
-**Tuning:**
+### Step 2 — Semantic Search
 
-**Cache location:** `<directory>/.embeddings/embeddings.pkl` — delete to force full re-embed.
+```bash
+uv run scripts/search.py --input <directory> --query "<query>"
+```
+
+This embeds the query using the configured provider and compares it with all cached embeddings, returning the `top_k` most similar notes.
+
+Results are saved to `<directory>/.embeddings/search_results.json`.
+
+### Step 3 — Semantic Connection Discovery
+
+```bash
+uv run scripts/link.py --input <directory>
+```
+
+This computes cosine similarity for all note pairs and outputs connections above the `default_threshold` to `<directory>/.embeddings/links.json`.
+
+The output includes:
+- A flat list of all link pairs with scores
+- A per-note grouping for easy lookup
+
+**Tuning**: Adjust `--threshold` to widen or narrow the connection discovery.
+
+## Cache
+
+- **Format**: JSON with metadata envelope (`metadata` + `data`)
+- **Location**: `<directory>/.embeddings/embeddings.json`
+- **Metadata**: Tracks generation timestamp, model, provider, embedding size
+- **Invalidation**: Based on file modification time (`mtime`)
+- **Force rebuild**: Delete the cache file or use `--force` flag
 
 ## Agent Instructions
+
+When using this skill:
+
+1. Always run `config.py` first if `config/config.json` does not exist.
+2. Run `embed.py` before `search.py` or `link.py` — the cache must exist.
+3. For remote providers (openai, gemini), ensure the API key environment variable is set.
+4. All scripts are idempotent and safe to re-run.

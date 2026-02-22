@@ -7,5 +7,12 @@
     "max_input_length": 8192,
     "cache_dir": ".embeddings",
     "default_threshold": 0.65,
-    "top_k": 5
+    "top_k": 5,
+    "skip_dirs": [
+        ".obsidian", ".trash", ".smart-env", ".makemd", ".space",
+        ".claude", ".embeddings", "Spaces", "templates"
+    ],
+    "skip_files": [
+        "CLAUDE.md", "Vault.md", "Dashboard.md", "templates.md"
+    ]
 }

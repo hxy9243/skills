@@ -6,10 +6,10 @@ A suite of Python scripts for semantically searching and linking notes in an Obs
 
 ```
 scripts/
-├── config.py # Configure the embedding model and other settings.
-├── embed.py  # Embed notes via Ollama (e.g. mxbai-embed-large), cached
-├── search.py # Search notes via Ollama (e.g. mxbai-embed-large), cached
-└── link.py   # Cosine similarity ranking → links.json
+├── config.py # Configure the embedding model and provider
+├── embed.py  # Embed notes, cached to .embeddings/embeddings.json
+├── search.py # Semantic search over embedded notes
+└── link.py   # All-pairs similarity → .embeddings/links.json
 ```
 
 ## Quick Start
@@ -24,9 +24,21 @@ npx skills install https://github.com/hxy9243/skills/blob/main/zettel-link/
 
 - uv 0.10.0+
 - Python 3.10+
-- Optional: [Ollama](https://ollama.com) with `mxbai-embed-large` (for local embedding only)
+- One of:
+  - [Ollama](https://ollama.com) with `mxbai-embed-large` (local, default)
+  - [OpenAI API](https://platform.openai.com/) with `text-embedding-3-small`
+  - [Google Gemini API](https://ai.google.dev/) with `text-embedding-004`
+
+## Supported Providers
+
+| Provider | Default Model            | API Key Env     |
+|----------|--------------------------|-----------------|
+| ollama   | mxbai-embed-large        | *(none)*        |
+| openai   | text-embedding-3-small   | OPENAI_API_KEY  |
+| gemini   | text-embedding-004       | GEMINI_API_KEY  |
 
 ## Idempotency
 
 All scripts are safe to re-run:
-- `embed.py` uses content-hash caching,only re-embeds changed notes
+- `embed.py` uses mtime-based caching — only re-embeds changed notes
+- `search.py` and `link.py` are read-only against the cache
