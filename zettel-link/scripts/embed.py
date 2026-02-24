@@ -46,6 +46,32 @@ HTML_RE = re.compile(r'<[^>]+>')
 URL_RE = re.compile(r'https?://\S+')
 
 
+from urllib.parse import urlparse
+
+# ── Allowed Endpoints (Exfiltration Guard) ──────────────────────────────────
+
+ALLOWED_DOMAINS = {
+    "openai": ["api.openai.com"],
+    "gemini": ["generativelanguage.googleapis.com"],
+    "ollama": ["localhost", "127.0.0.1"],
+}
+
+
+def validate_url(url: str, provider_name: str) -> None:
+    """Ensure the URL matches the expected official endpoint for the provider."""
+    parsed = urlparse(url)
+    domain = parsed.netloc.split(':')[0]
+    
+    allowed = ALLOWED_DOMAINS.get(provider_name, [])
+    if allowed and domain not in allowed:
+        # If it's a known provider but unknown domain, check if it's explicitly allowed in config
+        # For now, we raise a security warning and exit unless it's a local/custom case.
+        print(f"⚠️  Security Warning: Provider '{provider_name}' is using an unofficial endpoint: {domain}")
+        print(f"   Official domains: {', '.join(allowed)}")
+        print("   To bypass this, use a custom provider name in config or verify the URL.")
+        sys.exit(1)
+
+
 # ── Text cleaning ────────────────────────────────────────────────────────────
 
 def clean_text(content: str) -> str:
@@ -65,6 +91,8 @@ def clean_text(content: str) -> str:
 def embed_ollama(text: str, model: str, provider: dict) -> list[float]:
     """Embed text via Ollama local API."""
     url = provider["url"].rstrip("/") + "/api/embeddings"
+    validate_url(url, "ollama")
+    
     payload = json.dumps({"model": model, "prompt": text}).encode()
     req = urllib.request.Request(
         url,
@@ -110,6 +138,8 @@ def embed_openai(text: str, model: str, provider: dict) -> list[float]:
         sys.exit(1)
 
     url = provider["url"].rstrip("/") + "/embeddings"
+    validate_url(url, "openai")
+    
     payload = json.dumps({"model": model, "input": text}).encode()
     req = urllib.request.Request(
         url,
@@ -134,14 +164,19 @@ def embed_gemini(text: str, model: str, provider: dict) -> list[float]:
         sys.exit(1)
 
     base_url = provider["url"].rstrip("/")
-    url = f"{base_url}/models/{model}:embedContent?key={api_key}"
+    url = f"{base_url}/v1beta/models/{model}:embedContent"
+    validate_url(url, "gemini")
+
     payload = json.dumps({
         "content": {"parts": [{"text": text}]},
     }).encode()
     req = urllib.request.Request(
         url,
         data=payload,
-        headers={"Content-Type": "application/json"},
+        headers={
+            "Content-Type": "application/json",
+            "x-goog-api-key": api_key,
+        },
         method="POST",
     )
     with urllib.request.urlopen(req, timeout=60) as resp:

@@ -53,6 +53,16 @@ DEFAULT_CONFIG = {
     "cache_dir": ".embeddings",
     "default_threshold": 0.65,
     "top_k": 5,
+    "env": {
+        "OPENAI_API_KEY": {
+            "description": "API key for OpenAI embedding models",
+            "optional": true
+        },
+        "GEMINI_API_KEY": {
+            "description": "API key for Google Gemini embedding models",
+            "optional": true
+        }
+    },
     "skip_dirs": [
         ".obsidian", ".trash", ".smart-env", ".makemd", ".space",
         ".claude", ".embeddings", "Spaces", "templates",
