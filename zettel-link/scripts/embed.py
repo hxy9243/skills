@@ -77,11 +77,36 @@ def embed_ollama(text: str, model: str, provider: dict) -> list[float]:
         return data["embedding"]
 
 
+def get_api_key(env_var_name: str) -> str:
+    """Try to get API key from environment, then from .env file."""
+    # 1. Try environment
+    key = os.environ.get(env_var_name, "")
+    if key:
+        return key
+    
+    # 2. Try .env file in the skill root
+    script_dir = Path(__file__).parent
+    skill_root = script_dir.parent
+    env_file = skill_root / ".env"
+    
+    if env_file.exists():
+        try:
+            with open(env_file, "r") as f:
+                for line in f:
+                    if line.strip().startswith(f"{env_var_name}="):
+                        return line.split("=", 1)[1].strip().strip('"').strip("'")
+        except Exception:
+            pass
+            
+    return ""
+
+
 def embed_openai(text: str, model: str, provider: dict) -> list[float]:
     """Embed text via OpenAI-compatible API."""
-    api_key = os.environ.get(provider.get("api_key_env", "OPENAI_API_KEY"), "")
+    env_var = provider.get("api_key_env", "OPENAI_API_KEY")
+    api_key = get_api_key(env_var)
     if not api_key:
-        print(f"❌ API key not set: {provider.get('api_key_env', 'OPENAI_API_KEY')}")
+        print(f"❌ API key not set: {env_var}")
         sys.exit(1)
 
     url = provider["url"].rstrip("/") + "/embeddings"
@@ -102,9 +127,10 @@ def embed_openai(text: str, model: str, provider: dict) -> list[float]:
 
 def embed_gemini(text: str, model: str, provider: dict) -> list[float]:
     """Embed text via Google Gemini API."""
-    api_key = os.environ.get(provider.get("api_key_env", "GEMINI_API_KEY"), "")
+    env_var = provider.get("api_key_env", "GEMINI_API_KEY")
+    api_key = get_api_key(env_var)
     if not api_key:
-        print(f"❌ API key not set: {provider.get('api_key_env', 'GEMINI_API_KEY')}")
+        print(f"❌ API key not set: {env_var}")
         sys.exit(1)
 
     base_url = provider["url"].rstrip("/")

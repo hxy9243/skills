@@ -37,6 +37,20 @@ npx skills install https://github.com/hxy9243/skills/blob/main/zettel-link/
 | openai   | text-embedding-3-small   | OPENAI_API_KEY  |
 | gemini   | text-embedding-004       | GEMINI_API_KEY  |
 
+## Security
+
+To prevent suspicious environment scanning, `zettel-link` supports loading API keys from a local `.env` file within the skill directory.
+
+1. Create a `.env` file in the skill root.
+2. Add your keys:
+   ```bash
+   OPENAI_API_KEY=your_key_here
+   GEMINI_API_KEY=your_key_here
+   ```
+
+The script will check the environment first, then fallback to the `.env` file.
+
+
 ## Idempotency
 
 All scripts are safe to re-run:

@@ -125,5 +125,5 @@ When using this skill:
 
 1. Always run `config.py` first if `config/config.json` does not exist.
 2. Run `embed.py` before `search.py` or `link.py` — the cache must exist.
-3. For remote providers (openai, gemini), ensure the API key environment variable is set.
+3. For remote providers (openai, gemini), ensure the API key environment variable is set (or provide a local `.env` file in the skill directory).
 4. All scripts are idempotent and safe to re-run.
