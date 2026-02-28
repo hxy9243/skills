@@ -5,8 +5,11 @@ An AI-powered skill for expanding **Zettelkasten** notes into comprehensive writ
 ## Overview
 
 This skill provides a **3-stage pipeline** to transform your atomic notes into a coherent draft:
-1.  **Find Links**: Scans a seed note, extracts wikilinks, finds similar notes via tags, and generates a list of file paths.
-2.  **Preprocess**: Reads the files and context to generate a high-quality Markdown outline using subagent.
+1.  **Find Links**: Scans a seed note and identifies connections. Supports:
+    - **Standard**: Wikilinks and Tag matching.
+    - **`obsidian-cli` (Recommended)**: Uses the native CLI for fast vault indexing.
+    - **`zettel-link` (Optional)**: Semantic discovery for "hidden" connections without explicit links.
+2.  **Preprocess**: Reads the files and context to generate a high-quality Markdown outline using a sub-agent.
 3.  **Draft**: Reads the outline and context to generate a high-quality Markdown draft using a Pro LLM.
 
 ## Documentation

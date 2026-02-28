@@ -18,6 +18,8 @@ This skill now supports a 3-stage pipeline to balance cost and quality:
 - Run `scripts/find_links.py` to identify relevant existing notes.
   - **Wikilinked documents** (follows [[wikilinks]] N levels deep, up to M total docs)
   - **Tag-similar documents** (finds notes with overlapping tags)
+  - **Native Obsidian Integration**: Uses `obsidian-cli` for high-performance indexing and discovery if available.
+  - **Semantic Discovery (Optional)**: Can leverage the `zettel-link` skill for finding "hidden" conceptual connections that don't share explicit tags or links.
 - Output: A JSON list of absolute file paths to relevant notes.
 
 2) Subagent: Preprocess contents (with `preprocess_model`)
@@ -66,6 +68,7 @@ This will create `config/models.json` with your preferences. You can press ENTER
 - `search_skill`: Which search skill to use for web/X research (web_search, brave_search, or none)
 - `link_depth`: How many levels deep to follow [[wikilinks]] (N levels, default: 2)
 - `max_links`: Maximum total linked notes to include (M links, default: 10)
+- `discovery_mode`: Options are `standard` (default), `cli` (uses obsidian-cli), or `semantic` (uses zettel-link).
 
 ## Usage
 
