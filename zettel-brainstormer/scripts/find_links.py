@@ -1,37 +1,39 @@
 #!/usr/bin/env python3
 """
-Find Links script for zettel-brainstormer.
-Extracts paths of wikilinked docs and tag-similar docs.
-Writes JSON list of file paths: ["/path/to/doc1.md", "/path/to/doc2.md", ...]
+Retrieve candidate note paths for zettel brainstorming.
 
-Usage: find_links.py --input note.md --output paths.json
+Usage:
+  python find_links.py --input seed.md --output /tmp/candidates.json [--zettel-dir /path]
 """
-import sys, json, argparse
+
+import argparse
+import json
+import sys
 from pathlib import Path
-from typing import Set, List, Dict
+from typing import List, Set
 
 from config_manager import ConfigManager
 from obsidian_utils import extract_links_recursive, extract_tags
 
-def simple_read(path):
+
+def read_text(path: Path) -> str:
     try:
-        return Path(path).read_text(encoding='utf-8')
+        return path.read_text(encoding="utf-8")
     except Exception:
         return ""
 
-def write_json(path, data):
-    Path(path).write_text(json.dumps(data, indent=2), encoding='utf-8')
+
+def write_json(path: Path, data) -> None:
+    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
 
 def find_tag_similar_docs(
     seed_tags: Set[str],
     zettel_dir: Path,
     seed_path: Path,
-    max_similar: int = 5
+    max_similar: int = 5,
 ) -> List[str]:
-    """
-    Find notes with overlapping tags.
-    Returns list of paths: ['/path/to/doc1.md']
-    """
+    """Return note paths with overlapping tags, sorted by overlap descending."""
     similar = []
 
     for note_path in zettel_dir.rglob("*.md"):
@@ -39,83 +41,78 @@ def find_tag_similar_docs(
             continue
 
         try:
-            content = note_path.read_text(encoding='utf-8')
-            note_tags = extract_tags(content)
-            overlap = len(seed_tags & note_tags)
-
-            if overlap > 0:
-                similar.append({
-                    'path': str(note_path.resolve()),
-                    'overlap': overlap
-                })
-        except Exception as e:
+            content = note_path.read_text(encoding="utf-8")
+        except Exception:
             continue
 
-    # Sort by overlap descending, take top max_similar
-    similar.sort(key=lambda x: x['overlap'], reverse=True)
-    return [s['path'] for s in similar[:max_similar]]
+        note_tags = extract_tags(content)
+        overlap = len(seed_tags & note_tags)
+        if overlap > 0:
+            similar.append({"path": str(note_path.resolve()), "overlap": overlap})
 
-def find_links(args):
-    # Load configuration
+    similar.sort(key=lambda x: x["overlap"], reverse=True)
+    return [item["path"] for item in similar[:max_similar]]
+
+
+def find_links(args) -> None:
     config = ConfigManager.load()
+    retrieval_cfg = config.get("retrieval", {})
+
     if args.zettel_dir:
         zettel_dir = Path(args.zettel_dir).expanduser()
     else:
-        zettel_dir_str = config.get('zettel_dir')
-        if not zettel_dir_str:
-             print("Error: zettel_dir not configured.", file=sys.stderr)
-             sys.exit(1)
-        zettel_dir = Path(zettel_dir_str).expanduser()
+        zettel_dir_value = config.get("zettel_dir")
+        if not zettel_dir_value:
+            print("Error: zettel_dir is not configured.", file=sys.stderr)
+            sys.exit(1)
+        zettel_dir = Path(zettel_dir_value).expanduser()
 
-    link_depth = config.get('link_depth', 2)
-    max_links = config.get('max_links', 10)
+    link_depth = int(retrieval_cfg.get("link_depth", 2))
+    max_links = int(retrieval_cfg.get("max_links", 10))
 
     seed_path = Path(args.input).expanduser().resolve()
     if not seed_path.exists():
-        print(f"Error: Input note not found: {seed_path}", file=sys.stderr)
+        print(f"Error: input note not found: {seed_path}", file=sys.stderr)
         sys.exit(1)
 
-    text = simple_read(seed_path)
+    if not zettel_dir.exists():
+        print(f"Error: zettel_dir not found: {zettel_dir}", file=sys.stderr)
+        sys.exit(1)
 
-    # Extract wikilinked documents
+    seed_text = read_text(seed_path)
+
+    # Recursive wikilink retrieval (includes seed in traversal dictionary).
     linked_paths = set()
-    if zettel_dir.exists():
-        # extract_links_recursive returns dict {path: {level, content}}
-        raw_linked_docs = extract_links_recursive(seed_path, zettel_dir, link_depth, max_links)
-        for path in raw_linked_docs.keys():
-             linked_paths.add(str(path))
-        print(f"Extracted {len(linked_paths)} linked documents (depth={link_depth}, max={max_links})", file=sys.stderr)
-    else:
-        print(f"Warning: Zettelkasten directory not found: {zettel_dir}", file=sys.stderr)
+    raw_docs = extract_links_recursive(seed_path, zettel_dir, link_depth, max_links)
+    for path in raw_docs.keys():
+        resolved = str(path.resolve())
+        if resolved != str(seed_path):
+            linked_paths.add(resolved)
 
-    # Extract tag-similar documents
     tag_similar_paths = []
-    if zettel_dir.exists():
-        seed_tags = extract_tags(text)
-        if seed_tags:
-            tag_similar_paths = find_tag_similar_docs(seed_tags, zettel_dir, seed_path, max_similar=5)
-            print(f"Found {len(tag_similar_paths)} tag-similar documents (seed tags: {sorted(seed_tags)})", file=sys.stderr)
+    seed_tags = extract_tags(seed_text)
+    if seed_tags:
+        tag_similar_paths = find_tag_similar_docs(
+            seed_tags=seed_tags,
+            zettel_dir=zettel_dir,
+            seed_path=seed_path,
+            max_similar=5,
+        )
 
-    # Combine all paths, keeping seed note out (it's implicit context)
-    all_paths = set(linked_paths)
-    for p in tag_similar_paths:
-        all_paths.add(p)
+    all_paths = sorted(linked_paths | set(tag_similar_paths))
+    output_path = Path(args.output).expanduser()
+    write_json(output_path, all_paths)
 
-    # Ensure seed path is not in the list (if it somehow got linked)
-    if str(seed_path) in all_paths:
-        all_paths.remove(str(seed_path))
+    print(
+        f"Wrote {len(all_paths)} candidate paths "
+        f"({len(linked_paths)} wikilink, {len(tag_similar_paths)} tag-similar) to {output_path}",
+        file=sys.stderr,
+    )
 
-    # Output as JSON list
-    output_list = list(all_paths)
-    write_json(args.output, output_list)
-    print(f'Wrote {len(output_list)} paths to {args.output}', file=sys.stderr)
 
-if __name__ == '__main__':
-    p = argparse.ArgumentParser()
-    p.add_argument('--input', required=True, help='Input note path')
-    p.add_argument('--output', required=True, help='Output JSON path')
-    p.add_argument('--zettel-dir', help='Override Zettelkasten directory')
-
-    args = p.parse_args()
-
-    find_links(args)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input", required=True, help="Path to seed note")
+    parser.add_argument("--output", required=True, help="Output JSON file path")
+    parser.add_argument("--zettel-dir", help="Optional override for zettel directory")
+    find_links(parser.parse_args())

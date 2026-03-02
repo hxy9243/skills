@@ -1,93 +1,107 @@
 ---
 name: zettel-brainstormer
-description: It reads from your local zettelkasten notes, find a random idea, and find references by links or tags, then expand the idea with the references.
+description: Build structured brainstorming notes from a seed zettel by retrieving linked notes, preprocessing each note with subagents for relevance extraction, drafting with cited evidence, and publishing a natural blog-style post with a final References section. Use when asked to expand, research, synthesize, or publish from local Obsidian/Zettelkasten notes.
 ---
+# Zettel Brainstormer
 
-# Zettel Brainstormer 🧠
+Run this workflow in order. Keep each stage separate so relevance decisions happen before drafting.
 
-This skill formalizes the process of taking a rough idea or draft and enriching it with deep research, diverse perspectives, and structured brainstorming.
+## Configure Once
 
-The configuration file is `config/models.json`, which can be edited manually or using the `setup.py` script.
-
-## New 3-Stage Workflow
-
-This skill now supports a 3-stage pipeline to balance cost and quality:
-
-1) Find References (with `find_links.py`)
-
-- Run `scripts/find_links.py` to identify relevant existing notes.
-  - **Wikilinked documents** (follows [[wikilinks]] N levels deep, up to M total docs)
-  - **Tag-similar documents** (finds notes with overlapping tags)
-  - **Native Obsidian Integration**: Uses `obsidian-cli` for high-performance indexing and discovery if available.
-  - **Semantic Discovery (Optional)**: Can leverage the `zettel-link` skill for finding "hidden" conceptual connections that don't share explicit tags or links.
-- Output: A JSON list of absolute file paths to relevant notes.
-
-2) Subagent: Preprocess contents (with `preprocess_model`)
-
-- The agent iterates through the list of files found in Stage 1.
-- For each file:
-  - Read the file content.
-  - Apply `templates/preprocess.md` using the `preprocess_model`, pass the seed note keypoints and file content as context.
-  - Extract: Relevance score, Summary, Key Points, and Quotes.
-  - Output: A structured markdown summary of the note.
-
-3) Draft & Humanize (with `pro_model`)
-
-- Gather all preprocessed markdown outputs from Stage 2.
-- Apply `templates/draft.md` using the `pro_model`.
-- Synthesize points, add proper Obsidian properties, tags, and links.
-- Uses the `obsidian` skill if available to match style.
-
-## Files & Scripts
-
-This skill includes the following resources under the skill folder:
-
-- `scripts/find_links.py`  -- finds relevant note paths (linked + tag similar)
-- `scripts/draft_prompt.py` -- (Deprecated) generate prompt for agent
-- `scripts/obsidian_utils.py` -- shared utilities for wikilink extraction
-- `templates/preprocess.md` -- Instructions for subagent to extract info from single note
-- `templates/draft.md` -- Instructions for final draft generation
-- `config/models.example.json`  -- example configuration file
-
-## Configuration & Setup
-
-**First Run Setup**:
-Before using this skill, you must run the setup script to configure models and directories.
-
+1. Run setup:
 ```bash
-python scripts/setup.py
+python zettel-brainstormer/scripts/setup.py
+```
+2. Confirm `zettel-brainstormer/config/models.json` contains:
+- `zettel_dir`
+- `output_dir`
+- `models` and `agent_models`
+- `retrieval.link_depth` and `retrieval.max_links`
+
+## Stage 1: Retrieval
+
+Goal: retrieve candidate notes from the seed note.
+
+Required order for this stage:
+1. Read retrieval limits from config and target candidate count using `retrieval.max_links`.
+2. Prioritize retrieval from the external `zettel-link` skill when it is available and indexed.
+3. Also, run local retrieval with `scripts/find_links.py` to gather wikilink and tag-overlap notes.
+4. Merge and deduplicate candidates, prioritize semantic candidates first, and trim to configured count.
+5. Exclude the seed note itself.
+
+Local retrieval command:
+```bash
+python zettel-brainstormer/scripts/find_links.py \
+  --input "/absolute/path/to/Seed Note.md" \
+  --output /tmp/zettel_candidates.json
 ```
 
-This will create `config/models.json` with your preferences. You can press ENTER to accept defaults.
+Treat `/tmp/zettel_candidates.json` as the candidate pool for preprocessing.
 
-**Configuration Fields**:
-- `pro_model`: The model used for drafting (defaults to agent's current model)
-- `preprocess_model`: Cheap model for extraction (defaults to agent's current model)
-- `zettel_dir`: Path to your Zettelkasten notes
-- `output_dir`: Path where drafts should be saved
-- `search_skill`: Which search skill to use for web/X research (web_search, brave_search, or none)
-- `link_depth`: How many levels deep to follow [[wikilinks]] (N levels, default: 2)
-- `max_links`: Maximum total linked notes to include (M links, default: 10)
-- `discovery_mode`: Options are `standard` (default), `cli` (uses obsidian-cli), or `semantic` (uses zettel-link).
+## Stage 2: Preprocess (Subagent Per Note)
 
-## Usage
+Goal: preprocess each candidate note and decide relevance to the seed note.
 
-- Trigger when user asks: "brainstorm X", "expand this draft", "research and add notes to <path>".
-- Example workflow (pseudo):
-  1. Pick a seed note.
-  2. Find Links: `python scripts/find_links.py --input <seed_note> --output /tmp/paths.json`
-  3. Preprocess Subagent Loop:
-     - Load `/tmp/paths.json`.
-     - For each path, read content.
-     - Prompt `preprocess_model` with `templates/preprocess.md` + content.
-     - Store result.
-  4. Final Draft:
-     - Concatenate seed note + all preprocess results.
-     - Prompt `pro_model` with `templates/draft.md` + concatenated context.
-  5. Save result to note.
+1. Read `agents/preprocess.md` as the per-note instruction.
+2. Spawn one subagent per candidate note.
+3. For each note, require:
+- Relevance score against the seed note topic.
+- Concise summary.
+- Distinct key points.
+- Short evidence quotes when useful.
+4. Save each subagent output as markdown (one file per source note).
 
-## Notes for maintainers
+Quality rules:
+- Reject notes with weak relevance.
+- Prefer concrete claims and non-duplicated points.
+- Keep outputs compact and structured for downstream merge.
 
-- Keep preprocess outputs small (200-600 tokens) to save cost.
-- Ensure all external links are included in the `References` section with full titles and URLs.
-- When appending, always include a timestamp and short provenance line.
+## Stage 3: Draft (Synthesis Subagent)
+
+Goal: gather only relevant preprocess outputs and generate a referenced draft.
+
+1. Run the aggregation helper:
+```bash
+python zettel-brainstormer/scripts/compile_preprocess.py \
+  --seed "/absolute/path/to/Seed Note.md" \
+  --preprocess-dir /tmp/zettel_preprocess \
+  --output /tmp/zettel_draft_packet.json
+```
+2. Read `agents/draft.md`.
+3. Use one drafting subagent with:
+- Seed note content
+- Filtered relevant notes from `/tmp/zettel_draft_packet.json`
+- Required citation mapping from the packet
+4. Produce a draft that cites source notes inline and preserves traceability.
+
+## Stage 4: Publish (Publisher Subagent)
+
+Goal: rewrite the draft into natural long-form writing while preserving evidence quality.
+
+1. Read `agents/publisher.md`.
+2. Use one publisher subagent to rewrite the draft with these constraints:
+- Remove generic AI phrasing.
+- Use natural language and a coherent author voice.
+- Organize points with clear tiered argument structure.
+- Remove irrelevant points.
+- Do not force weak connections between notes.
+- Keep explicit citations for all retained claims.
+3. Always end with a `## References` section listing every cited note.
+
+## Bundled Resources
+
+- `agents/retriever.md`: retrieval-stage instructions
+- `agents/preprocess.md`: per-note preprocessing instruction
+- `agents/draft.md`: synthesis drafting instruction
+- `agents/publisher.md`: publication rewrite instruction
+- `scripts/find_links.py`: retrieval script for wikilinks + tag overlap
+- `scripts/compile_preprocess.py`: filter and merge preprocess outputs into a draft packet
+- `scripts/obsidian_utils.py`: wikilink and tag helpers
+- `scripts/config_manager.py`: shared config loader
+- `scripts/setup.py`: interactive config setup
+
+## Maintenance Rules
+
+- Keep stage boundaries strict: retrieval -> preprocess -> draft -> publish.
+- Keep prompts in `agents/` and scripts in `scripts/`.
+- Remove deprecated scripts instead of keeping parallel legacy paths.

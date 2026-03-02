@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-import json
-import os
-from pathlib import Path
 from config_manager import ConfigManager
+
 
 def get_input(prompt, default):
     response = input(f"{prompt} [{default}]: ").strip()
     return response if response else default
+
 
 def main():
     print("🧠 Zettel Brainstormer Setup 🧠")
@@ -15,48 +14,69 @@ def main():
     defaults = ConfigManager.load_defaults()
     config = {}
 
-    # Models
-    print("\n--- Model Configuration ---")
-    config['pro_model'] = get_input(
-        "Pro Model (for drafting)",
-        defaults.get('pro_model', 'openai/gpt-5.2')
-    )
-    config['preprocess_model'] = get_input(
-        "Preprocess Model (cheap/fast)",
-        defaults.get('preprocess_model', 'openrouter/x-ai/kimi-k2.5')
-    )
-
     # Directories
     print("\n--- Directory Configuration ---")
-    # Expand user path for default display if it starts with ~
-    default_zettel = defaults.get('zettel_dir', '~/Documents/Obsidian/Zettelkasten')
-    config['zettel_dir'] = get_input(
+    config["zettel_dir"] = get_input(
         "Zettelkasten Directory",
-        default_zettel
+        defaults.get("zettel_dir", "~/Documents/Obsidian/Zettelkasten"),
     )
-
-    default_output = defaults.get('output_dir', '~/Documents/Obsidian/Inbox')
-    config['output_dir'] = get_input(
+    config["output_dir"] = get_input(
         "Output/Inbox Directory",
-        default_output
+        defaults.get("output_dir", "~/Documents/Obsidian/Inbox"),
     )
 
-    # Search & Research
-    print("\n--- Research Configuration ---")
-    config['search_skill'] = get_input(
-        "Search skill (web_search, brave_search, or none)",
-        defaults.get('search_skill', 'web_search')
-    )
+    # Models
+    print("\n--- Model Tiers ---")
+    models = defaults.get("models", {})
+    agent_models = defaults.get("agent_models", {})
+    config["models"] = {
+        "fast": get_input(
+            "Fast model (retrieval/extraction)",
+            models.get("fast", "google/gemini-3-flash-preview"),
+        ),
+        "deep": get_input(
+            "Deep model (synthesis/critic)",
+            models.get("deep", "google/gemini-3-pro-preview"),
+        ),
+    }
+    config["agent_models"] = {
+        "default": get_input(
+            "Default agent model tier (fast/deep)",
+            agent_models.get("default", "fast"),
+        ),
+        "retriever": get_input(
+            "Retriever model tier (fast/deep)",
+            agent_models.get("retriever", "fast"),
+        ),
+        "preprocess": get_input(
+            "Preprocess model tier (fast/deep)",
+            agent_models.get("preprocess", "fast"),
+        ),
+        "drafter": get_input(
+            "Drafter model tier (fast/deep)",
+            agent_models.get("drafter", "deep"),
+        ),
+        "publisher": get_input(
+            "Publisher model tier (fast/deep)",
+            agent_models.get("publisher", "deep"),
+        ),
+    }
 
     # Wikilink extraction settings
-    print("\n--- Wikilink Extraction ---")
-    config['link_depth'] = int(get_input(
+    print("\n--- Retrieval Limits ---")
+    retrieval = defaults.get("retrieval", {})
+    config["retrieval"] = {}
+    config["retrieval"]["link_depth"] = int(get_input(
         "Link depth (N levels deep to follow wikilinks)",
-        str(defaults.get('link_depth', 2))
+        str(retrieval.get("link_depth", 2)),
     ))
-    config['max_links'] = int(get_input(
+    config["retrieval"]["max_links"] = int(get_input(
         "Max links (M total linked notes to include)",
-        str(defaults.get('max_links', 10))
+        str(retrieval.get("max_links", 10)),
+    ))
+    config["retrieval"]["semantic_max"] = int(get_input(
+        "Max semantic notes from zettel-link cache",
+        str(retrieval.get("semantic_max", 5)),
     ))
 
     # Save
