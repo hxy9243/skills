@@ -86,6 +86,8 @@ Goal: rewrite the draft into natural long-form writing while preserving evidence
 - Remove irrelevant points.
 - Do not force weak connections between notes.
 - Keep explicit citations for all retained claims.
+- Do not publish the draft's internal "Argument Spine" section.
+- Append valid frontmatter properties, including article-relevant `tags`.
 3. Always end with a `## References` section listing every cited note.
 
 ## Bundled Resources

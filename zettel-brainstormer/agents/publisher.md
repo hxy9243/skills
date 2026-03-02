@@ -13,13 +13,16 @@ Rewrite the draft into a natural blog-style post that reads like strong human wr
 - Citation list and reference mapping
 - Seed note intent
 - `candidate_paths` for creating correct references
+- Draft argument scaffold (thesis + ordered claims)
 
 ## Rewrite Objective
 Convert research-heavy draft prose into a clear narrative argument with deliberate pacing, concrete language, and editorial judgment.
 
 Discard any sections that do not directly support the thesis.
+Treat the draft argument scaffold as internal planning context only; do not publish it as a visible section.
 
 Use plain, concise titles that maps out the content of the section.
+Prioritize readability over cleverness: headings should be quickly scannable in a table of contents.
 
 ## Structure
 1. Title
@@ -27,6 +30,8 @@ Use plain, concise titles that maps out the content of the section.
 - Avoid vague titles like "Thoughts on" or "Reflections on".
 - Prefer tension, contrast, mechanism, or question framing.
 - Be concise.
+- Make the final title independent from section argument labels.
+- The H1 should express the article's central framing, not just repeat or concatenate body headings.
 
 2. Lead section (2-4 short paragraphs)
 - Each section should have a concise title that directly reflects the content. Avoid long sentences or phrases.
@@ -39,6 +44,22 @@ Use plain, concise titles that maps out the content of the section.
 - Use `###` only when needed for a sub-argument.
 - Each major section should do one job: claim, mechanism, example, implication, or counterpoint.
 - Keep paragraphs focused and moderately short.
+- Keep section titles short and concrete.
+
+## Section Title Rules
+- Prefer 2-5 words for section titles when possible.
+- Keep title text compact and easy to scan.
+- If numeric prefixes are used (for example `1.2`), keep the title portion compact.
+- Prefer noun phrases over full clauses.
+- Avoid long causal framing in titles (for example patterns like `When X, Y...`).
+- Avoid stacked qualifiers (`deeper`, `broader`, `systemic`) unless essential.
+- Do not include commas unless they improve clarity (`Stories, Not Just Facts` is acceptable).
+- Avoid title forms that read like complete sentence claims.
+
+## Title Rewrite Examples
+- `Humans Coordinate Through Story, Not Just Facts` -> `Stories, Not Just Facts`
+- `When Epistemic Habits Decay, Democracy Becomes Procedural but Empty` -> `Impact on Democracy`
+- `Silicon Valley's Political Turn Is a Symptom of Deeper Legitimacy Fracture` -> `Silicon Valley's Political Turn`
 
 1. Closing section
 - Synthesize core takeaways.
@@ -50,6 +71,12 @@ Use plain, concise titles that maps out the content of the section.
 - Include every cited source exactly once.
 - Keep titles/path mapping consistent with the draft citations.
 
+## Properties (Frontmatter)
+- The final note must include YAML frontmatter at the top.
+- Include tags in frontmatter (required) and make them specific to the final article.
+- Preserve or set useful publish metadata when available (for example: `title`, `tags`, `created`, `updated`, `source_seed`).
+- Keep frontmatter concise and valid YAML.
+
 ## Style Guide (Natural Blog Voice)
 - Write with confident but non-absolute language.
 - Prefer plain, precise wording over abstract jargon.
@@ -57,6 +84,7 @@ Use plain, concise titles that maps out the content of the section.
 - Use transitions that express logic, not filler.
 - Keep a coherent narrator voice throughout.
 - Allow nuance and tradeoffs; avoid binary claims unless strongly supported.
+- Keep headings plain-English and easy to parse on first read.
 
 ## Anti-AI Flavor Rules
 - Remove repetitive framing phrases and boilerplate transitions.
@@ -71,6 +99,9 @@ Use plain, concise titles that maps out the content of the section.
 - Do not force links between unrelated ideas.
 - Make uncertainty explicit where evidence is incomplete.
 - Preserve source-backed specificity while improving readability.
+- Follow the draft argument scaffold as the default order of reasoning.
+- If you reorder sections for readability, preserve causal and conceptual continuity.
+- Add transitions that explicitly connect section N to section N+1.
 
 ## Citation Rules
 - Preserve citation anchors on evidence-backed claims.
@@ -81,7 +112,9 @@ Use plain, concise titles that maps out the content of the section.
 
 ## Output Requirements
 - Polished markdown article with:
+  - YAML frontmatter properties at the top (including `tags`),
   - one H1 title,
   - logical `##`/`###` hierarchy,
   - coherent narrative flow,
+  - no visible `Argument Spine`/internal scaffold section,
   - final `## References` section.
