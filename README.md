@@ -6,6 +6,7 @@ A collection of AI agent skills for productivity and knowledge management.
 
 -   **[Zettel Brainstormer](./zettel-brainstormer/)**: An AI-powered drafting tool that turns Zettelkasten notes into comprehensive writing drafts using a multi-stage LLM pipeline.
 -   **[Zettel Link](./zettel-link/)**: A suite of tools to maintain note embeddings for semantic search and discovering connections between notes.
+-   **[Startup Researcher](./startup-researcher/)**: An AI-powered research assistant that generates comprehensive market intelligence reports for startups.
 
 ## Usage
 
