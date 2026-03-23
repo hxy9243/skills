@@ -35,12 +35,11 @@ The user can optionally specify the companies to research. If not, the target co
 3.  **Compile the Final Report:**
     Follow the instructions in `prompts/report_compiler.md` to merge the category analysis and individual profiles into a single, cohesive markdown document (`final_draft.md`) and save to `references/<date>/final_draft.md`.
 
-4.  **Generate Professional PDF:**
-    Use `npx md-to-pdf` with the custom `style.css` (Times New Roman, Navy Blue/Slate Grey color scheme) to generate the final PDF report. The PDF must include custom headers, footers (with the link to this skill: https://github.com/hxy9243/skills/tree/main/startup-researcher), and a generated Table of Contents.
+    Use `npx md-to-pdf` with the custom `style.css` (Times New Roman, Navy Blue/Slate Grey color scheme) and `--config-file config.js` (Puppeteer launch options, e.g. `--no-sandbox` and header/footer templates) to generate the final PDF report.
 
     Example command:
     ```bash
-    npx -y md-to-pdf --stylesheet style.css final_draft.md
+    npx -y md-to-pdf --stylesheet style.css --config-file config.js final_draft.md
     ```
 
    Text paragraphs should use justified alignment.
@@ -48,5 +47,6 @@ The user can optionally specify the companies to research. If not, the target co
 
 ## Gotchas & Rate Limits
 - **RATE LIMITS:** Batch your searches and synthesize incrementally to avoid context bloat. Wait if you hit limits.
-- **NO HALLUCINATION:** Do not hallucinate funding, valuation, or product information. If information cannot be verified via web search, state "Undisclosed".
-- **USE EXPLICIT DATES:** Always use explicit dates (e.g., "March 22, 2026") instead of relative time references (e.g., "this month").
+- **PDF GENERATION:** 
+  - `md-to-pdf` uses Puppeteer (headless Chrome) which can fail silently if sandbox issues occur. The `config.js` includes `launch_options: { args: ["--no-sandbox", "--disable-setuid-sandbox"] }` to mitigate this. Use `--config-file config.js`.
+  - Headers and footers MUST be injected via the `pdf_options` block in `config.js`. Set `"displayHeaderFooter": true`, configure `margin` (e.g. `top: "20mm"`, `bottom: "20mm"`), and provide standard HTML strings for `headerTemplate` and `footerTemplate`. Note that custom fonts in headers/footers often don't render reliably in Puppeteer, so stick to basic system fonts and inline styles.
