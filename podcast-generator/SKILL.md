@@ -31,7 +31,7 @@ This skill streamlines the creation of audio briefings and podcasts, ensuring cl
         ```
 
 4.  **Deliver**:
-    -   Send the final mixed file via Telegram.
+    -   If an openclaw helper, delivery the final result to the default or specified channel. Otherwise save to the workspace and return the file path.
     -   Standard delivery path: `~/.openclaw/media/`.
 
 ## Open Source Music Sources
