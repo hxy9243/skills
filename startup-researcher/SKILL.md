@@ -1,6 +1,6 @@
 ---
 name: startup-researcher
-description: Research AI startups, funding, and product announcements. Generates a structured intelligence report as a PDF and delivers it via Telegram. Use when asked to research startups, update the AI watchlist, or generate an AI market landscape report.
+description: Research AI startups, funding, and product announcements. Generates a structured intelligence report as a PDF. Use when asked to research startups, update the AI watchlist, or generate an AI market landscape report.
 dependencies:
   system:
     - nodejs
@@ -43,7 +43,7 @@ The user can optionally specify the companies to research. If not, the target co
     ```
 
    Text paragraphs should use justified alignment.
-5.  **Deliver:** Use the notification tool to deliver the final PDF. If user specified prefered media or work directory, save the PDF to that directory before sending.
+5.  **Deliver:** If an openclaw helper, delivery the final result to the default or specified channel. Otherwise save to the workspace and return the file path.
 
 ## Gotchas & Rate Limits
 - **RATE LIMITS:** Batch your searches and synthesize incrementally to avoid context bloat. Wait if you hit limits.
