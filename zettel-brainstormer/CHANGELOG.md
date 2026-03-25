@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.2 (2026-03-25)
+
+- **Retrieval:** Updated instructions to explicitly sequence `zettel-link` semantic retrieval as the first step, falling back gracefully to local scripts with a warning if the skill is not installed.
+- **Delivery:** Added an explicit Stage 5 requiring the agent to always list the cited references in the chat response.
+
+
 ## 2026-03-02
 
 - Refactored workflow into 4 explicit stages: Retrieval, Preprocess, Draft, Publish.
