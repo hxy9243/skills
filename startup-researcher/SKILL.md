@@ -19,8 +19,8 @@ The user can optionally specify the companies to research. If not, the target co
 ## Dependencies & Setup
 This skill uses WeasyPrint for native PDF rendering. If `weasyprint` or `python3 -m markdown` is not available in your environment, use your tools to install them and their required C-libraries before proceeding:
 - **macOS:** `brew install pango cairo gdk-pixbuf libffi`
-- **Ubuntu/Debian:** `sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libcairo2 libgdk-pixbuf2.0-0 shared-mime-info`
-- **Fedora/RHEL:** `sudo dnf install -y pango cairo gdk-pixbuf2`
+- **Ubuntu/Debian:** `apt-get update && apt-get install -y libpango-1.0-0 libcairo2 libgdk-pixbuf2.0-0 shared-mime-info`
+- **Fedora/RHEL:** `dnf install -y pango cairo gdk-pixbuf2`
 - **Python Packages:** `pip3 install weasyprint markdown`
 
 ## Research Workflow
