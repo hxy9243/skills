@@ -15,10 +15,10 @@ Retrieve candidate supporting notes from a seed note.
 
 ## Procedure
 1. Read retrieval limits from config and target candidate count from `retrieval.max_links`.
-2. If `zettel-link` is available and indexed, retrieve semantic candidates first.
-3. Run local retrieval to collect wikilinked and tag-overlap notes.
-4. Merge and deduplicate all candidates.
-5. Prioritize semantic candidates, then fill remaining slots with local retrieval results up to configured count.
+2. **MANDATORY FIRST STEP:** Always run the `zettel-link` skill (`scripts/search.py`) to retrieve high-quality semantic candidates using the seed note's topic or title. Do not skip this.
+3. **THEN:** Run local retrieval (`scripts/find_links.py`) to collect explicit wikilinked and tag-overlap notes.
+4. Merge and deduplicate all candidates from both tools.
+5. Prioritize semantic candidates from `zettel-link`, then fill remaining slots with local retrieval results up to configured count.
 6. Exclude the seed note itself.
 
 ## Output

@@ -24,9 +24,9 @@ Goal: retrieve candidate notes from the seed note.
 
 Required order for this stage:
 1. Read retrieval limits from config and target candidate count using `retrieval.max_links`.
-2. Prioritize retrieval from the external `zettel-link` skill when it is available and indexed.
-3. Also, run local retrieval with `scripts/find_links.py` to gather wikilink and tag-overlap notes.
-4. Merge and deduplicate candidates, prioritize semantic candidates first, and trim to configured count.
+2. **CRITICAL FIRST STEP:** You MUST run semantic retrieval using the external `zettel-link` skill (via its `scripts/search.py` command) to query the seed note's topic or title. This ensures high-similarity semantic matches are always found before falling back to local scripts.
+3. **ONLY AFTER** semantic retrieval, run local retrieval with `scripts/find_links.py` to gather exact wikilinks and tag-overlap notes.
+4. Merge and deduplicate candidates from both `zettel-link` and `find_links.py`. Prioritize semantic candidates first, and trim to the configured count.
 5. Exclude the seed note itself.
 
 Local retrieval command:
