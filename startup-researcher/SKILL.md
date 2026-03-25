@@ -40,7 +40,7 @@ This skill uses WeasyPrint for native PDF rendering. If `weasyprint` or `python3
 
     Example commands:
     ```bash
-    python3 -m markdown final_draft.md > final_draft.html
+    python3 -m markdown -x tables -x toc final_draft.md > final_draft.html
     weasyprint final_draft.html final_draft.pdf -s style.css
     ```
     

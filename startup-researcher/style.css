@@ -81,15 +81,29 @@ code {
     font-family: "Times New Roman", Times, serif;
 }
 
-footer {
-  position: running(footer-element);
-  text-align: center;
-}
-
 @page {
   size: Letter;
-  margin: 2cm;
-  @bottom-center {
-    content: element(footer-element);
-  }
+  margin: 2.5cm 2cm 2.5cm 2cm; /* extra top and bottom margin for the fixed header/footer */
+}
+
+footer {
+  position: fixed;
+  bottom: -1.5cm; /* Push it down into the page margin */
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 9pt;
+  color: #666;
+}
+
+header {
+  position: fixed;
+  top: -1.5cm;
+  left: 0;
+  right: 0;
+  text-align: right;
+  font-size: 9pt;
+  color: #666;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 4px;
 }
