@@ -1,15 +1,7 @@
 ---
 name: startup-researcher
 description: Research AI startups, funding, and product announcements. Generates a structured intelligence report as a PDF. Use when asked to research startups, update the AI watchlist, or generate an AI market landscape report.
-metadata:
-  openclaw:
-    requires: { "bins": ["md-to-pdf"] }
-    install:
-      - id: node
-        kind: node
-        package: md-to-pdf
-        bins: ["md-to-pdf"]
-        label: "Install md-to-pdf for report generation"
+dependencies: python>=3.10, weasyprint>=61.0, markdown>=3.5
 allowed_tools:
   - search_web
   - write_to_file
@@ -24,6 +16,13 @@ You are an expert venture capital analyst and AI market researcher orchestrator.
 ## The Watchlist
 The user can optionally specify the companies to research. If not, the target companies are categorized in `watchlist.yaml`. Always read `watchlist.yaml` in this directory to know who to track.
 
+## Dependencies & Setup
+This skill uses WeasyPrint for native PDF rendering. If `weasyprint` or `python3 -m markdown` is not available in your environment, use your tools to install them and their required C-libraries before proceeding:
+- **macOS:** `brew install pango cairo gdk-pixbuf libffi`
+- **Ubuntu/Debian:** `sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libcairo2 libgdk-pixbuf2.0-0 shared-mime-info`
+- **Fedora/RHEL:** `sudo dnf install -y pango cairo gdk-pixbuf2`
+- **Python Packages:** `pip3 install weasyprint markdown`
+
 ## Research Workflow
 
 1.  **Individual Company Research:**
@@ -37,19 +36,18 @@ The user can optionally specify the companies to research. If not, the target co
 3.  **Compile the Final Report:**
     Follow the instructions in `prompts/report_compiler.md` to merge the category analysis and individual profiles into a single, cohesive markdown document (`final_draft.md`) and save to `references/<date>/final_draft.md`.
 
-    Use `md-to-pdf` with the custom `style.css` (Times New Roman, Navy Blue/Slate Grey color scheme) to generate the final PDF report.
+    Use WeasyPrint with the custom `style.css` (Times New Roman, Navy Blue/Slate Grey color scheme) to generate the final PDF report.
 
-    Example command:
+    Example commands:
     ```bash
-    md-to-pdf --stylesheet style.css final_draft.md
+    python3 -m markdown final_draft.md > final_draft.html
+    weasyprint final_draft.html final_draft.pdf -s style.css
     ```
-    *Note: If the agent is running in a restricted Docker container, you may need to pass `--launch-options '{"args":["--no-sandbox", "--disable-setuid-sandbox"]}'` to Puppeteer, but it is disabled by default for security.*
+    
+    Text paragraphs should use justified alignment.
 
-   Text paragraphs should use justified alignment.
-5.  **Deliver:** If an openclaw helper, delivery the final result to the default or specified channel. Otherwise save to the workspace and return the file path.
+4.  **Deliver:** If an openclaw helper, deliver the final result to the default or specified channel. Otherwise save to the workspace and return the file path.
 
 ## Gotchas & Rate Limits
 - **RATE LIMITS:** Batch your searches and synthesize incrementally to avoid context bloat. Wait if you hit limits.
-- **PDF GENERATION:** 
-  - `md-to-pdf` uses Puppeteer (headless Chrome). If it fails silently in certain containerized environments, you may need to pass sandbox flags (e.g., `--launch-options '{"args":["--no-sandbox"]}'`), but these are omitted by default for security.
-  - If you need headers and footers, you can generate a temporary config file (e.g. `config.js`) with `pdf_options: { displayHeaderFooter: true, headerTemplate: '...', footerTemplate: '...' }` and pass `--config-file config.js`, but this is optional.
+- **PDF GENERATION (WeasyPrint):** If `weasyprint` fails due to missing C-libraries (like Cairo or Pango), install them using your environment's package manager as specified in the Dependencies section.

@@ -80,3 +80,16 @@ code {
     border-radius: 3px;
     font-family: "Times New Roman", Times, serif;
 }
+
+footer {
+  position: running(footer-element);
+  text-align: center;
+}
+
+@page {
+  size: Letter;
+  margin: 2cm;
+  @bottom-center {
+    content: element(footer-element);
+  }
+}
