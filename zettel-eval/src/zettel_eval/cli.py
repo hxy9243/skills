@@ -5,6 +5,7 @@ from pathlib import Path
 
 from zettel_eval.config import load_dataset_config, load_retrieval_config
 from zettel_eval.logging import append_log
+from zettel_eval.pipeline.optimize import build_optimizer_parser, run_optimization_from_args
 from zettel_eval.retrieval.search import evaluate_processed_datasets
 
 
@@ -16,6 +17,11 @@ def _build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("validate", help="Run Phase 1 dataset validation and ground truth generation.")
     subparsers.add_parser("benchmark", help="Run Phase 2 retrieval benchmarks.")
     subparsers.add_parser("pipeline", help="Run Phases 0-2 end to end.")
+    subparsers.add_parser(
+        "optimize",
+        help="Run Phase 3 DSPy optimization.",
+        parents=[build_optimizer_parser()],
+    )
 
     return parser
 
@@ -55,6 +61,12 @@ def _run_pipeline() -> int:
     return 0
 
 
+def _run_optimize(args: argparse.Namespace) -> int:
+    run_dir = run_optimization_from_args(args)
+    append_log(Path("output") / "pipeline.log", f"Optimization artifacts written to {run_dir}")
+    return 0
+
+
 def main() -> int:
     parser = _build_parser()
     args = parser.parse_args()
@@ -67,6 +79,8 @@ def main() -> int:
         return _run_benchmark()
     if args.command == "pipeline":
         return _run_pipeline()
+    if args.command == "optimize":
+        return _run_optimize(args)
 
     parser.error(f"Unknown command: {args.command}")
     return 2
