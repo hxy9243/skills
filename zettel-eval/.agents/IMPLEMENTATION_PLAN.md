@@ -8,20 +8,82 @@
 
 ---
 
-### Phase 1: Dataset & Ground Truth (The "Hide-the-Link" Trick)
-**Goal:** Create a clean, self-labeled dataset for testing retrieval algorithms without manual annotation.
+### Phase 0: Website Ingestion & Canonicalization
+**Goal:** Convert public note websites into a local, normalized Markdown dataset while preserving the internal link graph.
 **Method:**
-1. Download a dense, public Obsidian vault (e.g., Andy Matuschak's working notes).
-2. Parse Markdown files. Extract all outgoing wikilinks (`[[Link|Alias]]`).
-3. Strip wikilink brackets from the body text (keep alias if present).
-4. Save the stripped text into `corpus.csv` and a `ground_truth.csv` (mapping Source Note ID -> Target Note ID).
+1. Start from a fixed manifest of live public note websites. Initial candidates:
+   - Andy Matuschak's About these notes: `https://notes.andymatuschak.org/About_these_notes`
+   - Steph Ango: `https://stephango.com/`
+   - SuperMemo Guru: `https://supermemo.guru/wiki/SuperMemo_Guru`
+   - Jethro's Braindump: `https://braindump.jethro.dev`
+   - Mental Nodes: `https://www.mentalnodes.com/`
+2. Crawl same-origin note pages from each seed URL and save the raw page URL manifest locally.
+3. Use Defuddle to extract Markdown from each page:
+   - `defuddle parse <url> --md`
+4. Distinguish internal links from external links:
+   - Internal links point to another page in the same dataset/site.
+   - External links point outside the dataset and should not become note-level ground-truth targets.
+5. Canonicalize internal links into a stable local note-ID format and rewrite them into normalized local Markdown links.
+6. Save one local Markdown file per canonical note in a dataset directory, plus metadata needed to reconstruct provenance and the link graph.
+7. Emit dataset-level metadata:
+   - source site URL
+   - crawl date
+   - page URL to local note ID mapping
+   - internal link graph
+   - external link list
+**Artifact Output:** Save normalized notes under `datasets/raw/<dataset_slug>/notes/` and metadata under `datasets/raw/<dataset_slug>/metadata.json`.
+
+### Phase 1: Dataset Validation & Ground Truth (The "Hide-the-Link" Trick)
+**Goal:** Accept only datasets with enough scale and link density, then create self-labeled ground truth for retrieval evaluation.
+**Method:**
+1. Evaluate each ingested dataset against minimum acceptance criteria:
+   - At least 100 notes.
+   - More than 50% of notes have at least one incoming or outgoing internal link.
+   - The total number of unique bidirectional internal note-note links is at least 2x the total number of notes.
+   - Link connectivity should not be overly concentrated in a tiny number of hub pages; report the degree distribution and flag datasets where the top 10% of notes account for more than 50% of total internal-link degree.
+2. Perform manual corpus inspection before accepting a dataset:
+   - Sample at least 50 extracted links per corpus.
+   - Check whether links usually resolve to real notes.
+   - Check whether links are mostly semantic/contentful rather than navigational boilerplate.
+   - Discard the corpus if link quality is too poor for meaningful note-retrieval evaluation.
+3. For accepted datasets, parse the local normalized Markdown files and extract all outgoing internal links.
+4. Strip internal link markup from the body text while preserving the anchor text or alias when present.
+5. Save the stripped text into `corpus.csv` and a `ground_truth.csv` (mapping Source Note ID -> Target Note ID).
+**Implementation**
+This step should be deterministic and you should be able to implement all the steps in Python.
+
+Save the output into `datasets/` as versioned ground-truth artifacts.
 
 ### Phase 2: Retrieval Evaluation (Benchmarking IR)
-**Goal:** Measure search engine ability to find hidden links (Recall@K).
+**Goal:** Measure note-level retrieval quality on hidden-link reconstruction.
 **Method:**
-1. Feed stripped notes into Baseline (Dense `text-embedding-3-small`), Hybrid (Dense + BM25 via RRF), and Heavyweight (ColBERT).
-2. Calculate `Recall@10` and `MRR`.
-**Telemetry:** Log every query, retrieved IDs, and scores to `retrieval_metrics.csv`.
+1. Evaluate note-level retrieval only. Each hidden outgoing internal link is one evaluation example. If a source note has 5 distinct outgoing internal links, it contributes 5 examples.
+2. Benchmark multiple retrieval families:
+   - BM25 lexical baseline
+   - Dense embedding retrieval (for example `text-embedding-3-small`)
+   - ColBERT-based retrieval
+   - Hybrid retrieval (dense + lexical/BM25 fusion, e.g. RRF)
+3. Retrieval searches over all notes in the same dataset except the source note itself.
+4. Use dataset-level splits, not within-dataset random splits, to avoid leakage across heavily interlinked notes:
+   - If 4 or more datasets pass validation, reserve 1 dataset for dev, 1 for test, and use the remaining datasets for training or method development as needed.
+   - If only 3 datasets pass validation, use leave-one-dataset-out evaluation and report the average and variance across folds.
+   - Never tune on the final test dataset.
+5. Tune retrieval hyperparameters to optimize retrieval score on the dev split. This phase is not just a fixed benchmark; part of the evaluation is to measure how retrieval strategies and parameter choices change performance.
+6. At minimum, tune:
+   - whole-note versus chunked-note indexing
+   - chunk size and overlap when chunking is enabled
+   - top-K retrieval depth
+   - BM25 parameters
+   - hybrid fusion weights or RRF parameters
+   - ColBERT indexing/search parameters
+7. Define a fixed search budget per retrieval family and save the chosen hyperparameters in the experiment artifacts.
+8. Calculate `Recall@5`, `Recall@10`, and `MRR`.
+9. Report per-dataset scores and macro averages. If the score discrepancy across datasets is large, stop and inspect the dataset characteristics before proceeding to downstream phases.
+10. Run two retrieval conditions to measure lexical leakage:
+   - Anchor-preserved: remove link markup but keep alias/anchor text.
+   - Anchor-masked: remove both link markup and alias/anchor text, replacing it with minimal neutral text.
+11. Compare retrieval performance across the two conditions to estimate how much the benchmark depends on lexical cues rather than conceptual retrieval.
+**Telemetry:** Log every example, retrieval condition, retrieved IDs, scores, and chosen hyperparameters to `retrieval_metrics.csv`.
 
 ### Phase 3: Filter Evaluation (LLM-as-a-Judge & DSPy)
 **Goal:** Optimize the extraction layer (why a retrieved note is relevant to the seed).
