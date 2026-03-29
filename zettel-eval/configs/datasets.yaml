@@ -1,0 +1,16 @@
+raw_dir: datasets/raw
+processed_dir: datasets/processed
+output_dir: output
+max_pages_per_dataset: 150
+
+datasets:
+  - slug: andy-matuschak
+    seed_url: https://notes.andymatuschak.org/About_these_notes
+  - slug: steph-ango
+    seed_url: https://stephango.com/
+  - slug: supermemo-guru
+    seed_url: https://supermemo.guru/wiki/SuperMemo_Guru
+  - slug: braindump-jethro
+    seed_url: https://braindump.jethro.dev
+  - slug: mental-nodes
+    seed_url: https://www.mentalnodes.com/
