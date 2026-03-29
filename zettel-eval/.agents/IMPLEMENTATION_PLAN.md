@@ -3,19 +3,16 @@
 ## Environment & Tooling
 - **Language:** Python
 - **Package Manager:** `uv`
-- **Telemetry Format:** All logging must use plaintext files (`.log`) and CSVs (`.csv`). Avoid opaque databases (no SQLite) to ensure easy manual inspection.
-- **Output Directory:** All generated scripts, optimized prompts, and experiment results must be saved to a dedicated `output/` directory within the skill folder.
+- **Telemetry Format:** All logging must use plaintext files (`.log`) and CSVs (`.csv`).
+- **Output Directory:** All generated scripts, optimized prompts, and experiment results must be saved to a dedicated `output/` directory.
 
 ## Overall Architecture
-- The system should be organized as a staged offline evaluation pipeline:
-  - Phase 0 ingests live websites into normalized local Markdown datasets.
-  - Phase 1 validates dataset quality and emits retrieval-ready corpora plus ground truth.
-  - Phase 2 runs retrieval benchmarks and hyperparameter search over the accepted datasets.
-  - Phase 3 uses DSPy to optimize an LLM prompt that summarizes retrieved notes and filters them for relevance against the seed note.
-  - Phase 4 uses GEPA to optimize the final synthesis step using a pairwise LLM-as-a-Judge Elo rating.
-- Each phase should be executable independently from the command line, but should also compose into one end-to-end pipeline.
-- Each phase should read explicit input artifacts from disk and write explicit output artifacts to disk so runs are reproducible and restartable.
-- Configuration should live in checked-in files, while per-run outputs should live under `output/` and `datasets/`.
+- The system is organized as a staged offline evaluation pipeline:
+  - Phase 0: Ingests live websites into normalized local Markdown datasets.
+  - Phase 1: Validates dataset quality and emits retrieval-ready corpora plus ground truth.
+  - Phase 2: Runs retrieval benchmarks and hyperparameter search over the accepted datasets.
+  - Phase 3: End-to-end DSPy optimization of the LLM reasoning pipeline (Filtering + Synthesis) based on the final brainstorm quality.
+- Configuration lives in checked-in files, while per-run outputs live under `output/` and `datasets/`.
 
 ## Physical Source Layout
 Use a source tree like this:
@@ -45,11 +42,8 @@ src/zettel_eval/
     hybrid.py
     metrics.py
     search.py
-  filter/
-    dspy_optimizer.py
-    judge.py
-  synthesis/
-    gepa_optimizer.py
+  pipeline/
+    dspy_program.py
     judge.py
   reports/
     retrieval_report.py
@@ -58,126 +52,29 @@ configs/
   datasets.yaml
   retrieval.yaml
 
-datasets/
-  raw/
-    <dataset_slug>/
-      notes/
-      metadata.json
-  processed/
-    <dataset_slug>/
-      corpus.csv
-      ground_truth.csv
-      dataset_stats.json
-
 output/
-  retrieval_metrics.csv
   runs/
     <run_id>/
-      config.json
-      run.log
-      summary.md
 ```
-
-### Module Responsibilities
-- `cli.py`: top-level entrypoints for each phase and end-to-end execution.
-- `config.py`: load and validate dataset and retrieval configuration.
-- `datasets/models.py`: typed models for notes, links, examples, and dataset metadata.
-- `ingest/*`: crawl websites, extract Markdown, classify links, canonicalize note IDs, and write normalized datasets.
-- `validate/*`: compute dataset statistics, run acceptance checks, and generate `corpus.csv` plus `ground_truth.csv`.
-- `retrieval/*`: build indexes, run retrieval methods, tune hyperparameters, and compute retrieval metrics.
-- `filter/*`: DSPy implementation to optimize the summarization and relevance filter prompt.
-- `synthesis/*`: GEPA implementation to optimize the final brainstorm synthesis prompt.
-- `reports/*`: write Markdown summaries and machine-readable run artifacts.
 
 ---
 
-### Phase 0: Website Ingestion & Canonicalization
-**Goal:** Convert public note websites into a local, normalized Markdown dataset while preserving the internal link graph.
-**Method:**
-1. Start from a fixed manifest of live public note websites. Initial candidates:
-   - Andy Matuschak's About these notes: `https://notes.andymatuschak.org/About_these_notes`
-   - Steph Ango: `https://stephango.com/`
-   - SuperMemo Guru: `https://supermemo.guru/wiki/SuperMemo_Guru`
-   - Jethro's Braindump: `https://braindump.jethro.dev`
-   - Mental Nodes: `https://www.mentalnodes.com/`
-2. Crawl same-origin note pages from each seed URL and save the raw page URL manifest locally.
-3. Use Defuddle to extract Markdown from each page:
-   - `defuddle parse <url> --md`
-4. Distinguish internal links from external links:
-   - Internal links point to another page in the same dataset/site.
-   - External links point outside the dataset and should not become note-level ground-truth targets.
-5. Canonicalize internal links into a stable local note-ID format and rewrite them into normalized local Markdown links.
-6. Save one local Markdown file per canonical note in a dataset directory, plus metadata needed to reconstruct provenance and the link graph.
-7. Emit dataset-level metadata:
-   - source site URL
-   - crawl date
-   - page URL to local note ID mapping
-   - internal link graph
-   - external link list
-**Artifact Output:** Save normalized notes under `datasets/raw/<dataset_slug>/notes/` and metadata under `datasets/raw/<dataset_slug>/metadata.json`.
-
-### Phase 1: Dataset Validation & Ground Truth (The "Hide-the-Link" Trick)
-**Goal:** Accept only datasets with enough scale and link density, then create self-labeled ground truth for retrieval evaluation.
-**Method:**
-1. Evaluate each ingested dataset against minimum acceptance criteria:
-   - At least 100 notes.
-   - More than 50% of notes have at least one incoming or outgoing internal link.
-   - The total number of unique bidirectional internal note-note links is at least 2x the total number of notes.
-   - Link connectivity should not be overly concentrated in a tiny number of hub pages; report the degree distribution and flag datasets where the top 10% of notes account for more than 50% of total internal-link degree.
-   - Notes with >10 outgoing internal links are considered "menus" or "hubs" and are excluded from being used as seed notes in the evaluation set to prevent mathematically suppressing the @K metrics.
-2. Perform manual corpus inspection before accepting a dataset:
-   - Sample at least 50 extracted links per corpus.
-   - Check whether links usually resolve to real notes.
-   - Check whether links are mostly semantic/contentful rather than navigational boilerplate.
-   - Discard the corpus if link quality is too poor for meaningful note-retrieval evaluation.
-3. For accepted datasets, parse the local normalized Markdown files and extract all outgoing internal links.
-4. Strip internal link markup from the body text while preserving the anchor text or alias when present.
-5. Save the stripped text into `corpus.csv` and a `ground_truth.csv` (mapping Source Note ID -> Target Note IDs).
-**Implementation**
-This step should be deterministic and you should be able to implement all the steps in Python.
-Save the output into `datasets/` as versioned ground-truth artifacts.
+### Phase 0 & 1: Ingestion, Validation & Ground Truth
+**Goal:** Convert public note websites into a clean, self-labeled dataset (excluding notes with >10 internal links). Strip internal link markup to create `corpus.csv` and `ground_truth.csv`.
 
 ### Phase 2: Retrieval Evaluation (Benchmarking IR)
-**Goal:** Measure note-level retrieval quality on hidden-link reconstruction.
-**Method:**
-1. Evaluate note-level retrieval. Each note with valid ground-truth links (<= 10) acts as a query. The targets are all the notes it linked to.
-2. Benchmark multiple retrieval families:
-   - BM25 lexical baseline
-   - Dense embedding retrieval (e.g., `text-embedding-3-small`, `nomic-embed-text`)
-   - ColBERT-based retrieval (via RAGatouille)
-   - Hybrid retrieval (dense + lexical/BM25 fusion)
-3. Retrieval searches over all notes in the same dataset except the source note itself.
-4. Use dataset-level splits, not within-dataset random splits, to avoid leakage across heavily interlinked notes.
-5. Tune retrieval hyperparameters to optimize retrieval score.
-6. Calculate `MAP` (Mean Average Precision), `HitRate@5`, `HitRate@10`, and `MRR`.
-**Telemetry:** Log every example, retrieval condition, retrieved IDs, scores, and chosen hyperparameters to `retrieval_metrics.csv`.
+**Goal:** Measure note-level retrieval quality (BM25, Dense, Hybrid, ColBERT) on hidden-link reconstruction using `MAP`, `HitRate@5`, `HitRate@10`, and `MRR`.
 
-### Phase 3: Summarization & Relevance Filter Optimization (LLM-as-a-Judge & DSPy)
-**Goal:** Optimize the prompt used by the subagent that reads a single retrieved note, summarizes it, and decides if it is highly relevant to the original seed note. 
-**Output Requirement:** The pipeline uses DSPy internally to search for the best prompt, but the final artifact must be exported as a static plain-text instruction (`best_filter_prompt.txt`) that can be pasted directly into the `zettel-brainstormer` SKILL.md for OpenClaw to run natively.
+### Phase 3: End-to-End LLM Pipeline Optimization (DSPy)
+**Goal:** Instead of isolating the relevance filter and the final synthesis, we optimize the entire reasoning chain end-to-end. The ultimate goal is a high-quality brainstorm, so the optimization should be driven by evaluating the *final output*.
 
 **Method:**
-1. **The Task:** Given a `Seed Note` and a `Retrieved Note`, the LLM must generate a 2-3 sentence summary of the retrieved note and output a binary `PASS/FAIL` indicating if it provides a meaningful conceptual connection to the seed.
-2. **The Dataset:** Use the Top 10 retrieved notes from Phase 2 for a sample of seed notes.
-   - *Positive Examples:* Retrieved notes that are in the ground truth (Actual Links).
-   - *Negative/Hard Examples:* Retrieved notes that were highly ranked by embeddings but are NOT in the ground truth (False Positives).
-3. **The Evaluator (LLM-as-a-Judge Rubric):** A strong model (GPT-4o / Gemini 1.5 Pro) grades the DSPy-generated summaries and filter decisions against three criteria (0/1 scores):
-   - **Faithfulness (Grounding):** Does the summary contain *only* claims found in the retrieved note? (No hallucination).
-   - **Seed Alignment:** Does the summary explicitly explain the conceptual bridge to the seed note?
-   - **Pruning Accuracy:** Did the filter `PASS` the ground-truth links and `FAIL` the obvious semantic mismatches/noise? (Note: The judge can override the ground truth if a non-linked "Hidden Gem" is genuinely relevant, but it must strictly reject boilerplate or completely tangential notes).
-4. **Optimization Constraints (DSPy):**
-   - **Max Iterations:** 30 prompt variants.
-   - **Early Stopping:** Stop if the Judge's pass rate hits >95% or if there is no improvement over 5 consecutive rounds.
-**Telemetry:** Record prompt mutations to `filter_prompts.log`. Log pass/fail rates to `filter_eval.csv`.
-**Artifact Output:** Save the winning compiled prompt instructions to `output/best_filter_prompt.txt`.
-
-### Phase 4: Synthesis Evaluation (Pairwise Elo Rating via GEPA)
-**Goal:** Test strength, coherence, and novelty of the final synthesized argument using the surviving filtered notes.
-**Method:**
-1. Generate final output using Prompt A and Prompt B. Feed both to the Judge.
-2. **Rubric:** Novelty, Citation Density, Coherence. Output: A, B, or TIE.
-3. **Optimization Constraints (GEPA):**
-   - **Max Matches:** 50 pairwise comparisons.
-   - **Early Stopping:** Stop when the Elo rating of the top prompt stabilizes (change < 10 points over 5 matches).
-**Telemetry:** Log all pairwise matchups and justifications to `elo_matches.log`. Log the Elo trajectory to `elo_ratings.csv`.
-**Artifact Output:** Save the winning prompt to `output/best_synthesis_prompt.txt`.
+1. **The DSPy Program:** Create a `BrainstormPipeline` module in DSPy that takes a `Seed Note` and `Retrieved Notes` (from Phase 2's best retriever) and runs:
+   - *Step A (Filter/Process):* Summarize each retrieved note and decide if/how it connects to the seed.
+   - *Step B (Synthesize):* Draft the final brainstorm essay using the filtered notes.
+2. **The Evaluator (LLM-as-a-Judge):** A strong model (e.g., GPT-4o / Gemini 1.5 Pro) grades the *final synthesized brainstorm* against a strict rubric (0-5 scale per dimension, or binary pass/fail):
+   - **Innovation & Insight:** Does the synthesis generate a novel, surprising connection or insight, or is it just a bland summary?
+   - **Groundedness (No Hallucination):** Are all factual claims and ideas backed by the provided source notes?
+   - **Logical Coherence (No Coerced Logic):** Do the connections flow naturally, or did the model force a strained, illogical link between unrelated notes?
+3. **The Optimization:** Use DSPy's optimizers (e.g., `MIPRO` or `BootstrapFewShotWithRandomSearch`) to jointly optimize the prompts for Step A and Step B. The optimizer will mutate the instructions and few-shot examples to maximize the Judge's score on the final output over a training set of seed notes.
+4. **Artifact Output:** Export the final, optimized prompt instructions for the Filter and Synthesis steps into `output/best_filter_prompt.txt` and `output/best_synthesis_prompt.txt`.
