@@ -11,7 +11,8 @@
   - Phase 0 ingests live websites into normalized local Markdown datasets.
   - Phase 1 validates dataset quality and emits retrieval-ready corpora plus ground truth.
   - Phase 2 runs retrieval benchmarks and hyperparameter search over the accepted datasets.
-  - Later phases consume the accepted retrieval outputs rather than reimplementing earlier steps.
+  - Phase 3 uses DSPy to optimize an LLM prompt that summarizes retrieved notes and filters them for relevance against the seed note.
+  - Phase 4 uses GEPA to optimize the final synthesis step using a pairwise LLM-as-a-Judge Elo rating.
 - Each phase should be executable independently from the command line, but should also compose into one end-to-end pipeline.
 - Each phase should read explicit input artifacts from disk and write explicit output artifacts to disk so runs are reproducible and restartable.
 - Configuration should live in checked-in files, while per-run outputs should live under `output/` and `datasets/`.
@@ -44,6 +45,12 @@ src/zettel_eval/
     hybrid.py
     metrics.py
     search.py
+  filter/
+    dspy_optimizer.py
+    judge.py
+  synthesis/
+    gepa_optimizer.py
+    judge.py
   reports/
     retrieval_report.py
 
@@ -78,6 +85,8 @@ output/
 - `ingest/*`: crawl websites, extract Markdown, classify links, canonicalize note IDs, and write normalized datasets.
 - `validate/*`: compute dataset statistics, run acceptance checks, and generate `corpus.csv` plus `ground_truth.csv`.
 - `retrieval/*`: build indexes, run retrieval methods, tune hyperparameters, and compute retrieval metrics.
+- `filter/*`: DSPy implementation to optimize the summarization and relevance filter prompt.
+- `synthesis/*`: GEPA implementation to optimize the final brainstorm synthesis prompt.
 - `reports/*`: write Markdown summaries and machine-readable run artifacts.
 
 ---
@@ -115,6 +124,7 @@ output/
    - More than 50% of notes have at least one incoming or outgoing internal link.
    - The total number of unique bidirectional internal note-note links is at least 2x the total number of notes.
    - Link connectivity should not be overly concentrated in a tiny number of hub pages; report the degree distribution and flag datasets where the top 10% of notes account for more than 50% of total internal-link degree.
+   - Notes with >10 outgoing internal links are considered "menus" or "hubs" and are excluded from being used as seed notes in the evaluation set to prevent mathematically suppressing the @K metrics.
 2. Perform manual corpus inspection before accepting a dataset:
    - Sample at least 50 extracted links per corpus.
    - Check whether links usually resolve to real notes.
@@ -122,56 +132,47 @@ output/
    - Discard the corpus if link quality is too poor for meaningful note-retrieval evaluation.
 3. For accepted datasets, parse the local normalized Markdown files and extract all outgoing internal links.
 4. Strip internal link markup from the body text while preserving the anchor text or alias when present.
-5. Save the stripped text into `corpus.csv` and a `ground_truth.csv` (mapping Source Note ID -> Target Note ID).
+5. Save the stripped text into `corpus.csv` and a `ground_truth.csv` (mapping Source Note ID -> Target Note IDs).
 **Implementation**
 This step should be deterministic and you should be able to implement all the steps in Python.
-
 Save the output into `datasets/` as versioned ground-truth artifacts.
 
 ### Phase 2: Retrieval Evaluation (Benchmarking IR)
 **Goal:** Measure note-level retrieval quality on hidden-link reconstruction.
 **Method:**
-1. Evaluate note-level retrieval only. Each hidden outgoing internal link is one evaluation example. If a source note has 5 distinct outgoing internal links, it contributes 5 examples.
+1. Evaluate note-level retrieval. Each note with valid ground-truth links (<= 10) acts as a query. The targets are all the notes it linked to.
 2. Benchmark multiple retrieval families:
    - BM25 lexical baseline
-   - Dense embedding retrieval (for example `text-embedding-3-small`)
-   - ColBERT-based retrieval
-   - Hybrid retrieval (dense + lexical/BM25 fusion, e.g. RRF)
+   - Dense embedding retrieval (e.g., `text-embedding-3-small`, `nomic-embed-text`)
+   - ColBERT-based retrieval (via RAGatouille)
+   - Hybrid retrieval (dense + lexical/BM25 fusion)
 3. Retrieval searches over all notes in the same dataset except the source note itself.
-4. Use dataset-level splits, not within-dataset random splits, to avoid leakage across heavily interlinked notes:
-   - If 4 or more datasets pass validation, reserve 1 dataset for dev, 1 for test, and use the remaining datasets for training or method development as needed.
-   - If only 3 datasets pass validation, use leave-one-dataset-out evaluation and report the average and variance across folds.
-   - Never tune on the final test dataset.
-5. Tune retrieval hyperparameters to optimize retrieval score on the dev split. This phase is not just a fixed benchmark; part of the evaluation is to measure how retrieval strategies and parameter choices change performance.
-6. At minimum, tune:
-   - whole-note versus chunked-note indexing
-   - chunk size and overlap when chunking is enabled
-   - top-K retrieval depth
-   - BM25 parameters
-   - hybrid fusion weights or RRF parameters
-   - ColBERT indexing/search parameters
-7. Define a fixed search budget per retrieval family and save the chosen hyperparameters in the experiment artifacts.
-8. Calculate `Recall@5`, `Recall@10`, and `MRR`.
-9. Report per-dataset scores and macro averages. If the score discrepancy across datasets is large, stop and inspect the dataset characteristics before proceeding to downstream phases.
-10. Run two retrieval conditions to measure lexical leakage:
-   - Anchor-preserved: remove link markup but keep alias/anchor text.
-   - Anchor-masked: remove both link markup and alias/anchor text, replacing it with minimal neutral text.
-11. Compare retrieval performance across the two conditions to estimate how much the benchmark depends on lexical cues rather than conceptual retrieval.
+4. Use dataset-level splits, not within-dataset random splits, to avoid leakage across heavily interlinked notes.
+5. Tune retrieval hyperparameters to optimize retrieval score.
+6. Calculate `MAP` (Mean Average Precision), `HitRate@5`, `HitRate@10`, and `MRR`.
 **Telemetry:** Log every example, retrieval condition, retrieved IDs, scores, and chosen hyperparameters to `retrieval_metrics.csv`.
 
-### Phase 3: Filter Evaluation (LLM-as-a-Judge & DSPy)
-**Goal:** Optimize the extraction layer (why a retrieved note is relevant to the seed).
+### Phase 3: Summarization & Relevance Filter Optimization (LLM-as-a-Judge & DSPy)
+**Goal:** Optimize the prompt used by the subagent that reads a single retrieved note, summarizes it, and decides if it is highly relevant to the original seed note. 
+**Output Requirement:** The pipeline uses DSPy internally to search for the best prompt, but the final artifact must be exported as a static plain-text instruction (`best_filter_prompt.txt`) that can be pasted directly into the `zettel-brainstormer` SKILL.md for OpenClaw to run natively.
+
 **Method:**
-1. LLM-as-a-Judge (Gemini 1.5 Pro/GPT-4o) evaluates Filter output.
-2. **Rubric (Binary 0/1):** Grounding (No hallucinations) and Relevance.
-3. **Optimization Constraints (DSPy):**
+1. **The Task:** Given a `Seed Note` and a `Retrieved Note`, the LLM must generate a 2-3 sentence summary of the retrieved note and output a binary `PASS/FAIL` indicating if it provides a meaningful conceptual connection to the seed.
+2. **The Dataset:** Use the Top 10 retrieved notes from Phase 2 for a sample of seed notes.
+   - *Positive Examples:* Retrieved notes that are in the ground truth (Actual Links).
+   - *Negative/Hard Examples:* Retrieved notes that were highly ranked by embeddings but are NOT in the ground truth (False Positives).
+3. **The Evaluator (LLM-as-a-Judge Rubric):** A strong model (GPT-4o / Gemini 1.5 Pro) grades the DSPy-generated summaries and filter decisions against three criteria (0/1 scores):
+   - **Faithfulness (Grounding):** Does the summary contain *only* claims found in the retrieved note? (No hallucination).
+   - **Seed Alignment:** Does the summary explicitly explain the conceptual bridge to the seed note?
+   - **Pruning Accuracy:** Did the filter `PASS` the ground-truth links and `FAIL` the obvious semantic mismatches/noise? (Note: The judge can override the ground truth if a non-linked "Hidden Gem" is genuinely relevant, but it must strictly reject boilerplate or completely tangential notes).
+4. **Optimization Constraints (DSPy):**
    - **Max Iterations:** 30 prompt variants.
    - **Early Stopping:** Stop if the Judge's pass rate hits >95% or if there is no improvement over 5 consecutive rounds.
 **Telemetry:** Record prompt mutations to `filter_prompts.log`. Log pass/fail rates to `filter_eval.csv`.
-**Artifact Output:** Save the winning prompt to `output/best_filter_prompt.txt`.
+**Artifact Output:** Save the winning compiled prompt instructions to `output/best_filter_prompt.txt`.
 
-### Phase 4: Synthesis Evaluation (Pairwise Elo Rating)
-**Goal:** Test strength, coherence, and novelty of the final synthesized argument.
+### Phase 4: Synthesis Evaluation (Pairwise Elo Rating via GEPA)
+**Goal:** Test strength, coherence, and novelty of the final synthesized argument using the surviving filtered notes.
 **Method:**
 1. Generate final output using Prompt A and Prompt B. Feed both to the Judge.
 2. **Rubric:** Novelty, Citation Density, Coherence. Output: A, B, or TIE.
