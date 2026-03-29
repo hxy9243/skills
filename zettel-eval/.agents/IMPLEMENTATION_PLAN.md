@@ -6,6 +6,80 @@
 - **Telemetry Format:** All logging must use plaintext files (`.log`) and CSVs (`.csv`). Avoid opaque databases (no SQLite) to ensure easy manual inspection.
 - **Output Directory:** All generated scripts, optimized prompts, and experiment results must be saved to a dedicated `output/` directory within the skill folder.
 
+## Overall Architecture
+- The system should be organized as a staged offline evaluation pipeline:
+  - Phase 0 ingests live websites into normalized local Markdown datasets.
+  - Phase 1 validates dataset quality and emits retrieval-ready corpora plus ground truth.
+  - Phase 2 runs retrieval benchmarks and hyperparameter search over the accepted datasets.
+  - Later phases consume the accepted retrieval outputs rather than reimplementing earlier steps.
+- Each phase should be executable independently from the command line, but should also compose into one end-to-end pipeline.
+- Each phase should read explicit input artifacts from disk and write explicit output artifacts to disk so runs are reproducible and restartable.
+- Configuration should live in checked-in files, while per-run outputs should live under `output/` and `datasets/`.
+
+## Physical Source Layout
+Use a source tree like this:
+
+```text
+src/zettel_eval/
+  cli.py
+  config.py
+  logging.py
+  datasets/
+    manifest.py
+    models.py
+  ingest/
+    crawl.py
+    defuddle.py
+    links.py
+    canonicalize.py
+    writer.py
+  validate/
+    stats.py
+    inspect.py
+    ground_truth.py
+  retrieval/
+    bm25.py
+    dense.py
+    colbert.py
+    hybrid.py
+    metrics.py
+    search.py
+  reports/
+    retrieval_report.py
+
+configs/
+  datasets.yaml
+  retrieval.yaml
+
+datasets/
+  raw/
+    <dataset_slug>/
+      notes/
+      metadata.json
+  processed/
+    <dataset_slug>/
+      corpus.csv
+      ground_truth.csv
+      dataset_stats.json
+
+output/
+  retrieval_metrics.csv
+  runs/
+    <run_id>/
+      config.json
+      run.log
+      summary.md
+```
+
+### Module Responsibilities
+- `cli.py`: top-level entrypoints for each phase and end-to-end execution.
+- `config.py`: load and validate dataset and retrieval configuration.
+- `datasets/models.py`: typed models for notes, links, examples, and dataset metadata.
+- `ingest/*`: crawl websites, extract Markdown, classify links, canonicalize note IDs, and write normalized datasets.
+- `validate/*`: compute dataset statistics, run acceptance checks, and generate `corpus.csv` plus `ground_truth.csv`.
+- `retrieval/*`: build indexes, run retrieval methods, tune hyperparameters, and compute retrieval metrics.
+- `reports/*`: write Markdown summaries and machine-readable run artifacts.
+
 ---
 
 ### Phase 0: Website Ingestion & Canonicalization
