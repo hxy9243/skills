@@ -1,0 +1,70 @@
+You are given one seed note and a set of retrieved Zettelkasten notes. Write a short brainstorm essay that produces one clear synthesized idea rooted in the seed note and rigorously traceable to the provided notes.
+
+Primary objective:
+Generate a single coherent thesis that sharpens, extends, or reframes the seed note by combining it with the retrieved notes. The essay must feel more synthetic than summary, but it must stay extremely close to what the notes actually support. When forced to choose, prefer grounded precision over novelty.
+
+Hard grounding rules:
+- Use only information, distinctions, and language available in the provided notes.
+- Do not add outside facts, examples, historical context, named frameworks, or broader implications not directly supported by the notes.
+- Do not invent new terminology, categories, or redefinitions unless the notes themselves clearly warrant them.
+- Stay especially close to the seed note’s specific problem, tension, or design requirement; do not drift into adjacent themes unless multiple notes directly support the move.
+- Every substantive claim must be tied to note citations.
+- Every major claim or paragraph-level subclaim must include at least one brief exact quote from a cited note.
+- Quotes should be short and precise, not long block quotations.
+- Distinguish evidence from inference explicitly. Use phrasing such as “this suggests,” “this may imply,” “taken together,” or “a plausible synthesis is” for interpretive moves.
+- If a claim cannot be directly supported by quoted note evidence, omit it.
+
+Thesis and synthesis requirements:
+- Center the essay on one main insight, not several parallel themes.
+- Treat the seed note as the anchor: the final thesis should directly answer, refine, operationalize, or resolve something in the seed note.
+- Use retrieved notes to do real argumentative work: explain a mechanism, define a workflow, clarify a tradeoff, surface a tension, or show a sequence of stages.
+- Prefer concrete syntheses that are strongly evidenced, such as:
+  - turning the seed note’s problem into a stepwise process,
+  - showing how one note supplies the mechanism for another,
+  - linking early-stage capture to later-stage processing,
+  - reconciling two notes that seem to pull in different directions,
+  - or identifying a practical loop, constraint, or progression supported across several notes.
+- Avoid broad abstractions unless they are clearly assembled from multiple quoted notes.
+- Avoid overreaching into larger social, theoretical, terminological, or normative claims unless the notes explicitly go there.
+
+Coherence requirements:
+- Write in essay form, not bullets.
+- Begin with 1 short introductory paragraph that states the seed note’s central issue and the essay’s thesis.
+- Each body paragraph must advance exactly one subclaim in support of that thesis.
+- Each body paragraph should usually connect at least two notes; do not let paragraphs become isolated note summaries.
+- Make the progression explicit: for example, problem -> mechanism -> process -> implication -> limit.
+- Keep the argument cumulative. Each paragraph should add a necessary step, not restate earlier points.
+- End with a brief conclusion that states the strongest synthesized insight and names one unresolved question, tension, or limit that remains in the notes.
+
+Uncertainty and conflict:
+- If notes differ, quote both sides and state the disagreement precisely.
+- Do not smooth over contradictions to preserve flow.
+- If the tension cannot be resolved from the notes, say so and frame it as an open question rather than forcing a conclusion.
+
+Anti-overreach safeguards:
+- Do not claim that the notes redefine a concept, imply a broad theory, or support a larger coordination/social/systemic argument unless the notes explicitly and jointly support that level of claim.
+- Do not let one weakly related note justify a major framing move.
+- Do not use citations decoratively; each citation must support the exact nearby claim.
+- Avoid citation slippage: after every interpretive sentence, check that the cited note actually says or directly supports that point.
+- Prefer modest but well-supported synthesis over ambitious but thinly supported reframing.
+
+Evidence-use standard:
+- Cite notes inline with their identifiers in a consistent format.
+- For each major paragraph claim, include at least one short exact quote.
+- Use quote-plus-interpretation: present the quoted phrase, then explain what follows from it.
+- Keep quotes attributable and local, so a reader can verify the reasoning sentence by sentence.
+
+Style target:
+Aim for a concise research-memo style: careful, explicit, synthetic, and tightly anchored to the notes. The best response will feel innovative because it combines the notes into a clear process, mechanism, or tension-resolution, not because it introduces expansive framing.
+
+Before finalizing, verify:
+1. Is there exactly one central thesis?
+2. Is that thesis clearly anchored in the seed note’s specific tension?
+3. Does each body paragraph add one necessary step in the argument?
+4. Does every major claim include citation plus brief exact quote?
+5. Are all interpretive moves explicitly marked and modest?
+6. Have you avoided invented terminology, broad implications, and weakly supported reframings?
+7. Is the essay tightly grounded while still offering a real synthesis?
+
+Output format:
+Write a concise essay with inline citations and brief exact quotes for major claims. Make the reasoning easy to audit. Prioritize a tightly supported, seed-anchored synthesis over breadth or rhetorical flourish.

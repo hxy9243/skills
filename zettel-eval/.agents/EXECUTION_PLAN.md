@@ -8,27 +8,22 @@
 
 ### Step 1: Bootstrap & Ingest
 - Initialize the `uv` environment.
-- Run the data extraction script over the target Obsidian vault to generate `corpus.csv` and `ground_truth.csv` (excluding menu notes with >10 internal links).
+- Run `uv run main.py datasets ingest` and `uv run main.py datasets validate` over the target Obsidian vault to generate `corpus.csv` and `ground_truth.csv`.
 
 ### Step 2: Benchmark Retrieval Engines
-- Execute the evaluation harness against Baseline, Hybrid, and ColBERT architectures.
+- Run `uv run main.py retrieval benchmark` against Baseline, Hybrid, and ColBERT architectures.
 - Ensure IR metrics (`MAP`, `HitRate@5`, `HitRate@10`, `MRR`) are calculated at the per-note target level.
 - Save metrics to `retrieval_metrics.csv` and generate `summary.md`.
 
 ### Step 3: End-to-End Pairwise LLM Optimization (GEPA)
-- Run the Pairwise Hill-Climbing optimization loop (`run_pairwise_opt.py`) to create the ideal prompt for drafting the final brainstorm synthesis end-to-end.
+- Run `uv run main.py optimizer pairwise` to create the ideal prompt for drafting the final brainstorm synthesis end-to-end.
 - **Dataset:** Use the top 10 retrieval results from Step 2.
-- **Evaluation Rubric (LLM-as-a-Judge):** Grade the final synthesis blinded (Essay A vs B) on:
-  1. **Innovation & Insight:** Does it generate a novel, surprising connection?
-  2. **Groundedness (No Hallucination):** Are all claims backed by the source notes?
-  3. **Logical Coherence (No Coerced Logic):** Do the connections make sense, or are they forced/strained?
-- **Credit Assignment Rule:** Lock the Filter Prompt and mutate the Synthesis Prompt (or vice versa). DO NOT mutate both simultaneously.
+- **Evaluation Rubric (LLM-as-a-Judge):** Grade the final synthesis blinded (Essay A vs B) on Innovation, Groundedness, and Coherence.
 - Iterate and log prompt mutations.
 - Export the final, optimized plain-text instructions that openclaw subagents can execute natively.
 
 ### Step 4: Summarize & Visualize
-- Run the `run_tournament.py` script to pit the final Optimized Prompt against the initial Baseline Prompt in a 10-match Elo-rated tournament.
-- Generate a comprehensive Markdown summary report and output visualizations (e.g., using `matplotlib` or `seaborn` saved as PNGs) tracking the Elo trajectory (`plot_elo.py`).
+- Run `uv run main.py optimizer tournament` to pit the final Optimized Prompt against the initial Baseline Prompt in a 10-match Elo-rated tournament.
 
 ### Step 5: Apply to Zettel-Brainstormer (Update the Skill)
 - Once the optimized prompts have stabilized and the evaluation is complete, the final step is to **update the actual skill**.

@@ -14,6 +14,17 @@
   - Phase 3: End-to-End Pairwise Elo Optimization (GEPA-style). Replaces standard scalar DSPy optimizers to enable A/B pairwise LLM-as-a-Judge evaluations.
 - Configuration lives in checked-in files, while per-run outputs live under `output/` and `datasets/`.
 
+## CLI Sub-command Structure
+To avoid ambiguity, the pipeline tools are grouped under distinct sub-commands in `cli.py`:
+- `datasets`
+  - `ingest`: Ingest public note websites into raw Markdown datasets.
+  - `validate`: Validate link density, extract ground truth, and emit `corpus.csv`.
+- `retrieval`
+  - `benchmark`: Run the hidden-link retrieval benchmark (BM25, Dense, Hybrid) and compute IR metrics.
+- `optimizer`
+  - `pairwise`: Run the custom Pairwise Elo Hill-Climbing loop to optimize prompt instructions.
+  - `tournament`: Pit two prompts (e.g., Baseline vs Optimized) in an Elo-rated A/B tournament to evaluate final performance.
+
 ## Physical Source Layout
 Use a source tree like this:
 
@@ -29,6 +40,9 @@ src/zettel_eval/
   pipeline/
     dspy_program.py
     elo_judge.py
+    optimize.py
+    pairwise_opt.py
+    tournament.py
   reports/
 
 configs/
@@ -47,19 +61,16 @@ output/
 **Goal:** Convert public note websites into a clean, self-labeled dataset. Exclude notes with >10 internal links (hub/menu notes) to prevent suppressing @K metrics. Strip internal link markup to create `corpus.csv` and `ground_truth.csv` (mapping Source Note ID -> Target Note IDs as a set).
 
 ### Phase 2: Retrieval Evaluation (Benchmarking IR)
-**Goal:** Measure note-level retrieval quality (BM25, Dense, Hybrid, ColBERT) on hidden-link reconstruction using `MAP`, `HitRate@5`, `HitRate@10`, and `MRR`. 
+**Goal:** Measure note-level retrieval quality (BM25, Dense, Hybrid) on hidden-link reconstruction using `MAP`, `HitRate@5`, `HitRate@10`, and `MRR`. 
 **Method:** Treat target links as a set per note, not independent queries. Use `nomic-embed-text` and `text-embedding-3-small` with local LRU caching to minimize API costs.
 
 ### Phase 3: End-to-End Pairwise LLM Optimization (GEPA)
 **Goal:** Optimize the prompt used by the subagent to summarize/filter notes, and the prompt used to synthesize the final brainstorm. 
 **Method (Pairwise Hill-Climbing):**
 Standard DSPy optimizers rely on noisy absolute 1-100 grading. We bypass this by building a custom Pairwise Elo Optimizer:
-1. **The Credit Assignment Strategy:** Lock the Filter Prompt and mutate the Synthesis Prompt (or vice versa). If you mutate both simultaneously, the judge cannot determine which mutation caused the win/loss.
+1. **The Credit Assignment Strategy:** Lock the Filter Prompt and mutate the Synthesis Prompt (or vice versa). DO NOT mutate both simultaneously.
 2. **The Proposal:** A Pro LLM (e.g., `gpt-5.4`) reviews the current "Champion" prompt and previous match feedback, and proposes a new "Challenger" prompt.
-3. **The Arena:** Generate final essays using both the Champion and Challenger pipelines on 5-10 random seed notes.
-4. **The Pairwise Judge:** The Judge LLM reads Essay A and Essay B side-by-side (blinded) and outputs `winner: A|B|TIE` with a 1-sentence justification, based on:
-   - **Innovation & Insight:** Novel, surprising connections.
-   - **Groundedness:** No hallucinations; explicit evidence citations.
-   - **Logical Coherence:** Natural flow, no coerced logic.
+3. **The Arena:** Generate final essays using both the Champion and Challenger pipelines on random seed notes.
+4. **The Pairwise Judge:** The Judge LLM reads Essay A and Essay B side-by-side (blinded) and outputs `winner: A|B|TIE` with a 1-sentence justification.
 5. **The Hill Climb:** If the Challenger wins the majority of matches, it dethrones the Champion and the baseline updates.
 6. **Artifact Output:** Export the final, optimized prompt instructions into `output/runs/<run_id>/best_filter_prompt.txt` and `best_synthesis_prompt.txt`.
