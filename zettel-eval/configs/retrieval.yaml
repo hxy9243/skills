@@ -1,6 +1,7 @@
 benchmark_metrics:
-  - recall@5
-  - recall@10
+  - map
+  - hit@5
+  - hit@10
   - mrr
 
 split_mode: dataset
@@ -11,26 +12,38 @@ lexical_conditions:
 
 methods:
   bm25:
-    enabled: true
+    enabled: false
     top_k_values: [5, 10]
     grid:
       k1: [1.2, 1.8]
       b: [0.5, 0.75]
   dense:
-    enabled: true
+    enabled: false
     top_k_values: [5, 10]
     grid:
-      dimensions: [128, 256]
-  colbert:
-    enabled: true
+      dimensions: [1536]
+  dense_nomic:
+    enabled: false
     top_k_values: [5, 10]
     grid:
-      dimensions: [64, 128]
+      dimensions: [768]
   hybrid:
-    enabled: true
+    enabled: false
     top_k_values: [5, 10]
     grid:
       k1: [1.2]
       b: [0.75]
-      dimensions: [256]
-      alpha: [0.3, 0.5, 0.7]
+      dimensions: [1536]
+      alpha: [0.1, 0.3, 0.5, 0.7, 0.9]
+  hybrid_nomic:
+    enabled: false
+    top_k_values: [5, 10]
+    grid:
+      k1: [1.2]
+      b: [0.75]
+      dimensions: [768]
+      alpha: [0.1, 0.3, 0.5, 0.7, 0.9]
+  colbert:
+    enabled: true
+    top_k_values: [5, 10]
+    grid: {}

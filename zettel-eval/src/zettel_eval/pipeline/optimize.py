@@ -64,9 +64,9 @@ def run_optimization_from_args(args: argparse.Namespace) -> Path:
     trainset, valset = split_examples(examples)
     append_log(run_dir / "run.log", f"Loaded {len(examples)} examples ({len(trainset)} train / {len(valset)} val)")
 
-    task_lm = dspy.LM(model=args.task_model, temperature=0.2, cache=False)
-    judge_lm = dspy.LM(model=args.judge_model or args.task_model, temperature=0.0, cache=False)
-    prompt_lm = dspy.LM(model=args.prompt_model, temperature=0.2, cache=False) if args.prompt_model else None
+    task_lm = dspy.LM(model=args.task_model, temperature=1.0, max_tokens=16000, cache=False)
+    judge_lm = dspy.LM(model=args.judge_model or args.task_model, temperature=1.0, max_tokens=16000, cache=False)
+    prompt_lm = dspy.LM(model=args.prompt_model, temperature=1.0, max_tokens=16000, cache=False) if args.prompt_model else None
     dspy.configure(lm=task_lm)
 
     student = BrainstormPipeline()
@@ -272,15 +272,17 @@ def build_optimizer(
             metric=metric,
             num_candidate_programs=iterations,
             max_rounds=1,
-            max_bootstrapped_demos=4,
-            max_labeled_demos=8,
+            max_bootstrapped_demos=1,
+            max_labeled_demos=1,
         )
 
     return dspy.MIPROv2(
         metric=metric,
         prompt_model=prompt_lm or task_lm,
         task_model=task_lm,
-        auto="light",
+        max_bootstrapped_demos=1,
+        max_labeled_demos=1,
+        auto=None, num_candidates=7,
         num_threads=1,
         seed=seed,
         verbose=False,

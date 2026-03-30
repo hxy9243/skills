@@ -1,0 +1,357 @@
+{
+  "dataset_slug": "braindump-jethro",
+  "sample_size": 50,
+  "status": "manual_review_required",
+  "samples": [
+    {
+      "source_note_id": "posts-art",
+      "target_note_id": "posts-devops",
+      "anchor_text": "Dev Ops",
+      "href": "posts-devops",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-bayes-filter",
+      "target_note_id": "posts-gaussian-filter",
+      "anchor_text": "Gaussian Filter",
+      "href": "posts-gaussian-filter",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts",
+      "target_note_id": "posts-autoencoder",
+      "anchor_text": "Autoencoder",
+      "href": "posts-autoencoder",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts",
+      "target_note_id": "posts-financial-derivative",
+      "anchor_text": "Financial Derivative",
+      "href": "posts-financial-derivative",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-designing-dataintensive-applications",
+      "target_note_id": "posts-bloom-filter",
+      "anchor_text": "Bloom Filter",
+      "href": "posts-bloom-filter",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-control-as-inference",
+      "target_note_id": "posts-control-as-inference",
+      "anchor_text": "backward messages",
+      "href": "posts-control-as-inference",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-art",
+      "target_note_id": "posts-financial-success-is-a-function-of-how-you-behave-not-how-smart-you-are",
+      "anchor_text": "Financial Success is A Function of How You Behave, Not How Smart You Are",
+      "href": "posts-financial-success-is-a-function-of-how-you-behave-not-how-smart-you-are",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-arm",
+      "target_note_id": "posts-china-economics",
+      "anchor_text": "China Economics",
+      "href": "posts-china-economics",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-computer-vision",
+      "target_note_id": "posts-computer-vision",
+      "anchor_text": "quarternions",
+      "href": "posts-computer-vision",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-art",
+      "target_note_id": "posts-networking",
+      "anchor_text": "Computer Networking",
+      "href": "posts-networking",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-erm",
+      "target_note_id": "posts-critical-thinking",
+      "anchor_text": "Critical Thinking",
+      "href": "posts-critical-thinking",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts",
+      "target_note_id": "posts-erm",
+      "anchor_text": "Empirical Risk Minimization",
+      "href": "posts-erm",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-emti-dl-with-bayesian-principles",
+      "target_note_id": "posts-bayesian-deep-learning",
+      "anchor_text": "Bayesian Deep Learning",
+      "href": "posts-bayesian-deep-learning",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts",
+      "target_note_id": "posts-convolutional-neural-networks",
+      "anchor_text": "Convolutional Neural Networks",
+      "href": "posts-convolutional-neural-networks",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts",
+      "target_note_id": "posts-gcc",
+      "anchor_text": "GCC",
+      "href": "posts-gcc",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts",
+      "target_note_id": "posts-chen-big-2020",
+      "anchor_text": "chen\\_big\\_2020: Big Self-Supervised Models are Strong Semi-Supervised Learners",
+      "href": "posts-chen-big-2020",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-entropy",
+      "target_note_id": "posts-actor-critic",
+      "anchor_text": "Actor-Critic",
+      "href": "posts-actor-critic",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts",
+      "target_note_id": "posts-fast-nn-training",
+      "anchor_text": "Fast Neural Network Training",
+      "href": "posts-fast-nn-training",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-documentation",
+      "target_note_id": "posts-double-entry-accounting",
+      "anchor_text": "Double-entry Accounting",
+      "href": "posts-double-entry-accounting",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-erm",
+      "target_note_id": "posts-ekf-localization",
+      "anchor_text": "EKF Localization",
+      "href": "posts-ekf-localization",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts",
+      "target_note_id": "posts-credit-assignment-snn",
+      "anchor_text": "Credit Assignment in Spiking Neural Networks",
+      "href": "posts-credit-assignment-snn",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-arm",
+      "target_note_id": "posts-exploration-in-rl",
+      "anchor_text": "Exploration In Reinforcement Learning",
+      "href": "posts-exploration-in-rl",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts",
+      "target_note_id": "posts-cmake",
+      "anchor_text": "CMake",
+      "href": "posts-cmake",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts",
+      "target_note_id": "posts-branch-prediction",
+      "anchor_text": "Branch Prediction",
+      "href": "posts-branch-prediction",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-financial-derivative",
+      "target_note_id": "posts-forward-contracts",
+      "anchor_text": "Forward Contracts",
+      "href": "posts-forward-contracts",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-art",
+      "target_note_id": "posts-bayes-filter",
+      "anchor_text": "Bayes Filter",
+      "href": "posts-bayes-filter",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-cognitive-task-analysis",
+      "target_note_id": "posts-copying-better-how-to-acquire-the-tacit-knowledge-of-experts",
+      "anchor_text": "Copying Better: How To Acquire The Tacit Knowledge of Experts",
+      "href": "posts-copying-better-how-to-acquire-the-tacit-knowledge-of-experts",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-erm",
+      "target_note_id": "posts-artificial-intelligence",
+      "anchor_text": "Artificial Intelligence",
+      "href": "posts-artificial-intelligence",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts",
+      "target_note_id": "posts-colearning",
+      "anchor_text": "Co-learning",
+      "href": "posts-colearning",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-art",
+      "target_note_id": "posts-coding-interview",
+      "anchor_text": "Coding Interview Preparation",
+      "href": "posts-coding-interview",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-books",
+      "target_note_id": "posts-are-we-smart-enough-to-know-how-smart-animals-are",
+      "anchor_text": "Are We Smart Enough to Know How Smart Animals Are?",
+      "href": "posts-are-we-smart-enough-to-know-how-smart-animals-are",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-art",
+      "target_note_id": "posts-zador19-critique-pure-learning",
+      "anchor_text": "A critique of pure learning and what artificial neural networks can learn from animal brains",
+      "href": "posts-zador19-critique-pure-learning",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-erm",
+      "target_note_id": "posts-exchangeability",
+      "anchor_text": "Exchangeability",
+      "href": "posts-exchangeability",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-eds",
+      "target_note_id": "posts-artificial-intelligence",
+      "anchor_text": "Artificial Intelligence",
+      "href": "posts-artificial-intelligence",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts",
+      "target_note_id": "posts-double-entry-accounting",
+      "anchor_text": "Double-entry Accounting",
+      "href": "posts-double-entry-accounting",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-emacs-lisp",
+      "target_note_id": "posts-emacs-should-be-emacs-lisp",
+      "anchor_text": "Emacs Should Be Emacs Lisp - Tom Tromey",
+      "href": "posts-emacs-should-be-emacs-lisp",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-books",
+      "target_note_id": "posts-consciousness",
+      "anchor_text": "Consciousness",
+      "href": "posts-consciousness",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-distributed-rl",
+      "target_note_id": "posts-distributed-rl",
+      "anchor_text": "Espeholt et al., n.d.",
+      "href": "posts-distributed-rl",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts",
+      "target_note_id": "posts-financial-success-is-a-function-of-how-you-behave-not-how-smart-you-are",
+      "anchor_text": "Financial Success is A Function of How You Behave, Not How Smart You Are",
+      "href": "posts-financial-success-is-a-function-of-how-you-behave-not-how-smart-you-are",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts",
+      "target_note_id": "posts-bittorrent",
+      "anchor_text": "BitTorrent",
+      "href": "posts-bittorrent",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-emacs-lisp",
+      "target_note_id": "posts-elisp-buffer-passing-style",
+      "anchor_text": "Elisp: Buffer-passing Style",
+      "href": "posts-elisp-buffer-passing-style",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts",
+      "target_note_id": "posts-anthony-deden",
+      "anchor_text": "Anthony Deden",
+      "href": "posts-anthony-deden",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts",
+      "target_note_id": "posts-chen20-simpl-framew-contr-learn-visual-repres",
+      "anchor_text": "chen20\\_simpl\\_framew\\_contr\\_learn\\_visual\\_repres: A simple framework for contrastive learning of visual representations",
+      "href": "posts-chen20-simpl-framew-contr-learn-visual-repres",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-art",
+      "target_note_id": "posts-event-based-vision",
+      "anchor_text": "Event-based Vision",
+      "href": "posts-event-based-vision",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-eds",
+      "target_note_id": "posts-docker",
+      "anchor_text": "Docker 101",
+      "href": "posts-docker",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-entropy",
+      "target_note_id": "posts-deep-learning",
+      "anchor_text": "Deep Learning",
+      "href": "posts-deep-learning",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "braindump-jethro-dev",
+      "target_note_id": "posts",
+      "anchor_text": "full index",
+      "href": "posts",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-erm",
+      "target_note_id": "posts-expectation-maximization",
+      "anchor_text": "Expectation Maximization and Mixture Models",
+      "href": "posts-expectation-maximization",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-data-council",
+      "target_note_id": "posts-data-council",
+      "anchor_text": "\u21a9",
+      "href": "posts-data-council",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "posts-art",
+      "target_note_id": "posts-bayesian-inference",
+      "anchor_text": "Bayesian Inference",
+      "href": "posts-bayesian-inference",
+      "is_internal": true
+    }
+  ]
+}

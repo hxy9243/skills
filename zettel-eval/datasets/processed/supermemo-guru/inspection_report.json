@@ -1,0 +1,357 @@
+{
+  "dataset_slug": "supermemo-guru",
+  "sample_size": 50,
+  "status": "manual_review_required",
+  "samples": [
+    {
+      "source_note_id": "wiki-optimum-diet",
+      "target_note_id": "wiki-optimum-diet",
+      "anchor_text": "intermittent fasting",
+      "href": "wiki-optimum-diet",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "target_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "anchor_text": "Borbely model",
+      "href": "wiki-how-do-we-fall-asleep-3f",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-backpropagation-in-the-brain",
+      "target_note_id": "wiki-the-truth-about-grandmother-cells",
+      "anchor_text": "learn about zebras, and how we forget zebras",
+      "href": "wiki-the-truth-about-grandmother-cells",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-planning-a-perfect-productive-day-without-stress",
+      "target_note_id": "wiki-planning-a-perfect-productive-day-without-stress",
+      "anchor_text": "Plan to Enlightenment",
+      "href": "wiki-planning-a-perfect-productive-day-without-stress",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "target_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "anchor_text": "picture",
+      "href": "wiki-how-do-we-fall-asleep-3f",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-natural-creativity-cycle",
+      "target_note_id": "wiki-natural-creativity-cycle",
+      "anchor_text": "Neural aspects of the natural creativity cycle",
+      "href": "wiki-natural-creativity-cycle",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-neural-optimization-in-sleep",
+      "target_note_id": "wiki-neural-optimization-in-sleep",
+      "anchor_text": "shutdown test",
+      "href": "wiki-neural-optimization-in-sleep",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-100-bad-habits-learned-at-school",
+      "target_note_id": "wiki-100-bad-habits-learned-at-school",
+      "anchor_text": "Excessive conscientiousness",
+      "href": "wiki-100-bad-habits-learned-at-school",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-100-bad-habits-learned-at-school",
+      "target_note_id": "wiki-100-bad-habits-learned-at-school",
+      "anchor_text": "anxiety caused by knowledge gaps",
+      "href": "wiki-100-bad-habits-learned-at-school",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "target_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "anchor_text": "one that is responsible for transitions between NREM and REM sleep",
+      "href": "wiki-how-do-we-fall-asleep-3f",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-neuromythology",
+      "target_note_id": "wiki-neuromythology",
+      "anchor_text": "confused in the flood of hyperlinks",
+      "href": "wiki-neuromythology",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-optimum-diet",
+      "target_note_id": "wiki-optimum-diet",
+      "anchor_text": "bad conditioning",
+      "href": "wiki-optimum-diet",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-optimum-diet",
+      "target_note_id": "wiki-optimum-diet",
+      "anchor_text": "Bad conditioning",
+      "href": "wiki-optimum-diet",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-baby-sleep",
+      "target_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "anchor_text": "SCN",
+      "href": "wiki-how-do-we-fall-asleep-3f",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-100-bad-habits-learned-at-school",
+      "target_note_id": "wiki-100-bad-habits-learned-at-school",
+      "anchor_text": "learned helplessness",
+      "href": "wiki-100-bad-habits-learned-at-school",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "target_note_id": "wiki-sleep-and-learning",
+      "anchor_text": "recall",
+      "href": "wiki-sleep-and-learning",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-100-bad-habits-learned-at-school",
+      "target_note_id": "wiki-100-bad-habits-learned-at-school",
+      "anchor_text": "above",
+      "href": "wiki-100-bad-habits-learned-at-school",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-planning-a-perfect-productive-day-without-stress",
+      "target_note_id": "wiki-planning-a-perfect-productive-day-without-stress",
+      "anchor_text": "bad days",
+      "href": "wiki-planning-a-perfect-productive-day-without-stress",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-great-personalities-do-not-come-from-genes",
+      "target_note_id": "wiki-great-personalities-do-not-come-from-genes",
+      "anchor_text": "default personality",
+      "href": "wiki-great-personalities-do-not-come-from-genes",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-100-bad-habits-learned-at-school",
+      "target_note_id": "wiki-100-bad-habits-learned-at-school",
+      "anchor_text": "Submission to authority",
+      "href": "wiki-100-bad-habits-learned-at-school",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-sleep-and-learning",
+      "target_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "anchor_text": "rPRC",
+      "href": "wiki-how-do-we-fall-asleep-3f",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-biphasic-life",
+      "target_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "anchor_text": "REM-sleep deficit",
+      "href": "wiki-how-do-we-fall-asleep-3f",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-planning-a-perfect-productive-day-without-stress",
+      "target_note_id": "wiki-planning-a-perfect-productive-day-without-stress",
+      "anchor_text": "your time matters",
+      "href": "wiki-planning-a-perfect-productive-day-without-stress",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-error-of-ebbinghaus-forgetting-curve",
+      "target_note_id": "wiki-error-of-ebbinghaus-forgetting-curve",
+      "anchor_text": "below",
+      "href": "wiki-error-of-ebbinghaus-forgetting-curve",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-don-27t-teach-your-child-to-read",
+      "target_note_id": "wiki-don-27t-teach-your-child-to-read",
+      "anchor_text": "**Headstart myth**",
+      "href": "wiki-don-27t-teach-your-child-to-read",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-dangers-of-being-a-straight-a-student",
+      "target_note_id": "wiki-why-kids-hate-school-3f",
+      "anchor_text": "Freddy",
+      "href": "wiki-why-kids-hate-school-3f",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-optimum-diet",
+      "target_note_id": "wiki-optimum-diet",
+      "anchor_text": "above",
+      "href": "wiki-optimum-diet",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-neural-optimization-in-sleep",
+      "target_note_id": "wiki-neural-optimization-in-sleep",
+      "anchor_text": "neural optimization",
+      "href": "wiki-neural-optimization-in-sleep",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-100-bad-habits-learned-at-school",
+      "target_note_id": "wiki-100-bad-habits-learned-at-school",
+      "anchor_text": "futile grit",
+      "href": "wiki-100-bad-habits-learned-at-school",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-ban-on-homeschooling",
+      "target_note_id": "wiki-ban-on-homeschooling",
+      "anchor_text": "how not to play with religious fire",
+      "href": "wiki-ban-on-homeschooling",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-optimum-diet",
+      "target_note_id": "wiki-optimum-diet",
+      "anchor_text": "1995",
+      "href": "wiki-optimum-diet",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-100-bad-habits-learned-at-school",
+      "target_note_id": "wiki-100-bad-habits-learned-at-school",
+      "anchor_text": "above",
+      "href": "wiki-100-bad-habits-learned-at-school",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-sleep-and-learning",
+      "target_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "anchor_text": "two-process sleep model",
+      "href": "wiki-how-do-we-fall-asleep-3f",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "target_note_id": "wiki-biphasic-life",
+      "anchor_text": "circadian nature",
+      "href": "wiki-biphasic-life",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-childhood-amnesia",
+      "target_note_id": "wiki-childhood-amnesia",
+      "anchor_text": "Childhood amnesia: Mechanism",
+      "href": "wiki-childhood-amnesia",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-optimization-of-behavioral-spaces-in-development",
+      "target_note_id": "wiki-optimization-of-behavioral-spaces-in-development",
+      "anchor_text": "behavioral space",
+      "href": "wiki-optimization-of-behavioral-spaces-in-development",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-don-27t-teach-your-child-to-read",
+      "target_note_id": "wiki-don-27t-teach-your-child-to-read",
+      "anchor_text": "Freer Speckley",
+      "href": "wiki-don-27t-teach-your-child-to-read",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-ban-on-homeschooling",
+      "target_note_id": "wiki-ban-on-homeschooling",
+      "anchor_text": "Polish indoctrination see-saw",
+      "href": "wiki-ban-on-homeschooling",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "target_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "anchor_text": "dorsomedial hypothalamic nucleus (DMH)",
+      "href": "wiki-how-do-we-fall-asleep-3f",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-100-bad-habits-learned-at-school",
+      "target_note_id": "wiki-100-bad-habits-learned-at-school",
+      "anchor_text": "reliance on assistance",
+      "href": "wiki-100-bad-habits-learned-at-school",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-100-bad-habits-learned-at-school",
+      "target_note_id": "wiki-100-bad-habits-learned-at-school",
+      "anchor_text": "excessive conscientiousness",
+      "href": "wiki-100-bad-habits-learned-at-school",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-optimum-diet",
+      "target_note_id": "wiki-optimum-diet",
+      "anchor_text": "Spaced repetition in appetite control",
+      "href": "wiki-optimum-diet",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "target_note_id": "wiki-optimizing-the-timing-of-brainwork",
+      "anchor_text": "Sleeping against your natural rhythm",
+      "href": "wiki-optimizing-the-timing-of-brainwork",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "target_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "anchor_text": "SCN",
+      "href": "wiki-how-do-we-fall-asleep-3f",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "target_note_id": "wiki-how-do-we-fall-asleep-3f",
+      "anchor_text": "adenosine",
+      "href": "wiki-how-do-we-fall-asleep-3f",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-dangers-of-being-a-straight-a-student",
+      "target_note_id": "wiki-dangers-of-being-a-straight-a-student",
+      "anchor_text": "personal stories below",
+      "href": "wiki-dangers-of-being-a-straight-a-student",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-on-freedom-of-education-and-freedom-of-information",
+      "target_note_id": "wiki-learning-history-school-vs-self-directed-learning",
+      "anchor_text": "converge on similar themes",
+      "href": "wiki-learning-history-school-vs-self-directed-learning",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-great-personalities-do-not-come-from-genes",
+      "target_note_id": "wiki-great-personalities-do-not-come-from-genes",
+      "anchor_text": "Known genes",
+      "href": "wiki-great-personalities-do-not-come-from-genes",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-100-bad-habits-learned-at-school",
+      "target_note_id": "wiki-100-bad-habits-learned-at-school",
+      "anchor_text": "low self-esteem",
+      "href": "wiki-100-bad-habits-learned-at-school",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "wiki-planning-a-perfect-productive-day-without-stress",
+      "target_note_id": "wiki-planning-a-perfect-productive-day-without-stress",
+      "anchor_text": "turning off your phone",
+      "href": "wiki-planning-a-perfect-productive-day-without-stress",
+      "is_internal": true
+    }
+  ]
+}

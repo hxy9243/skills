@@ -1,45 +1,83 @@
 from __future__ import annotations
 
-import math
+from collections.abc import Sequence
+from tempfile import TemporaryDirectory
+import sys
+from types import ModuleType
+from uuid import uuid4
 
-from zettel_eval.retrieval.bm25 import tokenize
+from pydantic import BaseModel
 
+try:
+    import langchain  # noqa: F401
+    from langchain.retrievers.document_compressors.base import BaseDocumentCompressor
+except ModuleNotFoundError:
+    class BaseDocumentCompressor(BaseModel):
+        """Compatibility shim for ragatouille on modern langchain."""
 
-def _token_embedding(token: str, dimensions: int) -> list[float]:
-    vector = [0.0] * dimensions
-    index = hash(token) % dimensions
-    vector[index] = 1.0
-    return vector
+        model_config = {"arbitrary_types_allowed": True}
 
+    retrievers_module = ModuleType("langchain.retrievers")
+    compressors_module = ModuleType("langchain.retrievers.document_compressors")
+    base_module = ModuleType("langchain.retrievers.document_compressors.base")
+    base_module.BaseDocumentCompressor = BaseDocumentCompressor
+    sys.modules.setdefault("langchain.retrievers", retrievers_module)
+    sys.modules.setdefault("langchain.retrievers.document_compressors", compressors_module)
+    sys.modules["langchain.retrievers.document_compressors.base"] = base_module
 
-def _dot(left: list[float], right: list[float]) -> float:
-    return sum(a * b for a, b in zip(left, right, strict=True))
+from ragatouille import RAGPretrainedModel
 
 
 class ColBERTRetriever:
-    """A lightweight late-interaction approximation for offline experimentation."""
+    """Real ColBERT retriever backed by ragatouille."""
 
-    def __init__(self, notes: dict[str, str], dimensions: int = 64) -> None:
-        self.dimensions = dimensions
-        self.note_token_vectors = {
-            note_id: [_token_embedding(token, dimensions) for token in tokenize(text)]
-            for note_id, text in notes.items()
-        }
+    def __init__(self, notes: dict[str, str]) -> None:
+        self._notes = notes
+        self._ids = list(notes.keys())
+        self._temp_dir = TemporaryDirectory(prefix="zettel-colbert-")
+        self._index_name = f"zettel-eval-{uuid4().hex}"
+        self._model = RAGPretrainedModel.from_pretrained(
+            "colbert-ir/colbertv2.0",
+            index_root=self._temp_dir.name,
+        )
+        self._model.index(
+            collection=[notes[note_id] for note_id in self._ids],
+            document_ids=self._ids,
+            index_name=self._index_name,
+            split_documents=False,
+        )
 
-    def search(self, query: str, exclude_ids: set[str] | None = None, limit: int = 10) -> list[tuple[str, float]]:
+    def __del__(self) -> None:
+        temp_dir = getattr(self, "_temp_dir", None)
+        if temp_dir is not None:
+            temp_dir.cleanup()
+
+    def search(
+        self,
+        query: str,
+        exclude_ids: set[str] | None = None,
+        limit: int = 10,
+    ) -> list[tuple[str, float]]:
         exclude_ids = exclude_ids or set()
-        query_vectors = [_token_embedding(token, self.dimensions) for token in tokenize(query)]
-        scores: list[tuple[str, float]] = []
-        for note_id, note_vectors in self.note_token_vectors.items():
+        requested = min(len(self._ids), max(limit + len(exclude_ids), limit))
+        if requested <= 0:
+            return []
+
+        results = self._model.search(query=query, k=requested)
+        return self._filter_results(results, exclude_ids=exclude_ids, limit=limit)
+
+    def _filter_results(
+        self,
+        results: Sequence[dict],
+        exclude_ids: set[str],
+        limit: int,
+    ) -> list[tuple[str, float]]:
+        filtered: list[tuple[str, float]] = []
+        for result in results:
+            note_id = str(result["document_id"])
             if note_id in exclude_ids:
                 continue
-            if not note_vectors or not query_vectors:
-                scores.append((note_id, 0.0))
-                continue
-            score = 0.0
-            for query_vector in query_vectors:
-                score += max(_dot(query_vector, note_vector) for note_vector in note_vectors)
-            score /= math.sqrt(len(query_vectors))
-            scores.append((note_id, score))
-        scores.sort(key=lambda item: item[1], reverse=True)
-        return scores[:limit]
+            filtered.append((note_id, float(result["score"])))
+            if len(filtered) >= limit:
+                break
+        return filtered

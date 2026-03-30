@@ -1,0 +1,357 @@
+{
+  "dataset_slug": "steph-ango",
+  "sample_size": 50,
+  "status": "manual_review_required",
+  "samples": [
+    {
+      "source_note_id": "writing",
+      "target_note_id": "topics-obsidian",
+      "anchor_text": "obsidian",
+      "href": "topics-obsidian",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "writing",
+      "target_note_id": "photoshop-for-text",
+      "anchor_text": "2022-10-18 Photoshop for text",
+      "href": "photoshop-for-text",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "stephango-com",
+      "target_note_id": "vcware",
+      "anchor_text": "2024 \u00b7 02 100% user-supported",
+      "href": "vcware",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics-leverage",
+      "target_note_id": "quality-software",
+      "anchor_text": "2023 \u00b7 10 Quality software deserves your hard\u2011earned cash",
+      "href": "quality-software",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "obsidian",
+      "target_note_id": "obsidian-web-clipper",
+      "anchor_text": "Web Clipper",
+      "href": "obsidian-web-clipper",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "file-over-app",
+      "target_note_id": "obsidian",
+      "anchor_text": "Obsidian",
+      "href": "obsidian",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "writing",
+      "target_note_id": "pain",
+      "anchor_text": "2023-11-09 Pain is information",
+      "href": "pain",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics-obsidian",
+      "target_note_id": "40-questions-decade",
+      "anchor_text": "2022 \u00b7 01 40 questions to ask yourself every decade",
+      "href": "40-questions-decade",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "vault",
+      "target_note_id": "40-questions",
+      "anchor_text": "40 questions to ask yourself every year",
+      "href": "40-questions",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics-writing",
+      "target_note_id": "file-over-app",
+      "anchor_text": "2023 \u00b7 07 File over app",
+      "href": "file-over-app",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "obsidian-web-clipper",
+      "target_note_id": "tidy",
+      "anchor_text": "Tidy Reader",
+      "href": "tidy",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics-habits",
+      "target_note_id": "40-questions",
+      "anchor_text": "2016 \u00b7 10 40 questions to ask yourself every year",
+      "href": "40-questions",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "feed-xml",
+      "target_note_id": "Perfect Days",
+      "anchor_text": "Perfect Days",
+      "href": "Perfect Days",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics",
+      "target_note_id": "topics-packaging",
+      "anchor_text": "packaging",
+      "href": "topics-packaging",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics-minimalism",
+      "target_note_id": "concise",
+      "anchor_text": "2023 \u00b7 08 Concise explanations accelerate progress",
+      "href": "concise",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics",
+      "target_note_id": "topics-perfectionism",
+      "anchor_text": "perfectionism",
+      "href": "topics-perfectionism",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "about",
+      "target_note_id": "lumi",
+      "anchor_text": "Lumi",
+      "href": "lumi",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics-learning",
+      "target_note_id": "love",
+      "anchor_text": "2024 \u00b7 05 Love is freedom",
+      "href": "love",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "projects",
+      "target_note_id": "defuddle",
+      "anchor_text": "Defuddle",
+      "href": "defuddle",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "earth-needs-progress-not-perfection",
+      "target_note_id": "slash-packaging",
+      "anchor_text": "Slash Packaging",
+      "href": "slash-packaging",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics",
+      "target_note_id": "topics-tools",
+      "anchor_text": "tools",
+      "href": "topics-tools",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics-perfectionism",
+      "target_note_id": "a-little-bit-every-day",
+      "anchor_text": "2018 \u00b7 09 A little bit every day",
+      "href": "a-little-bit-every-day",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "about",
+      "target_note_id": "computer-show",
+      "anchor_text": "Computer Show",
+      "href": "computer-show",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "stephango-com",
+      "target_note_id": "always-learning-always-teaching",
+      "anchor_text": "2013 \u00b7 04 Always learning, always teaching",
+      "href": "always-learning-always-teaching",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics-startups",
+      "target_note_id": "vcware",
+      "anchor_text": "2024 \u00b7 02 100% user-supported",
+      "href": "vcware",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "vault",
+      "target_note_id": "permalink-opener",
+      "anchor_text": "Permalink Opener",
+      "href": "permalink-opener",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "feed",
+      "target_note_id": "Vidiots",
+      "anchor_text": "Vidiots",
+      "href": "Vidiots",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "about",
+      "target_note_id": "computer-show",
+      "anchor_text": "Computer Show",
+      "href": "computer-show",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics-tools",
+      "target_note_id": "synthography",
+      "anchor_text": "2022 \u00b7 07 A camera for ideas",
+      "href": "synthography",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "writing",
+      "target_note_id": "every-app-is-a-superpower",
+      "anchor_text": "2015-04-19 Every app is a superpower",
+      "href": "every-app-is-a-superpower",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics-popular",
+      "target_note_id": "concise",
+      "anchor_text": "2023 \u00b7 08 Concise explanations accelerate progress",
+      "href": "concise",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "tidy",
+      "target_note_id": "obsidian",
+      "anchor_text": "Obsidian",
+      "href": "obsidian",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics-evergreen",
+      "target_note_id": "calmness",
+      "anchor_text": "2022 \u00b7 10 Calmness is a superpower",
+      "href": "calmness",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "projects",
+      "target_note_id": "omak",
+      "anchor_text": "Omak",
+      "href": "omak",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "love",
+      "target_note_id": "precious",
+      "anchor_text": "energy",
+      "href": "precious",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "obsidian",
+      "target_note_id": "40-questions",
+      "anchor_text": "40 questions to ask yourself every year",
+      "href": "40-questions",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics-leverage",
+      "target_note_id": "buy-wisely",
+      "anchor_text": "2023 \u00b7 09 Buy wisely",
+      "href": "buy-wisely",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "stephango-com",
+      "target_note_id": "40-questions-decade",
+      "anchor_text": "2022 \u00b7 01 40 questions to ask yourself every decade",
+      "href": "40-questions-decade",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "projects",
+      "target_note_id": "print-with-light",
+      "anchor_text": "Print with Light",
+      "href": "print-with-light",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "stephango-com",
+      "target_note_id": "topics-humanism",
+      "anchor_text": "humanism",
+      "href": "topics-humanism",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "about",
+      "target_note_id": "well-made",
+      "anchor_text": "Well Made",
+      "href": "well-made",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "writing",
+      "target_note_id": "self-guarantee",
+      "anchor_text": "2024-12-03 Self-guaranteeing promises",
+      "href": "self-guarantee",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "stephango-com",
+      "target_note_id": "saw",
+      "anchor_text": "Use the saw, fear the saw",
+      "href": "saw",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "tidy",
+      "target_note_id": "tidyurl",
+      "anchor_text": "Tidy URL",
+      "href": "tidyurl",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "evergreen-notes",
+      "target_note_id": "calmness",
+      "anchor_text": "Calmness is a superpower",
+      "href": "calmness",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics-startups",
+      "target_note_id": "concise",
+      "anchor_text": "2023 \u00b7 08 Concise explanations accelerate progress",
+      "href": "concise",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics-ideas",
+      "target_note_id": "precious",
+      "anchor_text": "2023 \u00b7 07 Caloric energy is precious",
+      "href": "precious",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics-rituals",
+      "target_note_id": "a-little-bit-every-day",
+      "anchor_text": "2018 \u00b7 09 A little bit every day",
+      "href": "a-little-bit-every-day",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "stephango-com",
+      "target_note_id": "announcing-slash-packaging",
+      "anchor_text": "2020 \u00b7 04 Announcing Slash Packaging",
+      "href": "announcing-slash-packaging",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "topics-design",
+      "target_note_id": "every-app-is-a-superpower",
+      "anchor_text": "2015 \u00b7 04 Every app is a superpower",
+      "href": "every-app-is-a-superpower",
+      "is_internal": true
+    }
+  ]
+}

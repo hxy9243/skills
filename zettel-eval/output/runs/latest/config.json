@@ -1,0 +1,8 @@
+{
+  "methods": [
+    "bm25",
+    "dense",
+    "colbert",
+    "hybrid"
+  ]
+}

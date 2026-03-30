@@ -11,7 +11,8 @@ def build_summary_report(summary_rows: list[dict], dataset_scores: dict[str, dic
     for row in summary_rows:
         lines.append(
             f"- `{row['dataset_slug']}` / `{row['method']}`:"
-            f" R@5={row['recall_at_5']}, R@10={row['recall_at_10']}, MRR={row['mrr']}, params={row['params']}"
+            f" MAP={row['map']}, Hit@5={row['hit_rate_at_5']},"
+            f" Hit@10={row['hit_rate_at_10']}, MRR={row['mrr']}, params={row['params']}"
         )
 
     lines.extend(["", "## Aggregate Diagnostics", ""])

@@ -1,0 +1,357 @@
+{
+  "dataset_slug": "andy-matuschak",
+  "sample_size": 50,
+  "status": "manual_review_required",
+  "samples": [
+    {
+      "source_note_id": "zldprtyt7ca2z2lugltfmss",
+      "target_note_id": "zwzvw2vm4tpjpkxnhuflaso",
+      "anchor_text": "It\u2019s hard to hear yourself think",
+      "href": "zwzvw2vm4tpjpkxnhuflaso",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zqm6xab3xxrxlhzf7gahpj2",
+      "target_note_id": "zb74h9cuwroseuqve7jzyco",
+      "anchor_text": "Write about what you read to internalize texts deeply",
+      "href": "zb74h9cuwroseuqve7jzyco",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zpktsiu725w9wqcqovpbcxm",
+      "target_note_id": "zkpv6qkserdrgqyryvgs2ws",
+      "anchor_text": "Mnemonic medium",
+      "href": "zkpv6qkserdrgqyryvgs2ws",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zkpv6qkserdrgqyryvgs2ws",
+      "target_note_id": "zqke7jzs1cyqhbnlydhmqyq",
+      "anchor_text": "Memory augmentation can accelerate the unpleasant early stages of learning a subject",
+      "href": "zqke7jzs1cyqhbnlydhmqyq",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zstqsq4atxb61k3z43tforn",
+      "target_note_id": "zkpv6qkserdrgqyryvgs2ws",
+      "anchor_text": "Mnemonic medium",
+      "href": "zkpv6qkserdrgqyryvgs2ws",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zskd44o2vtbquqyqmjupo4b",
+      "target_note_id": "z4exkuljdbrbze7pvagxc5a",
+      "anchor_text": "Evergreen note-writing helps insight accumulate",
+      "href": "z4exkuljdbrbze7pvagxc5a",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zrbqwbnhmvdfltkxmcibmox",
+      "target_note_id": "z2hqehqwkdrll9juwfawzzx",
+      "anchor_text": "Evergreen notes should be concept-oriented",
+      "href": "z2hqehqwkdrll9juwfawzzx",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zbmsspm1wffdehxncbcqszp",
+      "target_note_id": "z4kscvkqcd2xmvwvsdubztn",
+      "anchor_text": "Spacing effect",
+      "href": "z4kscvkqcd2xmvwvsdubztn",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zgkqpvetpybvbxmpmuuvfx8",
+      "target_note_id": "z2pg1cbuyvjv4jeoqmr8xua",
+      "anchor_text": "Triage strategies for maintaining inboxes (e.g. Inbox Zero) are often too brittle",
+      "href": "z2pg1cbuyvjv4jeoqmr8xua",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zdh1yhnfqnxdere12b4zd8k",
+      "target_note_id": "znuaigaxp21eorser1jm9yu",
+      "anchor_text": "Evergreen notes should be atomic",
+      "href": "znuaigaxp21eorser1jm9yu",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "z85vbmd4d4z3srygaxenkam",
+      "target_note_id": "zjowjeprvrjnm2zl3gdxbjg",
+      "anchor_text": "The mnemonic medium can help readers apply what they\u2019ve learned through simple application prompts",
+      "href": "zjowjeprvrjnm2zl3gdxbjg",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zf9ywlhqhfn5rfupapiyqmp",
+      "target_note_id": "zcmhnca1ise74mkkyqs5pbz",
+      "anchor_text": "Work with the garage door up",
+      "href": "zcmhnca1ise74mkkyqs5pbz",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zylng1blcbm9jeconnhvysl",
+      "target_note_id": "z4gear5cerwdjprdhu5gy3n",
+      "anchor_text": "Peripheral vision",
+      "href": "z4gear5cerwdjprdhu5gy3n",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "ztdjzqbkat9paltsk2hfepx",
+      "target_note_id": "zmqk1sfxwbvmbsqasjstuvm",
+      "anchor_text": "Span of absolute judgment",
+      "href": "zmqk1sfxwbvmbsqasjstuvm",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zgsgs1uhdogpktvzb5hdt2a",
+      "target_note_id": "z92tgmibsnraf5kxxstnkbj",
+      "anchor_text": "Enacted experience",
+      "href": "z92tgmibsnraf5kxxstnkbj",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "ztdjzqbkat9paltsk2hfepx",
+      "target_note_id": "z4kscvkqcd2xmvwvsdubztn",
+      "anchor_text": "Spacing effect",
+      "href": "z4kscvkqcd2xmvwvsdubztn",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "z8su3r8xyzyvwrhyddjasj2",
+      "target_note_id": "ze92anleszr5pwoyatkzka8",
+      "anchor_text": "Evergreen notes are a safe place to develop wild ideas",
+      "href": "ze92anleszr5pwoyatkzka8",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zkpv6qkserdrgqyryvgs2ws",
+      "target_note_id": "zpirwrhqxgff9zej765pb8m",
+      "anchor_text": "The critical thing to optimize in spaced repetition memory systems is emotional connection to the review session and its contents",
+      "href": "zpirwrhqxgff9zej765pb8m",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zpirwrhqxgff9zej765pb8m",
+      "target_note_id": "z2d1qpwddpktbjpnuwyfvva",
+      "anchor_text": "Spaced repetition memory system",
+      "href": "z2d1qpwddpktbjpnuwyfvva",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "ztdjzqbkat9paltsk2hfepx",
+      "target_note_id": "zuvbjdpc4kbud5fslmpfpbw",
+      "anchor_text": "Educational games are a doomed approach to creating enabling environments",
+      "href": "zuvbjdpc4kbud5fslmpfpbw",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zbmsspm1wffdehxncbcqszp",
+      "target_note_id": "z4exkuljdbrbze7pvagxc5a",
+      "anchor_text": "Evergreen note-writing helps insight accumulate",
+      "href": "z4exkuljdbrbze7pvagxc5a",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zqvwwb95vzchcpow3gwy5wi",
+      "target_note_id": "z5e5qawixcmbtntupvxeoex",
+      "anchor_text": "Evergreen notes",
+      "href": "z5e5qawixcmbtntupvxeoex",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zr6rrbcfy5rfkiimfnajzkb",
+      "target_note_id": "zaf4onsv9qb38ncsvyezgab",
+      "anchor_text": "\u201cBetter note-taking\u201d misses the point; what matters is \u201cbetter thinking\u201d",
+      "href": "zaf4onsv9qb38ncsvyezgab",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zdfv5gx8kksclke8dq1rfuk",
+      "target_note_id": "ztn3g4wtm1hbknfuvlljpev",
+      "anchor_text": "Knowledge work should accrete",
+      "href": "ztn3g4wtm1hbknfuvlljpev",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "z5wxoe5azjstbpkerety5kv",
+      "target_note_id": "zdxbgewk7msyonq2ngnrf8h",
+      "anchor_text": "A reading inbox to capture possibly-useful references",
+      "href": "zdxbgewk7msyonq2ngnrf8h",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zqke7jzs1cyqhbnlydhmqyq",
+      "target_note_id": "z2d1qpwddpktbjpnuwyfvva",
+      "anchor_text": "Spaced repetition memory system",
+      "href": "z2d1qpwddpktbjpnuwyfvva",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zqvwwb95vzchcpow3gwy5wi",
+      "target_note_id": "z2hqehqwkdrll9juwfawzzx",
+      "anchor_text": "Evergreen notes should be concept-oriented",
+      "href": "z2hqehqwkdrll9juwfawzzx",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zkipfe1kyieeajs3ceactdf",
+      "target_note_id": "zr6rrbcfy5rfkiimfnajzkb",
+      "anchor_text": "Evergreen note-writing as fundamental unit of knowledge work",
+      "href": "zr6rrbcfy5rfkiimfnajzkb",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zme6gv6mc1mq2kde5acyho8",
+      "target_note_id": "zfuk9qqspnyhagvzzc33zgh",
+      "anchor_text": "Close open loops",
+      "href": "zfuk9qqspnyhagvzzc33zgh",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zgd1fxbdzd7wnh7nrhravyc",
+      "target_note_id": "zkpv6qkserdrgqyryvgs2ws",
+      "anchor_text": "Mnemonic medium",
+      "href": "zkpv6qkserdrgqyryvgs2ws",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "z2iksmfhifvy5a16abv5muw",
+      "target_note_id": "zup4guzpf33dwkzpiu9n6v5",
+      "anchor_text": "A writing inbox for transient and incomplete notes",
+      "href": "zup4guzpf33dwkzpiu9n6v5",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "z6esdslvzlgwur7m3wqggay",
+      "target_note_id": "z3bazmung7hvamfhkytucwf",
+      "anchor_text": "How might the mnemonic medium adapt to readers\u2019 differing backgrounds and goals?",
+      "href": "z3bazmung7hvamfhkytucwf",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zer7kcch6zuurodjbwdj2n5",
+      "target_note_id": "z79rmnnulruj6r8q1cxspdm",
+      "anchor_text": "Create speculative outlines while you write",
+      "href": "z79rmnnulruj6r8q1cxspdm",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "ztzb8spnoqzxs3mkvpkprmn",
+      "target_note_id": "zpkulaeffpqkcwplcpzbw6i",
+      "anchor_text": "The mnemonic medium supplies expert-authored prompts to remove the burden of prompt-writing",
+      "href": "zpkulaeffpqkcwplcpzbw6i",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zkpv6qkserdrgqyryvgs2ws",
+      "target_note_id": "z3bazmung7hvamfhkytucwf",
+      "anchor_text": "How might the mnemonic medium adapt to readers\u2019 differing backgrounds and goals?",
+      "href": "z3bazmung7hvamfhkytucwf",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zaf4onsv9qb38ncsvyezgab",
+      "target_note_id": "zr6rrbcfy5rfkiimfnajzkb",
+      "anchor_text": "Evergreen note-writing as fundamental unit of knowledge work",
+      "href": "zr6rrbcfy5rfkiimfnajzkb",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zwht8vabtmnbstwke9z8jpc",
+      "target_note_id": "zqetsqertejhypitmroaee",
+      "anchor_text": "Effects of the mnemonic medium on reader memory",
+      "href": "zqetsqertejhypitmroaee",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "z5e5qawixcmbtntupvxeoex",
+      "target_note_id": "zdcus8a5uxgr8hqygsqp83a",
+      "anchor_text": "Zettelkasten",
+      "href": "zdcus8a5uxgr8hqygsqp83a",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zf8xcu4bwxwbmsyp7tmff9i",
+      "target_note_id": "zdgk8tvvdd1mbtgpmmb5ugh",
+      "anchor_text": "Release valves for non-linear thought may support improved linear output",
+      "href": "zdgk8tvvdd1mbtgpmmb5ugh",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "z2d1qpwddpktbjpnuwyfvva",
+      "target_note_id": "zhkeub5ttkcjsygmbdfqcmq",
+      "anchor_text": "SRS retry mechanism",
+      "href": "zhkeub5ttkcjsygmbdfqcmq",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "about-these-notes",
+      "target_note_id": "zhtevhgzqpu8qhprhumtsuk",
+      "anchor_text": "My morning writing practice",
+      "href": "zhtevhgzqpu8qhprhumtsuk",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "z7yl32dpacvqsszrmpt88x5",
+      "target_note_id": "zdrdgszgufssj49gtbf1djg",
+      "anchor_text": "Orbit",
+      "href": "zdrdgszgufssj49gtbf1djg",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zdfv5gx8kksclke8dq1rfuk",
+      "target_note_id": "zaf4onsv9qb38ncsvyezgab",
+      "anchor_text": "\u201cBetter note-taking\u201d misses the point; what matters is \u201cbetter thinking\u201d",
+      "href": "zaf4onsv9qb38ncsvyezgab",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zkpv6qkserdrgqyryvgs2ws",
+      "target_note_id": "zdrdgszgufssj49gtbf1djg",
+      "anchor_text": "Orbit",
+      "href": "zdrdgszgufssj49gtbf1djg",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zt2cna38erscy2nkgw2thsl",
+      "target_note_id": "z6jlcobbgh7ukrgtiklcpv2",
+      "anchor_text": "Insight through making",
+      "href": "z6jlcobbgh7ukrgtiklcpv2",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zaf4onsv9qb38ncsvyezgab",
+      "target_note_id": "z4exkuljdbrbze7pvagxc5a",
+      "anchor_text": "Evergreen note-writing helps insight accumulate",
+      "href": "z4exkuljdbrbze7pvagxc5a",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "znqv445uecylxvsrvgovsfv",
+      "target_note_id": "z5e5qawixcmbtntupvxeoex",
+      "anchor_text": "Evergreen notes",
+      "href": "z5e5qawixcmbtntupvxeoex",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "z2hjuxmumvaotofbpndrg5w",
+      "target_note_id": "zhkeub5ttkcjsygmbdfqcmq",
+      "anchor_text": "SRS retry mechanism",
+      "href": "zhkeub5ttkcjsygmbdfqcmq",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "zf9ywlhqhfn5rfupapiyqmp",
+      "target_note_id": "zrxeyta5yxgqibp3ue3c6si",
+      "anchor_text": "Explorable explanations",
+      "href": "zrxeyta5yxgqibp3ue3c6si",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "znqldkmito9eha9ewygxs7b",
+      "target_note_id": "z2hqehqwkdrll9juwfawzzx",
+      "anchor_text": "Evergreen notes should be concept-oriented",
+      "href": "z2hqehqwkdrll9juwfawzzx",
+      "is_internal": true
+    }
+  ]
+}

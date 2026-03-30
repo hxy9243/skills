@@ -11,9 +11,7 @@ from zettel_eval.logging import write_json
 from zettel_eval.validate.inspect import write_manual_inspection_report
 from zettel_eval.validate.stats import compute_stats
 
-
-INTERNAL_LINK_RE = re.compile(r"\[\[([^\]|]+)\|([^\]]+)\]\]")
-
+INTERNAL_LINK_RE = re.compile(r"\[\[([^\]|]+)(?:\|([^\]]+))?\]\]")
 
 def _load_notes(metadata_path: Path) -> list[NoteRecord]:
     raw = json.loads(metadata_path.read_text(encoding="utf-8"))
@@ -31,19 +29,21 @@ def _load_notes(metadata_path: Path) -> list[NoteRecord]:
         )
     return notes
 
-
 def _load_metadata(metadata_path: Path) -> dict:
     return json.loads(metadata_path.read_text(encoding="utf-8"))
 
-
 def _extract_links(note_text: str) -> list[tuple[str, str]]:
-    return [(match.group(1), match.group(2)) for match in INTERNAL_LINK_RE.finditer(note_text)]
+    # Returns [(target_id, anchor_text_or_none)]
+    return [(match.group(1), match.group(2) or match.group(1)) for match in INTERNAL_LINK_RE.finditer(note_text)]
 
-
-def _mask_anchor(text: str, target_note_id: str, anchor_text: str) -> str:
-    pattern = re.escape(f"[[{target_note_id}|{anchor_text}]]")
-    return re.sub(pattern, "[[MASKED_LINK]]", text)
-
+def _mask_all_anchors(text: str, links: list[tuple[str, str]]) -> str:
+    masked = text
+    for target_id, anchor in links:
+        # We need to replace either [[target|anchor]] or [[target]]
+        # A simple string replacement is safer than regex to avoid escape issues
+        masked = masked.replace(f"[[{target_id}|{anchor}]]", "[[MASKED]]")
+        masked = masked.replace(f"[[{target_id}]]", "[[MASKED]]")
+    return masked
 
 def run_validate_phase(dataset_config: DatasetConfig) -> None:
     dataset_config.processed_dir.mkdir(parents=True, exist_ok=True)
@@ -61,7 +61,7 @@ def run_validate_phase(dataset_config: DatasetConfig) -> None:
             note_path = dataset_dir / note.markdown_path
             note.text = note_path.read_text(encoding="utf-8")
             note.outgoing_links = [
-                type("LinkStub", (), {"target_note_id": target_id, "anchor_text": anchor, "is_internal": True})()
+                type("LinkStub", (), {"target_note_id": target_id, "anchor_text": anchor, "is_internal": True, "href": target_id})()
                 for target_id, anchor in _extract_links(note.text)
             ]
 
@@ -90,27 +90,33 @@ def run_validate_phase(dataset_config: DatasetConfig) -> None:
 
         ground_truth_rows: list[dict] = []
         for note in notes:
-            for target_note_id, anchor_text in _extract_links(note.text):
-                if target_note_id not in note_by_id:
-                    continue
-                ground_truth_rows.append(
-                    {
-                        "dataset_slug": dataset_dir.name,
-                        "source_note_id": note.note_id,
-                        "target_note_id": target_note_id,
-                        "query_text": note.text,
-                        "retrieval_condition": "anchor_preserved",
-                    }
-                )
-                ground_truth_rows.append(
-                    {
-                        "dataset_slug": dataset_dir.name,
-                        "source_note_id": note.note_id,
-                        "target_note_id": target_note_id,
-                        "query_text": _mask_anchor(note.text, target_note_id, anchor_text),
-                        "retrieval_condition": "anchor_masked",
-                    }
-                )
+            links = _extract_links(note.text)
+            valid_targets = {t_id for t_id, _ in links if t_id in note_by_id}
+            
+            # EXCLUDE MENU NOTES
+            if len(valid_targets) == 0 or len(valid_targets) > 10:
+                continue
+                
+            targets_json = json.dumps(list(valid_targets))
+            
+            ground_truth_rows.append(
+                {
+                    "dataset_slug": dataset_dir.name,
+                    "source_note_id": note.note_id,
+                    "target_note_ids": targets_json,
+                    "query_text": note.text,
+                    "retrieval_condition": "anchor_preserved",
+                }
+            )
+            ground_truth_rows.append(
+                {
+                    "dataset_slug": dataset_dir.name,
+                    "source_note_id": note.note_id,
+                    "target_note_ids": targets_json,
+                    "query_text": _mask_all_anchors(note.text, links),
+                    "retrieval_condition": "anchor_masked",
+                }
+            )
 
         with (processed_dir / "ground_truth.csv").open("w", encoding="utf-8", newline="") as handle:
             writer = csv.DictWriter(
@@ -118,7 +124,7 @@ def run_validate_phase(dataset_config: DatasetConfig) -> None:
                 fieldnames=[
                     "dataset_slug",
                     "source_note_id",
-                    "target_note_id",
+                    "target_note_ids",
                     "query_text",
                     "retrieval_condition",
                 ],

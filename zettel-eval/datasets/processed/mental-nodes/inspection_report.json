@@ -1,0 +1,357 @@
+{
+  "dataset_slug": "mental-nodes",
+  "sample_size": 50,
+  "status": "manual_review_required",
+  "samples": [
+    {
+      "source_note_id": "potential-words-for-mindfulness-in-french",
+      "target_note_id": "neology",
+      "anchor_text": "Neology",
+      "href": "neology",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "from-collector-to-creator",
+      "target_note_id": "do-not-keep-orphan-notes",
+      "anchor_text": "Do not keep orphan notes",
+      "href": "do-not-keep-orphan-notes",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "from-cartomancy-to-cartospection",
+      "target_note_id": "noegraphy",
+      "anchor_text": "Noegraphy",
+      "href": "noegraphy",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "keep-your-levels-of-consumption-and-creation-balanced",
+      "target_note_id": "being-intentional-about-the-content-we-consume-is-an-act-of-freedom",
+      "anchor_text": "Being intentional about the content we consume is an act of freedom",
+      "href": "being-intentional-about-the-content-we-consume-is-an-act-of-freedom",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "about",
+      "target_note_id": "why-i-care-about-metacognition",
+      "anchor_text": "metacognition",
+      "href": "why-i-care-about-metacognition",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "taking-raw-notes-is-useless",
+      "target_note_id": "keep-your-levels-of-consumption-and-creation-balanced",
+      "anchor_text": "we create our own version",
+      "href": "keep-your-levels-of-consumption-and-creation-balanced",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "a-non-linear-cadavre-exquis",
+      "target_note_id": "mind-networks-modelling",
+      "anchor_text": "mental network",
+      "href": "mind-networks-modelling",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "the-temporality-of-complexity",
+      "target_note_id": "mind-networks-modelling",
+      "anchor_text": "Mind networks",
+      "href": "mind-networks-modelling",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "antistatic-garden",
+      "target_note_id": "writing-is-thinking",
+      "anchor_text": "writing is thinking",
+      "href": "writing-is-thinking",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "neology",
+      "target_note_id": "consciousness",
+      "anchor_text": "conscience",
+      "href": "consciousness",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "do-not-keep-orphan-notes",
+      "target_note_id": "from-collector-to-creator",
+      "anchor_text": "from collector to creator",
+      "href": "from-collector-to-creator",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "universal-alphabet-of-emotion",
+      "target_note_id": "connected-creativity",
+      "anchor_text": "connected creativity",
+      "href": "connected-creativity",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "networked-thinking-can-happen-at-many-levels",
+      "target_note_id": "mind-networks-modelling",
+      "anchor_text": "mind-to-mind networks",
+      "href": "mind-networks-modelling",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "complex-thinking-is-impossible-without-external-scaffolding",
+      "target_note_id": "good-thinking-is-impossible-without-internal-scaffolding",
+      "anchor_text": "good thinking is impossible without internal scaffolding",
+      "href": "good-thinking-is-impossible-without-internal-scaffolding",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "why-i-care-about-metacognition",
+      "target_note_id": "consciousness",
+      "anchor_text": "consciousness",
+      "href": "consciousness",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "the-temporality-of-complexity",
+      "target_note_id": "the-revision-history-of-an-idea",
+      "anchor_text": "the revision history of an idea",
+      "href": "the-revision-history-of-an-idea",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "connected-creativity",
+      "target_note_id": "what-is-an-atomic-idea",
+      "anchor_text": "atomic ideas",
+      "href": "what-is-an-atomic-idea",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "taking-raw-notes-is-useless",
+      "target_note_id": "how-to-take-smart-notes",
+      "anchor_text": "How to take smart notes",
+      "href": "how-to-take-smart-notes",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "ideorama",
+      "target_note_id": "neology",
+      "anchor_text": "Neology",
+      "href": "neology",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "a-gardening-guide-for-your-mind",
+      "target_note_id": "living-beyond-your-expiration-date",
+      "anchor_text": "live beyond their expiration date",
+      "href": "living-beyond-your-expiration-date",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "mind-expanding-tools",
+      "target_note_id": "from-cartomancy-to-cartospection",
+      "anchor_text": "Cartospection",
+      "href": "from-cartomancy-to-cartospection",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "divergent-minds-as-drivers-of-human-evolution",
+      "target_note_id": "pattern-thinking-psychosis-and-psychedelics",
+      "anchor_text": "pattern thinking, psychosis, and psychedelics",
+      "href": "pattern-thinking-psychosis-and-psychedelics",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "noegraphy",
+      "target_note_id": "neology",
+      "anchor_text": "neologism",
+      "href": "neology",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "mind-expanding-tools",
+      "target_note_id": "why-i-care-about-metacognition",
+      "anchor_text": "Metacognition",
+      "href": "why-i-care-about-metacognition",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "connected-creativity",
+      "target_note_id": "on-the-newness-of-ideas",
+      "anchor_text": "On the newness of ideas",
+      "href": "on-the-newness-of-ideas",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "threaded-thinking-instead-of-linear-thinking",
+      "target_note_id": "do-not-keep-orphan-notes",
+      "anchor_text": "there are no orphan thoughts",
+      "href": "do-not-keep-orphan-notes",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "a-nostalgia-of-early-online-communities",
+      "target_note_id": "consciousness",
+      "anchor_text": "conscious",
+      "href": "consciousness",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "a-gardening-guide-for-your-mind",
+      "target_note_id": "do-not-keep-orphan-notes",
+      "anchor_text": "Do not keep orphan notes",
+      "href": "do-not-keep-orphan-notes",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "living-beyond-your-expiration-date",
+      "target_note_id": "the-only-way-to-learn-in-public-is-to-build-in-public",
+      "anchor_text": "Creating original work",
+      "href": "the-only-way-to-learn-in-public-is-to-build-in-public",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "universal-alphabet-of-emotion",
+      "target_note_id": "mind-networks-modelling",
+      "anchor_text": "networked thinking",
+      "href": "mind-networks-modelling",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "imagination-is-the-second-most-powerful-force-on-earth",
+      "target_note_id": "from-collector-to-creator",
+      "anchor_text": "make it real",
+      "href": "from-collector-to-creator",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "writing-is-thinking",
+      "target_note_id": "living-beyond-your-expiration-date",
+      "anchor_text": "beyond its expiration date",
+      "href": "living-beyond-your-expiration-date",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "recursive-reality",
+      "target_note_id": "simulation-hypothesis",
+      "anchor_text": "simulation hypothesis",
+      "href": "simulation-hypothesis",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "keep-your-levels-of-consumption-and-creation-balanced",
+      "target_note_id": "a-gardening-guide-for-your-mind",
+      "anchor_text": "Creating a digital garden",
+      "href": "a-gardening-guide-for-your-mind",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "on-the-newness-of-ideas",
+      "target_note_id": "writing-is-thinking",
+      "anchor_text": "thought",
+      "href": "writing-is-thinking",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "mind-networks-modelling",
+      "target_note_id": "how-to-take-smart-notes",
+      "anchor_text": "taking smart notes",
+      "href": "how-to-take-smart-notes",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "the-revision-history-of-an-idea",
+      "target_note_id": "noegraphy",
+      "anchor_text": "noegraphy",
+      "href": "noegraphy",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "the-timeless-way-of-thinking",
+      "target_note_id": "the-temporality-of-complexity",
+      "anchor_text": "complex",
+      "href": "the-temporality-of-complexity",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "what-is-an-atomic-idea",
+      "target_note_id": "ideorama",
+      "anchor_text": "ideorama",
+      "href": "ideorama",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "noegraphy",
+      "target_note_id": "mind-networks-modelling",
+      "anchor_text": "minds interconnect",
+      "href": "mind-networks-modelling",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "the-big-illusion-of-consciousness",
+      "target_note_id": "ideorama",
+      "anchor_text": "a theatre of the mind",
+      "href": "ideorama",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "about",
+      "target_note_id": "a-gardening-guide-for-your-mind",
+      "anchor_text": "digital garden",
+      "href": "a-gardening-guide-for-your-mind",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "www-mentalnodes-com",
+      "target_note_id": "connected-creativity",
+      "anchor_text": "connected creativity",
+      "href": "connected-creativity",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "a-gardening-guide-for-your-mind",
+      "target_note_id": "on-the-newness-of-ideas",
+      "anchor_text": "new work",
+      "href": "on-the-newness-of-ideas",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "flow-versus-consciousness",
+      "target_note_id": "consciousness",
+      "anchor_text": "consciousness",
+      "href": "consciousness",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "www-mentalnodes-com",
+      "target_note_id": "a-gardening-guide-for-your-mind",
+      "anchor_text": "digital garden",
+      "href": "a-gardening-guide-for-your-mind",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "the-temporality-of-complexity",
+      "target_note_id": "threaded-thinking-instead-of-linear-thinking",
+      "anchor_text": "threaded thinking",
+      "href": "threaded-thinking-instead-of-linear-thinking",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "antistatic-garden",
+      "target_note_id": "mind-networks-modelling",
+      "anchor_text": "mind networks modelling",
+      "href": "mind-networks-modelling",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "complex-thinking-is-impossible-without-external-scaffolding",
+      "target_note_id": "taking-raw-notes-is-useless",
+      "anchor_text": "notes",
+      "href": "taking-raw-notes-is-useless",
+      "is_internal": true
+    },
+    {
+      "source_note_id": "the-only-way-to-learn-in-public-is-to-build-in-public",
+      "target_note_id": "keep-your-levels-of-consumption-and-creation-balanced",
+      "anchor_text": "keep your levels of consumption and creation balanced",
+      "href": "keep-your-levels-of-consumption-and-creation-balanced",
+      "is_internal": true
+    }
+  ]
+}

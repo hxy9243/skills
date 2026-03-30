@@ -31,7 +31,7 @@ class RetrievalMethodConfig:
 
 @dataclass(slots=True)
 class RetrievalConfig:
-    benchmark_metrics: list[str] = field(default_factory=lambda: ["recall@5", "recall@10", "mrr"])
+    benchmark_metrics: list[str] = field(default_factory=lambda: ["map", "hit@5", "hit@10", "mrr"])
     split_mode: str = "dataset"
     lexical_conditions: list[str] = field(default_factory=lambda: ["anchor_preserved", "anchor_masked"])
     methods: dict[str, RetrievalMethodConfig] = field(default_factory=dict)
@@ -73,7 +73,7 @@ def load_retrieval_config(path: Path | str = Path("configs/retrieval.yaml")) -> 
             grid=dict(data.get("grid", {})),
         )
     return RetrievalConfig(
-        benchmark_metrics=list(raw.get("benchmark_metrics", ["recall@5", "recall@10", "mrr"])),
+        benchmark_metrics=list(raw.get("benchmark_metrics", ["map", "hit@5", "hit@10", "mrr"])),
         split_mode=str(raw.get("split_mode", "dataset")),
         lexical_conditions=list(raw.get("lexical_conditions", ["anchor_preserved", "anchor_masked"])),
         methods=methods,

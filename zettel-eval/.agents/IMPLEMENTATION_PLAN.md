@@ -11,7 +11,7 @@
   - Phase 0: Ingests live websites into normalized local Markdown datasets.
   - Phase 1: Validates dataset quality and emits retrieval-ready corpora plus ground truth.
   - Phase 2: Runs retrieval benchmarks and hyperparameter search over the accepted datasets.
-  - Phase 3: End-to-end DSPy optimization of the LLM reasoning pipeline (Filtering + Synthesis) based on the final brainstorm quality.
+  - Phase 3: End-to-End Pairwise Elo Optimization (GEPA-style). Replaces standard scalar DSPy optimizers to enable A/B pairwise LLM-as-a-Judge evaluations.
 - Configuration lives in checked-in files, while per-run outputs live under `output/` and `datasets/`.
 
 ## Physical Source Layout
@@ -23,36 +23,20 @@ src/zettel_eval/
   config.py
   logging.py
   datasets/
-    manifest.py
-    models.py
   ingest/
-    crawl.py
-    defuddle.py
-    links.py
-    canonicalize.py
-    writer.py
   validate/
-    stats.py
-    inspect.py
-    ground_truth.py
   retrieval/
-    bm25.py
-    dense.py
-    colbert.py
-    hybrid.py
-    metrics.py
-    search.py
   pipeline/
     dspy_program.py
-    judge.py
+    elo_judge.py
   reports/
-    retrieval_report.py
 
 configs/
   datasets.yaml
   retrieval.yaml
 
 output/
+  retrieval_metrics.csv
   runs/
     <run_id>/
 ```
@@ -60,21 +44,22 @@ output/
 ---
 
 ### Phase 0 & 1: Ingestion, Validation & Ground Truth
-**Goal:** Convert public note websites into a clean, self-labeled dataset (excluding notes with >10 internal links). Strip internal link markup to create `corpus.csv` and `ground_truth.csv`.
+**Goal:** Convert public note websites into a clean, self-labeled dataset. Exclude notes with >10 internal links (hub/menu notes) to prevent suppressing @K metrics. Strip internal link markup to create `corpus.csv` and `ground_truth.csv` (mapping Source Note ID -> Target Note IDs as a set).
 
 ### Phase 2: Retrieval Evaluation (Benchmarking IR)
-**Goal:** Measure note-level retrieval quality (BM25, Dense, Hybrid, ColBERT) on hidden-link reconstruction using `MAP`, `HitRate@5`, `HitRate@10`, and `MRR`.
+**Goal:** Measure note-level retrieval quality (BM25, Dense, Hybrid, ColBERT) on hidden-link reconstruction using `MAP`, `HitRate@5`, `HitRate@10`, and `MRR`. 
+**Method:** Treat target links as a set per note, not independent queries. Use `nomic-embed-text` and `text-embedding-3-small` with local LRU caching to minimize API costs.
 
-### Phase 3: End-to-End LLM Pipeline Optimization (DSPy)
-**Goal:** Instead of isolating the relevance filter and the final synthesis, we optimize the entire reasoning chain end-to-end. The ultimate goal is a high-quality brainstorm, so the optimization should be driven by evaluating the *final output*.
-
-**Method:**
-1. **The DSPy Program:** Create a `BrainstormPipeline` module in DSPy that takes a `Seed Note` and `Retrieved Notes` (from Phase 2's best retriever) and runs:
-   - *Step A (Filter/Process):* Summarize each retrieved note and decide if/how it connects to the seed.
-   - *Step B (Synthesize):* Draft the final brainstorm essay using the filtered notes.
-2. **The Evaluator (LLM-as-a-Judge):** A strong model (e.g., GPT-4o / Gemini 1.5 Pro) grades the *final synthesized brainstorm* against a strict rubric (0-5 scale per dimension, or binary pass/fail):
-   - **Innovation & Insight:** Does the synthesis generate a novel, surprising connection or insight, or is it just a bland summary?
-   - **Groundedness (No Hallucination):** Are all factual claims and ideas backed by the provided source notes?
-   - **Logical Coherence (No Coerced Logic):** Do the connections flow naturally, or did the model force a strained, illogical link between unrelated notes?
-3. **The Optimization:** Use DSPy's optimizers (e.g., `MIPRO` or `BootstrapFewShotWithRandomSearch`) to jointly optimize the prompts for Step A and Step B. The optimizer will mutate the instructions and few-shot examples to maximize the Judge's score on the final output over a training set of seed notes.
-4. **Artifact Output:** Export the final, optimized prompt instructions for the Filter and Synthesis steps into `output/best_filter_prompt.txt` and `output/best_synthesis_prompt.txt`.
+### Phase 3: End-to-End Pairwise LLM Optimization (GEPA)
+**Goal:** Optimize the prompt used by the subagent to summarize/filter notes, and the prompt used to synthesize the final brainstorm. 
+**Method (Pairwise Hill-Climbing):**
+Standard DSPy optimizers rely on noisy absolute 1-100 grading. We bypass this by building a custom Pairwise Elo Optimizer:
+1. **The Credit Assignment Strategy:** Lock the Filter Prompt and mutate the Synthesis Prompt (or vice versa). If you mutate both simultaneously, the judge cannot determine which mutation caused the win/loss.
+2. **The Proposal:** A Pro LLM (e.g., `gpt-5.4`) reviews the current "Champion" prompt and previous match feedback, and proposes a new "Challenger" prompt.
+3. **The Arena:** Generate final essays using both the Champion and Challenger pipelines on 5-10 random seed notes.
+4. **The Pairwise Judge:** The Judge LLM reads Essay A and Essay B side-by-side (blinded) and outputs `winner: A|B|TIE` with a 1-sentence justification, based on:
+   - **Innovation & Insight:** Novel, surprising connections.
+   - **Groundedness:** No hallucinations; explicit evidence citations.
+   - **Logical Coherence:** Natural flow, no coerced logic.
+5. **The Hill Climb:** If the Challenger wins the majority of matches, it dethrones the Champion and the baseline updates.
+6. **Artifact Output:** Export the final, optimized prompt instructions into `output/runs/<run_id>/best_filter_prompt.txt` and `best_synthesis_prompt.txt`.
