@@ -1,0 +1,7 @@
+Every week I create a weekly note, and write my to-dos for the week. I may add more items to it during the week.
+
+If any items didn’t get done I roll them over to the next weekly note or drop them.
+
+That’s it.
+
+I usually write my to-dos from scratch without looking at the previous week’s list. This helps me decide which items I should drop. If I can’t remember a to-do it probably wasn’t that important.

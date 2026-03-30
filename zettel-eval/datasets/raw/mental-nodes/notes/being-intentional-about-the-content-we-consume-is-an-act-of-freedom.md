@@ -1,0 +1,1 @@
+[[a-knowledge-workers-most-precious-tool-is-their-mind|A knowledge worker's most precious tool is their mind]]. The same way we take care of our body through a healthy diet and exercise, we need to take care of our mind through a healthy content consumption and proactive thinking. Only then can we hope to [[on-the-newness-of-ideas|generate new ideas]].

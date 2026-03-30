@@ -1,0 +1,18 @@
+16 entries about this topic
+
+- [[remove|2024 · 06 What can we remove?]]
+- [[love|2024 · 05 Love is freedom]]
+- [[earth|2024 · 02 Earth is becoming sentient]]
+- [[optimism|2023 · 12 Choose optimism]]
+- [[pain|2023 · 11 Pain is information]]
+- [[buy-wisely|2023 · 09 Buy wisely]]
+- [[style|2023 · 09 Style is consistent constraint]]
+- [[in-good-hands|2023 · 08 In good hands]]
+- [[precious|2023 · 07 Caloric energy is precious]]
+- [[nibble|2023 · 07 Nibble and your appetite will grow]]
+- [[calmness|2022 · 10 Calmness is a superpower]]
+- [[stadium-of-selves|2020 · 01 Stadium of selves]]
+- [[a-little-bit-every-day|2018 · 09 A little bit every day]]
+- [[scars|2015 · 11 Scars are beautiful]]
+- [[empathy|2015 · 11 Default to empathy]]
+- [[agents-of-chaos|2012 · 11 Agents of chaos]]

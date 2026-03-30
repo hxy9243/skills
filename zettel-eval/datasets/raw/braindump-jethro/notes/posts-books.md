@@ -1,0 +1,21 @@
+#### Links to this note
+
+- [[posts-are-we-smart-enough-to-know-how-smart-animals-are|Are We Smart Enough to Know How Smart Animals Are?]]
+- [[posts-an-opinionated-guide-to-ml-research|Article: An Opinionated Guide to Machine Learning Research]]
+- [[posts-the-art-of-doing-science-and-engineering|Book: The Art Of Doing Science And Engineering]]
+- [[posts-cplusplus|C++ Language]]
+- [[posts-consciousness|Consciousness]]
+- [[posts-critical-thinking|Critical Thinking]]
+- [[posts-data-council|Datacouncil.ai Conference Notes]]
+- [How To Take Smart Notes](https://braindump.jethro.dev/posts/how_to_take_smart_notes)
+- [Machine Learning](https://braindump.jethro.dev/posts/machine_learning)
+- [Neural Ordinary Differential Equations](https://braindump.jethro.dev/posts/neural_ode)
+- [Python](https://braindump.jethro.dev/posts/python)
+- [Reading and Writing Inbox](https://braindump.jethro.dev/posts/reading_and_writing_inbox)
+- [Roam Research](https://braindump.jethro.dev/posts/roam_research)
+- [Singapore Society](https://braindump.jethro.dev/posts/ges1028)
+- [Statistical Learning](https://braindump.jethro.dev/posts/statistical_learning)
+- [Stochastic Processes](https://braindump.jethro.dev/posts/stochastic_processes)
+- [The Art Of Unix Programming](https://braindump.jethro.dev/posts/the_art_of_unix_programming)
+- [Writing](https://braindump.jethro.dev/posts/writing)
+- [XGBoost](https://braindump.jethro.dev/posts/xgboost)

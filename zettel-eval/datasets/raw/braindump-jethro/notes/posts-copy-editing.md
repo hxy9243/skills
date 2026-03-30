@@ -1,0 +1,15 @@
+series comma
+
+always use the Oxford comma (or series comma)
+
+only comma
+
+use the *only comma*, where the subject is one of its kind: e.g. *His son, Juliet…* where Juliet is the only son
+
+that vs which
+
+use *that* without a comma, where the information presented is important, and *which* without a comma, where removing such information would do no harm.
+
+## References
+
+- [Dreyer’s English: An Utterly Correct Guide to Clarity and Style by Benjamin D…](https://www.goodreads.com/book/show/40063024-dreyer-s-english)

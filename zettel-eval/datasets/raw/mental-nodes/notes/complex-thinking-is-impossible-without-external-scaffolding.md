@@ -1,0 +1,5 @@
+> "Notes on paper, or on a computer screen \[...\] do not make contemporary physics or other kinds of intellectual endeavour easier, they make it possible." — Neil Levy in [Handbook of Neuroethics](https://link.springer.com/referencework/10.1007/978-94-007-4707-4) (2011)
+
+While for most day-to-day thinking it is acceptable to make decisions based on [[consciousness|unconscious]] mental shortcuts and cognitive biases—automatic judgements such as: this alley has more light, hence it is safer; this brand looks fancier, hence it must be better; this book is bigger; hence it must have more information—complex thinking requires external scaffolding. (however, [[good-thinking-is-impossible-without-internal-scaffolding|good thinking is impossible without internal scaffolding]])
+
+[[writing-is-thinking|The most efficient and accessible kind of external scaffolding for complex thinking is writing]], whether on paper or on a computer. (hand-written [[taking-raw-notes-is-useless|notes]] help better understand content because they're slower to write and thus force you to think to condense the original content while preserving meaning)

@@ -1,0 +1,3 @@
+Most people don’t seem to take note-writing very seriously as a skill. For some, that’s because they see it as a simple utility (e.g. [[znqv445uecylxvsrvgovsfv|Most people use notes as a bucket for storage or scratch thoughts]]). For others, their indifference may arise because they notice that [[zdfv5gx8kksclke8dq1rfuk|Note-writing practices are generally ineffective]].
+
+But some note-writing practices are vastly more effective than others. It’s possible to become much, much more skilled at writing notes, and that skill translates into valuable output: [[zr6rrbcfy5rfkiimfnajzkb|Evergreen note-writing as fundamental unit of knowledge work]].

@@ -1,0 +1,3 @@
+The [[zkpv6qkserdrgqyryvgs2ws|Mnemonic medium]] may be effective for [[znvvrcxnkjk7pcabibvaic1|Quantum Country]] readers, but to what extent do [[zqetsqertejhypitmroaee|Effects of the mnemonic medium on reader memory]] generalize to “platform knowledge” on other topics? Do we observe surprising domain-specific barriers or possibilities?
+
+There’s ample experimental data that the [[z4kscvkqcd2xmvwvsdubztn|Spacing effect]] applies across many topics, and there’s anecdotal data that a [[z2d1qpwddpktbjpnuwyfvva|Spaced repetition memory system]] can effectively encode material across many topics. We may need domain-specific problem-solving to establish how to encode each topic’s knowledge into prompts.

@@ -1,0 +1,1 @@
+Every time you write a new note, make sure to go back to previous notes and to interlink them together. Orphan notes do not contribute to the serendipitous creation of [[on-the-newness-of-ideas|new insights]]. Only by connecting notes together can we go [[from-collector-to-creator|from collector to creator]].

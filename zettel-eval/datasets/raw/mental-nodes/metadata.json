@@ -1,0 +1,1571 @@
+{
+  "dataset_slug": "mental-nodes",
+  "seed_url": "https://www.mentalnodes.com/",
+  "crawl_started_at": "2026-03-29T01:41:53.308027+00:00",
+  "note_id_by_url": {
+    "https://www.mentalnodes.com/": "www-mentalnodes-com",
+    "https://www.mentalnodes.com/about": "about",
+    "https://www.mentalnodes.com/a-gardening-guide-for-your-mind": "a-gardening-guide-for-your-mind",
+    "https://www.mentalnodes.com/connected-creativity": "connected-creativity",
+    "https://www.mentalnodes.com/the-only-way-to-learn-in-public-is-to-build-in-public": "the-only-way-to-learn-in-public-is-to-build-in-public",
+    "https://www.mentalnodes.com/mind-networks-modelling": "mind-networks-modelling",
+    "https://www.mentalnodes.com/why-i-care-about-metacognition": "why-i-care-about-metacognition",
+    "https://www.mentalnodes.com/divergent-minds-as-drivers-of-human-evolution": "divergent-minds-as-drivers-of-human-evolution",
+    "https://www.mentalnodes.com/taking-raw-notes-is-useless": "taking-raw-notes-is-useless",
+    "https://www.mentalnodes.com/do-not-keep-orphan-notes": "do-not-keep-orphan-notes",
+    "https://www.mentalnodes.com/threaded-thinking-instead-of-linear-thinking": "threaded-thinking-instead-of-linear-thinking",
+    "https://www.mentalnodes.com/on-the-newness-of-ideas": "on-the-newness-of-ideas",
+    "https://www.mentalnodes.com/living-beyond-your-expiration-date": "living-beyond-your-expiration-date",
+    "https://www.mentalnodes.com/networked-thinking-can-happen-at-many-levels": "networked-thinking-can-happen-at-many-levels",
+    "https://www.mentalnodes.com/from-collector-to-creator": "from-collector-to-creator",
+    "https://www.mentalnodes.com/antistatic-garden": "antistatic-garden",
+    "https://www.mentalnodes.com/keep-your-levels-of-consumption-and-creation-balanced": "keep-your-levels-of-consumption-and-creation-balanced",
+    "https://www.mentalnodes.com/what-is-an-atomic-idea": "what-is-an-atomic-idea",
+    "https://www.mentalnodes.com/interconnectedness-of-things": "interconnectedness-of-things",
+    "https://www.mentalnodes.com/designing-a-thinking-practice": "designing-a-thinking-practice",
+    "https://www.mentalnodes.com/pattern-thinking-psychosis-and-psychedelics": "pattern-thinking-psychosis-and-psychedelics",
+    "https://www.mentalnodes.com/universal-alphabet-of-emotion": "universal-alphabet-of-emotion",
+    "https://www.mentalnodes.com/the-credentials-of-brainbased-learning": "the-credentials-of-brainbased-learning",
+    "https://www.mentalnodes.com/the-temporality-of-complexity": "the-temporality-of-complexity",
+    "https://www.mentalnodes.com/how-to-take-smart-notes": "how-to-take-smart-notes",
+    "https://www.mentalnodes.com/a-non-linear-cadavre-exquis": "a-non-linear-cadavre-exquis",
+    "https://www.mentalnodes.com/noegraphy": "noegraphy",
+    "https://www.mentalnodes.com/the-revision-history-of-an-idea": "the-revision-history-of-an-idea",
+    "https://www.mentalnodes.com/consciousness": "consciousness",
+    "https://www.mentalnodes.com/imagination-is-the-second-most-powerful-force-on-earth": "imagination-is-the-second-most-powerful-force-on-earth",
+    "https://www.mentalnodes.com/simulation-hypothesis": "simulation-hypothesis",
+    "https://www.mentalnodes.com/complex-thinking-is-impossible-without-external-scaffolding": "complex-thinking-is-impossible-without-external-scaffolding",
+    "https://www.mentalnodes.com/good-thinking-is-impossible-without-internal-scaffolding": "good-thinking-is-impossible-without-internal-scaffolding",
+    "https://www.mentalnodes.com/mind-expanding-tools": "mind-expanding-tools",
+    "https://www.mentalnodes.com/writing-is-thinking": "writing-is-thinking",
+    "https://www.mentalnodes.com/folders-kill-creativity": "folders-kill-creativity",
+    "https://www.mentalnodes.com/being-intentional-about-the-content-we-consume-is-an-act-of-freedom": "being-intentional-about-the-content-we-consume-is-an-act-of-freedom",
+    "https://www.mentalnodes.com/processing-versus-creating": "processing-versus-creating",
+    "https://www.mentalnodes.com/what-would-it-take-to-write-one-million-words": "what-would-it-take-to-write-one-million-words",
+    "https://www.mentalnodes.com/a-nostalgia-of-early-online-communities": "a-nostalgia-of-early-online-communities",
+    "https://www.mentalnodes.com/a-knowledge-workers-most-precious-tool-is-their-mind": "a-knowledge-workers-most-precious-tool-is-their-mind",
+    "https://www.mentalnodes.com/ideorama": "ideorama",
+    "https://www.mentalnodes.com/finding-balance-between-anthropomorphism-and-scientific-materialism": "finding-balance-between-anthropomorphism-and-scientific-materialism",
+    "https://www.mentalnodes.com/from-cartomancy-to-cartospection": "from-cartomancy-to-cartospection",
+    "https://www.mentalnodes.com/the-timeless-way-of-thinking": "the-timeless-way-of-thinking",
+    "https://www.mentalnodes.com/neology": "neology",
+    "https://www.mentalnodes.com/flow-versus-consciousness": "flow-versus-consciousness",
+    "https://www.mentalnodes.com/the-big-illusion-of-consciousness": "the-big-illusion-of-consciousness",
+    "https://www.mentalnodes.com/the-quantum-nature-of-consciousness": "the-quantum-nature-of-consciousness",
+    "https://www.mentalnodes.com/recursive-reality": "recursive-reality",
+    "https://www.mentalnodes.com/a-text-renaissance": "a-text-renaissance",
+    "https://www.mentalnodes.com/potential-words-for-mindfulness-in-french": "potential-words-for-mindfulness-in-french",
+    "https://www.mentalnodes.com/physics-is-the-grammar-of-reality": "physics-is-the-grammar-of-reality",
+    "https://www.mentalnodes.com/to-be-verified": "to-be-verified",
+    "https://www.mentalnodes.com/recursive-recording": "recursive-recording"
+  },
+  "notes": [
+    {
+      "note_id": "www-mentalnodes-com",
+      "source_url": "https://www.mentalnodes.com/",
+      "title": "Www Mentalnodes Com",
+      "markdown_path": "notes/www-mentalnodes-com.md",
+      "text": "Oh, hello there! \ud83c\udf31\n\nI created this public notebook / [[a-gardening-guide-for-your-mind|digital garden]] because I believe in the power of [[connected-creativity|connected creativity]] and [[the-only-way-to-learn-in-public-is-to-build-in-public|learning in public]].\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "www-mentalnodes-com",
+          "target_note_id": "a-gardening-guide-for-your-mind",
+          "anchor_text": "digital garden",
+          "href": "https://www.mentalnodes.com/a-gardening-guide-for-your-mind",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "www-mentalnodes-com",
+          "target_note_id": "connected-creativity",
+          "anchor_text": "connected creativity",
+          "href": "https://www.mentalnodes.com/connected-creativity",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "www-mentalnodes-com",
+          "target_note_id": "the-only-way-to-learn-in-public-is-to-build-in-public",
+          "anchor_text": "learning in public",
+          "href": "https://www.mentalnodes.com/the-only-way-to-learn-in-public-is-to-build-in-public",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "about",
+      "source_url": "https://www.mentalnodes.com/about",
+      "title": "About",
+      "markdown_path": "notes/about.md",
+      "text": "Hello there! I'm Anne-Laure Le Cunff, founder of [Ness Labs](https://nesslabs.com/) and a [PhD researcher](https://neuronlined.org/) at the Institute of Psychiatry, Psychology & Neuroscience, King's College London, where I study how different brains learn differently.\n\nThis is a public notebook where I share some of my thoughts on [[mind-networks-modelling|networked thinking]], [[connected-creativity|creativity]], [[why-i-care-about-metacognition|metacognition]], and [[divergent-minds-as-drivers-of-human-evolution|collective intelligence]]. It uses bi-directional links, so you can see which pages refer to the one you are currently reading.\n\nThese notes are personal thoughts. You'd probably be right to disagree with many of them.\n\nThanks and credits:\n\n- [TW](https://tiddlywiki.com/) for powering the backend of this notebook ([tutorial](https://nesslabs.com/digital-garden-tiddlywiki))\n- [Brandon Hall](https://tacticaltypos.net/) for his TW static website generator run-through ([video](https://youtu.be/qRZeH680XWA))\n- [Alyssa X](https://alyssax.com/) for all the help with the code\n- [Andy Matuschak](https://notes.andymatuschak.org/) for the inspiration\n- [Dave Gifford](https://giffmex.org/gifts/tiddlyblink.html) for the plugin supporting bi-directional links\n\nFAQ\n\n*Why a digital garden?*\n\nI jot down raw thoughts in my note-taking app, and publish longer essays on my blog. My [[a-gardening-guide-for-your-mind|digital garden]] is a space to connect early-stage ideas, collect evergreen notes, and plant the seeds for more ambitious work.\n\n*Is there a table of content?*\n\nNo. Just click on any link within a note or a backlink in the sidebar to navigate through the content.\n\n*How can I discuss these ideas?*\n\nThe best way to reach out is on [Twitter](https://twitter.com/). Click on the Twitter icon in the sidebar of any note and add your comment. I will be automatically tagged and can get back to you.\n\n*I want to build a digital garden as well.*\n\nThat's a great idea. You can start with [this tutorial](https://nesslabs.com/digital-garden-tiddlywiki). There are many other ways to go about it, so feel free to tinker or try a completely different route.\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "about",
+          "target_note_id": null,
+          "anchor_text": "Ness Labs",
+          "href": "https://nesslabs.com/",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "about",
+          "target_note_id": null,
+          "anchor_text": "PhD researcher",
+          "href": "https://neuronlined.org/",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "about",
+          "target_note_id": "mind-networks-modelling",
+          "anchor_text": "networked thinking",
+          "href": "https://www.mentalnodes.com/mind-networks-modelling",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "about",
+          "target_note_id": "connected-creativity",
+          "anchor_text": "creativity",
+          "href": "https://www.mentalnodes.com/connected-creativity",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "about",
+          "target_note_id": "why-i-care-about-metacognition",
+          "anchor_text": "metacognition",
+          "href": "https://www.mentalnodes.com/why-i-care-about-metacognition",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "about",
+          "target_note_id": "divergent-minds-as-drivers-of-human-evolution",
+          "anchor_text": "collective intelligence",
+          "href": "https://www.mentalnodes.com/divergent-minds-as-drivers-of-human-evolution",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "about",
+          "target_note_id": null,
+          "anchor_text": "TW",
+          "href": "https://tiddlywiki.com/",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "about",
+          "target_note_id": null,
+          "anchor_text": "tutorial",
+          "href": "https://nesslabs.com/digital-garden-tiddlywiki",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "about",
+          "target_note_id": null,
+          "anchor_text": "Brandon Hall",
+          "href": "https://tacticaltypos.net/",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "about",
+          "target_note_id": null,
+          "anchor_text": "video",
+          "href": "https://youtu.be/qRZeH680XWA",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "about",
+          "target_note_id": null,
+          "anchor_text": "Alyssa X",
+          "href": "https://alyssax.com/",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "about",
+          "target_note_id": null,
+          "anchor_text": "Andy Matuschak",
+          "href": "https://notes.andymatuschak.org/",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "about",
+          "target_note_id": null,
+          "anchor_text": "Dave Gifford",
+          "href": "https://giffmex.org/gifts/tiddlyblink.html",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "about",
+          "target_note_id": "a-gardening-guide-for-your-mind",
+          "anchor_text": "digital garden",
+          "href": "https://www.mentalnodes.com/a-gardening-guide-for-your-mind",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "about",
+          "target_note_id": null,
+          "anchor_text": "Twitter",
+          "href": "https://twitter.com/",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "about",
+          "target_note_id": null,
+          "anchor_text": "this tutorial",
+          "href": "https://nesslabs.com/digital-garden-tiddlywiki",
+          "is_internal": false
+        }
+      ]
+    },
+    {
+      "note_id": "a-gardening-guide-for-your-mind",
+      "source_url": "https://www.mentalnodes.com/a-gardening-guide-for-your-mind",
+      "title": "A Gardening Guide For Your Mind",
+      "markdown_path": "notes/a-gardening-guide-for-your-mind.md",
+      "text": "This is what a gardening guide for your mind would look like:\n\n- **Seeds.** Seed your garden with quality content and cultivate your curiosity. Plant seeds in your mind garden by taking smart personal notes ([[taking-raw-notes-is-useless|taking raw notes is useless]]). These don't need to be written in a publishable form.\n- **Trees.** Grow your knowledge by forming new branches and connecting the dots. Write short structured notes articulating specific ideas and publish them in your digital garden. One note in your digital garden = one idea. (what you're currently reading is such a note) [[do-not-keep-orphan-notes|Do not keep orphan notes]]. [[threaded-thinking-instead-of-linear-thinking|Thread your thoughts.]]\n- **Fruits.** Produce [[on-the-newness-of-ideas|new work]]. These are more substantial\u2014essays, videos, maybe a book at some point. The kind of work researchers and creatives may hope will help them [[living-beyond-your-expiration-date|live beyond their expiration date]].\n\n[[networked-thinking-can-happen-at-many-levels|Networked thinking can happen at many levels]]. A digital garden is a scalable way to transform seeds of information into original work and to go [[from-collector-to-creator|from collector to creator]].\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "a-gardening-guide-for-your-mind",
+          "target_note_id": "taking-raw-notes-is-useless",
+          "anchor_text": "taking raw notes is useless",
+          "href": "https://www.mentalnodes.com/taking-raw-notes-is-useless",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "a-gardening-guide-for-your-mind",
+          "target_note_id": "do-not-keep-orphan-notes",
+          "anchor_text": "Do not keep orphan notes",
+          "href": "https://www.mentalnodes.com/do-not-keep-orphan-notes",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "a-gardening-guide-for-your-mind",
+          "target_note_id": "threaded-thinking-instead-of-linear-thinking",
+          "anchor_text": "Thread your thoughts.",
+          "href": "https://www.mentalnodes.com/threaded-thinking-instead-of-linear-thinking",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "a-gardening-guide-for-your-mind",
+          "target_note_id": "on-the-newness-of-ideas",
+          "anchor_text": "new work",
+          "href": "https://www.mentalnodes.com/on-the-newness-of-ideas",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "a-gardening-guide-for-your-mind",
+          "target_note_id": "living-beyond-your-expiration-date",
+          "anchor_text": "live beyond their expiration date",
+          "href": "https://www.mentalnodes.com/living-beyond-your-expiration-date",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "a-gardening-guide-for-your-mind",
+          "target_note_id": "networked-thinking-can-happen-at-many-levels",
+          "anchor_text": "Networked thinking can happen at many levels",
+          "href": "https://www.mentalnodes.com/networked-thinking-can-happen-at-many-levels",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "a-gardening-guide-for-your-mind",
+          "target_note_id": "from-collector-to-creator",
+          "anchor_text": "from collector to creator",
+          "href": "https://www.mentalnodes.com/from-collector-to-creator",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "connected-creativity",
+      "source_url": "https://www.mentalnodes.com/connected-creativity",
+      "title": "Connected Creativity",
+      "markdown_path": "notes/connected-creativity.md",
+      "text": "Innovation is combinational in nature. Sudden eureka moments are an illusion, the tip of the iceberg hiding the [[networked-thinking-can-happen-at-many-levels|network]] of existing ideas our mind slowly connected over time to generate something that feels brand new.\n\nProgress is built [[divergent-minds-as-drivers-of-human-evolution|on the shoulders of creative connectors]] who can see patterns where others see none, who are able to simulate conversations between authors by connecting the dots across different fields, and who are part of learning communities that foster curiosity and creativity.\n\nMaybe creative thinking should be renamed patterned thinking or networked thinking?\n\nAlso, what does that mean for the nature of [[what-is-an-atomic-idea|atomic ideas]]?\n\nRelated: [[on-the-newness-of-ideas|On the newness of ideas]], [[interconnectedness-of-things|Interconnectedness of things]], [[designing-a-thinking-practice|Designing a thinking practice]]\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "connected-creativity",
+          "target_note_id": "networked-thinking-can-happen-at-many-levels",
+          "anchor_text": "network",
+          "href": "https://www.mentalnodes.com/networked-thinking-can-happen-at-many-levels",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "connected-creativity",
+          "target_note_id": "divergent-minds-as-drivers-of-human-evolution",
+          "anchor_text": "on the shoulders of creative connectors",
+          "href": "https://www.mentalnodes.com/divergent-minds-as-drivers-of-human-evolution",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "connected-creativity",
+          "target_note_id": "what-is-an-atomic-idea",
+          "anchor_text": "atomic ideas",
+          "href": "https://www.mentalnodes.com/what-is-an-atomic-idea",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "connected-creativity",
+          "target_note_id": "on-the-newness-of-ideas",
+          "anchor_text": "On the newness of ideas",
+          "href": "https://www.mentalnodes.com/on-the-newness-of-ideas",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "connected-creativity",
+          "target_note_id": "interconnectedness-of-things",
+          "anchor_text": "Interconnectedness of things",
+          "href": "https://www.mentalnodes.com/interconnectedness-of-things",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "connected-creativity",
+          "target_note_id": "designing-a-thinking-practice",
+          "anchor_text": "Designing a thinking practice",
+          "href": "https://www.mentalnodes.com/designing-a-thinking-practice",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "the-only-way-to-learn-in-public-is-to-build-in-public",
+      "source_url": "https://www.mentalnodes.com/the-only-way-to-learn-in-public-is-to-build-in-public",
+      "title": "The Only Way To Learn In Public Is To Build In Public",
+      "markdown_path": "notes/the-only-way-to-learn-in-public-is-to-build-in-public.md",
+      "text": "Our natural fear of being judged leads most people to build, learn, and think privately. But seeking validation should not be the goal of learning in public. Instead, the goal should be to tap into your network's collective intelligence to create constructive feedback loops.\n\nCorollary: learning in public should be synonymous with building in public. Claiming \u201cI learned this!\u201d is meaningless. How do you measure your levels of \u201clearning\u201d? The only way to learn publicly is to work on a project you own, and to share your progress. Not \u201cI learned this!\u201d but \u201cI built this!\u201d\n\nIt also ensures you [[keep-your-levels-of-consumption-and-creation-balanced|keep your levels of consumption and creation balanced]].\n\nKeeping a public log of what you build is an effective way to track your learning progress. In the future, you can go back to previous projects and measure the gap between your prior and current levels of skills.\n\nAn overused Reid Hoffman's quote captures some of the idea of learning in public: \u201cIf you are not embarrassed by the first version of your product, you've launched too late.\u201d In practice, it means sharing what you build often and early; not waiting until a project is polished to ask for feedback; proactively seeking help and suggestions from your peers.\n\n> \u201cLearning in Public\u201d is scary for many reasons \u2013 people can find and cling to outdated information and users are exposing their knowledge during a vulnerable time in the project (i.e. when they don\u2019t yet have all the answers). However, during this part of the process is when learning can be most valuable. \u2014 via [How Do Rocket Scientists Learn? (aka, knowledge management lessons learned at Goddard, NASA)](https://www.govloop.com/community/blog/how-do-rocket-scientists-learn-aka-knowledge-management-lessons-learned-at-goddard-nasa)\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "the-only-way-to-learn-in-public-is-to-build-in-public",
+          "target_note_id": "keep-your-levels-of-consumption-and-creation-balanced",
+          "anchor_text": "keep your levels of consumption and creation balanced",
+          "href": "https://www.mentalnodes.com/keep-your-levels-of-consumption-and-creation-balanced",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "the-only-way-to-learn-in-public-is-to-build-in-public",
+          "target_note_id": null,
+          "anchor_text": "How Do Rocket Scientists Learn? (aka, knowledge management lessons learned at Goddard, NASA)",
+          "href": "https://www.govloop.com/community/blog/how-do-rocket-scientists-learn-aka-knowledge-management-lessons-learned-at-goddard-nasa",
+          "is_internal": false
+        }
+      ]
+    },
+    {
+      "note_id": "mind-networks-modelling",
+      "source_url": "https://www.mentalnodes.com/mind-networks-modelling",
+      "title": "Mind Networks Modelling",
+      "markdown_path": "notes/mind-networks-modelling.md",
+      "text": "Brain networks can be studied at different spatial and temporal levels. Similar to large scale networks, in order to understand how dynamic activity emerges and is modulated by patterns of connectivity, you could zoom out a lot and look at the activity at the whole brain level. Or you could zoom in and look at a tiny group of cells. Conversely, various tools allow us to look at what happens at the milliseconds scale (which is the scale at which neurons operate), up to minutes, hours, or longer.\n\nWhat I call a mind network is the conceptual layer or thought processes and ideas generated by our brains. When people say \"my brain thinks\"\u2014it's a [[the-credentials-of-brainbased-learning|category mistake]]. Our brain doesn't think. Our brain is just a wobbly mass of cells. As far as we know, you cannot map ideas 1:1 with specific locations in the brain. While ideas are generated by the constant changes in the brain's connectivity network and the interaction between the brain's network nodes, your brain network (neurobiological processes) is not your mind network (thought processes).\n\nSimilar to the brain network, the mind network could be modelled and studied at different spacial and [[the-temporality-of-complexity|temporal scales]]. We could study the overall patterns of connectivity in one's mind (between thoughts, ideas, maybe even emotions) or we could zoom in to look at the connections between very specific nodes. From a temporal standpoint, we could look at long-term patterns (pruning of certain areas of interest, expansion of specific idea-worlds in the mind), or short term interactions (transclusion, new links).\n\nIn the case of mind networks, we could zoom out even more to [[networked-thinking-can-happen-at-many-levels|look at mind-to-mind connectivity]]. The Internet already makes this possible at various spatial and temporal scales, but there is no widely used protocol tracking the exact origin and subsequent modifications of ideas so dynamic patterns could be studied. The [Underscore Protocol](http://www.uprtcl.io/) (\\_Prtcl), which dubbed itself \"Git for ideas\", is an attempt at tackling this challenge of tracking mind-to-mind networks, but it's yet to be seen whether it will be widely adopted.\n\nWhile it's still early, brain-computer interfaces may help us better map the brain network to the mind network in the future. In the mean time, manually [[connected-creativity|connecting your thoughts]] in a way that's study-able (mainly by [[how-to-take-smart-notes|taking smart notes]]) is one of the best ways to start mapping your own mind network.\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "mind-networks-modelling",
+          "target_note_id": "the-credentials-of-brainbased-learning",
+          "anchor_text": "category mistake",
+          "href": "https://www.mentalnodes.com/the-credentials-of-brainbased-learning",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "mind-networks-modelling",
+          "target_note_id": "the-temporality-of-complexity",
+          "anchor_text": "temporal scales",
+          "href": "https://www.mentalnodes.com/the-temporality-of-complexity",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "mind-networks-modelling",
+          "target_note_id": "networked-thinking-can-happen-at-many-levels",
+          "anchor_text": "look at mind-to-mind connectivity",
+          "href": "https://www.mentalnodes.com/networked-thinking-can-happen-at-many-levels",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "mind-networks-modelling",
+          "target_note_id": null,
+          "anchor_text": "Underscore Protocol",
+          "href": "http://www.uprtcl.io/",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "mind-networks-modelling",
+          "target_note_id": "connected-creativity",
+          "anchor_text": "connecting your thoughts",
+          "href": "https://www.mentalnodes.com/connected-creativity",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "mind-networks-modelling",
+          "target_note_id": "how-to-take-smart-notes",
+          "anchor_text": "taking smart notes",
+          "href": "https://www.mentalnodes.com/how-to-take-smart-notes",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "why-i-care-about-metacognition",
+      "source_url": "https://www.mentalnodes.com/why-i-care-about-metacognition",
+      "title": "Why I Care About Metacognition",
+      "markdown_path": "notes/why-i-care-about-metacognition.md",
+      "text": "Whatever I study, wherever I explore, I keep on coming back to metacognition\u2014thinking about thinking. I care because to me it's the epitomy of what it means to be human. I care because metacognition is not only at the intersection of science and philosophy. It *is* the intersection of science and philosophy. Whether you consider neuroscience, AI, machine learning, the hard problem of [[consciousness|consciousness]], [[imagination-is-the-second-most-powerful-force-on-earth|imagination]], the question of reality (aka \"are we living in a [[simulation-hypothesis|simulation]]?\") you will always end up contemplating the concept of metacognition. Metacognition is the bridge made of the [[complex-thinking-is-impossible-without-external-scaffolding|external]] and [[good-thinking-is-impossible-without-internal-scaffolding|internal]] scaffolding needed for great thinking.\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "why-i-care-about-metacognition",
+          "target_note_id": "consciousness",
+          "anchor_text": "consciousness",
+          "href": "https://www.mentalnodes.com/consciousness",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "why-i-care-about-metacognition",
+          "target_note_id": "imagination-is-the-second-most-powerful-force-on-earth",
+          "anchor_text": "imagination",
+          "href": "https://www.mentalnodes.com/imagination-is-the-second-most-powerful-force-on-earth",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "why-i-care-about-metacognition",
+          "target_note_id": "simulation-hypothesis",
+          "anchor_text": "simulation",
+          "href": "https://www.mentalnodes.com/simulation-hypothesis",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "why-i-care-about-metacognition",
+          "target_note_id": "complex-thinking-is-impossible-without-external-scaffolding",
+          "anchor_text": "external",
+          "href": "https://www.mentalnodes.com/complex-thinking-is-impossible-without-external-scaffolding",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "why-i-care-about-metacognition",
+          "target_note_id": "good-thinking-is-impossible-without-internal-scaffolding",
+          "anchor_text": "internal",
+          "href": "https://www.mentalnodes.com/good-thinking-is-impossible-without-internal-scaffolding",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "divergent-minds-as-drivers-of-human-evolution",
+      "source_url": "https://www.mentalnodes.com/divergent-minds-as-drivers-of-human-evolution",
+      "title": "Divergent Minds As Drivers Of Human Evolution",
+      "markdown_path": "notes/divergent-minds-as-drivers-of-human-evolution.md",
+      "text": "Is there any good resource exploring neurodivergence as a potential drive for human evolution? Maybe a chronology with famous divergent minds and their contribution(s) to the progress of humankind? Or a book exploring the relationship between [[pattern-thinking-psychosis-and-psychedelics|pattern thinking, psychosis, and psychedelics]]?\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "divergent-minds-as-drivers-of-human-evolution",
+          "target_note_id": "pattern-thinking-psychosis-and-psychedelics",
+          "anchor_text": "pattern thinking, psychosis, and psychedelics",
+          "href": "https://www.mentalnodes.com/pattern-thinking-psychosis-and-psychedelics",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "taking-raw-notes-is-useless",
+      "source_url": "https://www.mentalnodes.com/taking-raw-notes-is-useless",
+      "title": "Taking Raw Notes Is Useless",
+      "markdown_path": "notes/taking-raw-notes-is-useless.md",
+      "text": "Mechanical note-taking (listening and passively writing down) is useless for memory and creativity.\n\nFirst, the generation effect shows that we remember information better when [[keep-your-levels-of-consumption-and-creation-balanced|we create our own version]] of it.\n\nSecond, creativity requires the ability to connect the dots between many ideas and content sources, sometimes in surprising ways. Raw notes, [[folders-kill-creativity|especially when classified by topic or category or source]] and thus living in silos, do not allow for discovering these surprising connections. [[do-not-keep-orphan-notes|Do not keep orphan notes]].\n\nPractical approach: [[how-to-take-smart-notes|How to take smart notes]].\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "taking-raw-notes-is-useless",
+          "target_note_id": "keep-your-levels-of-consumption-and-creation-balanced",
+          "anchor_text": "we create our own version",
+          "href": "https://www.mentalnodes.com/keep-your-levels-of-consumption-and-creation-balanced",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "taking-raw-notes-is-useless",
+          "target_note_id": "folders-kill-creativity",
+          "anchor_text": "especially when classified by topic or category or source",
+          "href": "https://www.mentalnodes.com/folders-kill-creativity",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "taking-raw-notes-is-useless",
+          "target_note_id": "do-not-keep-orphan-notes",
+          "anchor_text": "Do not keep orphan notes",
+          "href": "https://www.mentalnodes.com/do-not-keep-orphan-notes",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "taking-raw-notes-is-useless",
+          "target_note_id": "how-to-take-smart-notes",
+          "anchor_text": "How to take smart notes",
+          "href": "https://www.mentalnodes.com/how-to-take-smart-notes",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "do-not-keep-orphan-notes",
+      "source_url": "https://www.mentalnodes.com/do-not-keep-orphan-notes",
+      "title": "Do Not Keep Orphan Notes",
+      "markdown_path": "notes/do-not-keep-orphan-notes.md",
+      "text": "Every time you write a new note, make sure to go back to previous notes and to interlink them together. Orphan notes do not contribute to the serendipitous creation of [[on-the-newness-of-ideas|new insights]]. Only by connecting notes together can we go [[from-collector-to-creator|from collector to creator]].\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "do-not-keep-orphan-notes",
+          "target_note_id": "on-the-newness-of-ideas",
+          "anchor_text": "new insights",
+          "href": "https://www.mentalnodes.com/on-the-newness-of-ideas",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "do-not-keep-orphan-notes",
+          "target_note_id": "from-collector-to-creator",
+          "anchor_text": "from collector to creator",
+          "href": "https://www.mentalnodes.com/from-collector-to-creator",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "threaded-thinking-instead-of-linear-thinking",
+      "source_url": "https://www.mentalnodes.com/threaded-thinking-instead-of-linear-thinking",
+      "title": "Threaded Thinking Instead Of Linear Thinking",
+      "markdown_path": "notes/threaded-thinking-instead-of-linear-thinking.md",
+      "text": "Linear thinking is a myth. Yet, somehow, the way we teach people to think at school is linear. First, formulate a question. Then, the hypothesis. Third, design a protocol to test your hypothesis. Evaluate the results. Of course, it can be argued the process is circular rather than linear\u2014a learning loop of sort where you formulate a new hypothesis based on the results of the latest experiment\u2014but the process traditionally taught to students still involves thinking in a specific order. But how can I formulate a question if I haven't had the opportunity to think about the topic already? And how do I decide which question is the best to choose if I don't have some pre-existing knowledge?\n\nThinking is not only non-linear, it's messy. It involves a lot of back and forth, dead ends, branching, walking back, merging ideas, changing ideas, contradicting ideas. When I picture what my thoughts look like\u2014the actual process of navigating different ideas in my head\u2014I don't see a nice straight road with check points, I see a massive web of tangled threads.\n\nThen why is it that most tools and thinking strategies assume a nice chronological order for my thought processes? The ideal tool for thought would embrace the messiness of our minds, and organically help insights emerge from chaos instead of forcing an artificial order. I think this is why I Iike the concept of the Zettelkasten method so much. The dead ends, the forking and merging of ideas, are all defining features instead of bugs to be squashed. In Zettelkasten, [[do-not-keep-orphan-notes|there are no orphan thoughts]]. Each new idea is added to the existing web, linking back to previous ideas and ready to be linked to. It's much more similar to the way our memory actually works. (linking new knowledge to existing knowledge makes it easy to remember)\n\nSomething I'm struggling with when it comes to threaded thinking is the volume of ideas. A mistake I have made in my previous note-taking system is to add everything to my thinking box, from interesting ideas to raw snippets taken from articles and books. It's a mess, but not a productive one. Productive threaded thinking needs to be selective: only the best (most interesting) ideas and questions should be saved. Fleeting notes should be discarded as soon as they've been turned into a permanent one. Again, no thought should be left orphan.\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "threaded-thinking-instead-of-linear-thinking",
+          "target_note_id": "do-not-keep-orphan-notes",
+          "anchor_text": "there are no orphan thoughts",
+          "href": "https://www.mentalnodes.com/do-not-keep-orphan-notes",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "on-the-newness-of-ideas",
+      "source_url": "https://www.mentalnodes.com/on-the-newness-of-ideas",
+      "title": "On The Newness Of Ideas",
+      "markdown_path": "notes/on-the-newness-of-ideas.md",
+      "text": "What's a \u201cnew\u201d idea? Related: what's an \u201coriginal\u201d [[writing-is-thinking|thought]]?\n\nLavoisier once said: \u201cRien ne se perd, rien ne se cr\u00e9e, tout se transforme\u201d\u2014meaning \u201cNothing is lost, nothing is created, everything is transformed.\u201d\n\nWe keep on chasing newness and originality, but is everything a remix? While Lavoisier's quote does apply to nature's fundamental principles (physics), is it true of the world of ideas (metaphysics)?\n\nBeyond the romantic idea of breakthrough eureka moments of inspiration, where discoveries emerge from thing air, scientific progress is mostly driven by the [[keep-your-levels-of-consumption-and-creation-balanced|combination of existing knowledge]]. However, it can be argued that the resulting ideas can be new and original (while the *matter* of the discovery exists whereas we know it or not, a discovery *itself* doesn't exist until it's been discovered)\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "on-the-newness-of-ideas",
+          "target_note_id": "writing-is-thinking",
+          "anchor_text": "thought",
+          "href": "https://www.mentalnodes.com/writing-is-thinking",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "on-the-newness-of-ideas",
+          "target_note_id": "keep-your-levels-of-consumption-and-creation-balanced",
+          "anchor_text": "combination of existing knowledge",
+          "href": "https://www.mentalnodes.com/keep-your-levels-of-consumption-and-creation-balanced",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "living-beyond-your-expiration-date",
+      "source_url": "https://www.mentalnodes.com/living-beyond-your-expiration-date",
+      "title": "Living Beyond Your Expiration Date",
+      "markdown_path": "notes/living-beyond-your-expiration-date.md",
+      "text": "[[the-only-way-to-learn-in-public-is-to-build-in-public|Creating original work]] (writing a book, making a scientific discovery, founding a company) is currently the only way to live beyond your expiration date.\n\n(playing devil's advocate: having children?)\n\nLiving beyond your expiration date does not mean making history (it could, but it's extremely rare). It means people will keep on building on what you started. It may be for a few more months or decades or centuries depending on how useful/groundbreaking your original work is.\n\nN.B. Like food you put in the freezer and decide to cook later, your work can be re-discovered many years after your death.\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "living-beyond-your-expiration-date",
+          "target_note_id": "the-only-way-to-learn-in-public-is-to-build-in-public",
+          "anchor_text": "Creating original work",
+          "href": "https://www.mentalnodes.com/the-only-way-to-learn-in-public-is-to-build-in-public",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "networked-thinking-can-happen-at-many-levels",
+      "source_url": "https://www.mentalnodes.com/networked-thinking-can-happen-at-many-levels",
+      "title": "Networked Thinking Can Happen At Many Levels",
+      "markdown_path": "notes/networked-thinking-can-happen-at-many-levels.md",
+      "text": "Is networked thinking...\n\n- Personal networked thinking ([[threaded-thinking-instead-of-linear-thinking|threaded thinking]]), as in within an individual's own ideas? (assuming one can have [[on-the-newness-of-ideas|their own ideas]])\n- Collective thinking, as in several individuals connecting ideas together or [[mind-networks-modelling|mind-to-mind networks]]?\n- Societal thinking, as in a society organically thinking as one single organism? How does cellular thinking impact the organism's thinking? There is certainly a feedback loop.\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "networked-thinking-can-happen-at-many-levels",
+          "target_note_id": "threaded-thinking-instead-of-linear-thinking",
+          "anchor_text": "threaded thinking",
+          "href": "https://www.mentalnodes.com/threaded-thinking-instead-of-linear-thinking",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "networked-thinking-can-happen-at-many-levels",
+          "target_note_id": "on-the-newness-of-ideas",
+          "anchor_text": "their own ideas",
+          "href": "https://www.mentalnodes.com/on-the-newness-of-ideas",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "networked-thinking-can-happen-at-many-levels",
+          "target_note_id": "mind-networks-modelling",
+          "anchor_text": "mind-to-mind networks",
+          "href": "https://www.mentalnodes.com/mind-networks-modelling",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "from-collector-to-creator",
+      "source_url": "https://www.mentalnodes.com/from-collector-to-creator",
+      "title": "From Collector To Creator",
+      "markdown_path": "notes/from-collector-to-creator.md",
+      "text": "Many [[taking-raw-notes-is-useless|note-takers]] hoard content because it gives them an illusion of knowledge. The best way to truly understand anything is to use the generation effect: to [[a-gardening-guide-for-your-mind|produce your own content]], in your own words, and to [[the-only-way-to-learn-in-public-is-to-build-in-public|share it with the world]] to create a feedback loop.\n\n- **Collect.** Note-taking, raw snippets, Kindle highlights + personal commentary.\n- **Connect.** Link to previous notes. [[do-not-keep-orphan-notes|Do not keep orphan notes]].\n- **Create.** Write original article.\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "from-collector-to-creator",
+          "target_note_id": "taking-raw-notes-is-useless",
+          "anchor_text": "note-takers",
+          "href": "https://www.mentalnodes.com/taking-raw-notes-is-useless",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "from-collector-to-creator",
+          "target_note_id": "a-gardening-guide-for-your-mind",
+          "anchor_text": "produce your own content",
+          "href": "https://www.mentalnodes.com/a-gardening-guide-for-your-mind",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "from-collector-to-creator",
+          "target_note_id": "the-only-way-to-learn-in-public-is-to-build-in-public",
+          "anchor_text": "share it with the world",
+          "href": "https://www.mentalnodes.com/the-only-way-to-learn-in-public-is-to-build-in-public",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "from-collector-to-creator",
+          "target_note_id": "do-not-keep-orphan-notes",
+          "anchor_text": "Do not keep orphan notes",
+          "href": "https://www.mentalnodes.com/do-not-keep-orphan-notes",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "antistatic-garden",
+      "source_url": "https://www.mentalnodes.com/antistatic-garden",
+      "title": "Antistatic Garden",
+      "markdown_path": "notes/antistatic-garden.md",
+      "text": "\"It's less than a blog, more than a tweet.\" As part of my exploration of [[a-gardening-guide-for-your-mind|digital gardens]] and inspired by Anna and Kelly Pendergrast, this is a little experiment to visually document interesting things I learn about every week. See [their Antistatic slides](https://docs.google.com/presentation/d/1GWSFltGp0Qr9YKzu4cc_4eGhFcWCrzGN0zn5G0vp3mE/mobilepresent) for reference.\n\nWhile I believe [[writing-is-thinking|writing is thinking]], writing can be visual. Mind maps are such examples of attempts at [[mind-networks-modelling|mind networks modelling]].\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "antistatic-garden",
+          "target_note_id": "a-gardening-guide-for-your-mind",
+          "anchor_text": "digital gardens",
+          "href": "https://www.mentalnodes.com/a-gardening-guide-for-your-mind",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "antistatic-garden",
+          "target_note_id": null,
+          "anchor_text": "their Antistatic slides",
+          "href": "https://docs.google.com/presentation/d/1GWSFltGp0Qr9YKzu4cc_4eGhFcWCrzGN0zn5G0vp3mE/mobilepresent",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "antistatic-garden",
+          "target_note_id": "writing-is-thinking",
+          "anchor_text": "writing is thinking",
+          "href": "https://www.mentalnodes.com/writing-is-thinking",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "antistatic-garden",
+          "target_note_id": "mind-networks-modelling",
+          "anchor_text": "mind networks modelling",
+          "href": "https://www.mentalnodes.com/mind-networks-modelling",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "keep-your-levels-of-consumption-and-creation-balanced",
+      "source_url": "https://www.mentalnodes.com/keep-your-levels-of-consumption-and-creation-balanced",
+      "title": "Keep Your Levels Of Consumption And Creation Balanced",
+      "markdown_path": "notes/keep-your-levels-of-consumption-and-creation-balanced.md",
+      "text": "We don't lack access to information. The challenge is to filter, sort, and transform that information. [[being-intentional-about-the-content-we-consume-is-an-act-of-freedom|Being intentional about the content we consume is an act of freedom]].\n\nWe should ideally balance our input and output through continuous creation. The information we consume should be turned into evergreen notes\u2014using our own words. To make the most of the generation effect, notes should be collated into original articles, connecting the dots across many pieces of information, and putting [[on-the-newness-of-ideas|original thoughts into the world]].\n\n[[a-gardening-guide-for-your-mind|Creating a digital garden]] is a great way to do so.\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "keep-your-levels-of-consumption-and-creation-balanced",
+          "target_note_id": "being-intentional-about-the-content-we-consume-is-an-act-of-freedom",
+          "anchor_text": "Being intentional about the content we consume is an act of freedom",
+          "href": "https://www.mentalnodes.com/being-intentional-about-the-content-we-consume-is-an-act-of-freedom",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "keep-your-levels-of-consumption-and-creation-balanced",
+          "target_note_id": "on-the-newness-of-ideas",
+          "anchor_text": "original thoughts into the world",
+          "href": "https://www.mentalnodes.com/on-the-newness-of-ideas",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "keep-your-levels-of-consumption-and-creation-balanced",
+          "target_note_id": "a-gardening-guide-for-your-mind",
+          "anchor_text": "Creating a digital garden",
+          "href": "https://www.mentalnodes.com/a-gardening-guide-for-your-mind",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "what-is-an-atomic-idea",
+      "source_url": "https://www.mentalnodes.com/what-is-an-atomic-idea",
+      "title": "What Is An Atomic Idea",
+      "markdown_path": "notes/what-is-an-atomic-idea.md",
+      "text": "Is it possible to get to the essence of an idea? Could an [[ideorama|ideorama]] be broken down into individual pixels? Even if the concept of physical atoms as the smallest, indivisible component making up the whole Universe has been proven wrong, the concept of an atom may be helpful in thinking from first principles. However, the recursive nature of reality may also apply to ideas - meaning there are no atomic ideas.\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "what-is-an-atomic-idea",
+          "target_note_id": "ideorama",
+          "anchor_text": "ideorama",
+          "href": "https://www.mentalnodes.com/ideorama",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "interconnectedness-of-things",
+      "source_url": "https://www.mentalnodes.com/interconnectedness-of-things",
+      "title": "Interconnectedness Of Things",
+      "markdown_path": "notes/interconnectedness-of-things.md",
+      "text": "We tend to see our bodies as a well defined space, \"this is my body\" / \"this is outside my body\" but our bodies are more like ecosystems within ecosystems, galaxies for bacteria, fungi and viruses.\n",
+      "outgoing_links": []
+    },
+    {
+      "note_id": "designing-a-thinking-practice",
+      "source_url": "https://www.mentalnodes.com/designing-a-thinking-practice",
+      "title": "Designing A Thinking Practice",
+      "markdown_path": "notes/designing-a-thinking-practice.md",
+      "text": "The constant flow of information and potential activities we are exposed to mean we need to be more intentional when it comes to generating original thoughts. We need to proactively block time to think and design a meaningful thinking practice. (akin to a meditation practice, but focused on taking [[taking-raw-notes-is-useless|smart notes]] or creative writing)\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "designing-a-thinking-practice",
+          "target_note_id": "taking-raw-notes-is-useless",
+          "anchor_text": "smart notes",
+          "href": "https://www.mentalnodes.com/taking-raw-notes-is-useless",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "pattern-thinking-psychosis-and-psychedelics",
+      "source_url": "https://www.mentalnodes.com/pattern-thinking-psychosis-and-psychedelics",
+      "title": "Pattern Thinking Psychosis And Psychedelics",
+      "markdown_path": "notes/pattern-thinking-psychosis-and-psychedelics.md",
+      "text": "The brain is designed for pattern thinking. See pattern recognition research in cognitive science and psychology.\n\n*Researchers have argued that the capacity of working memory is better characterized as the ability to mentally form relations between elements, or to grasp relations in given information.* \u2014 via [How Many Variables Can Humans Process?](https://journals.sagepub.com/doi/10.1111/j.0956-7976.2005.00782.x).\n\n*Perhaps the most fascinating part of Green and Turkeltaub\u2019s tDCS experiment is the nature of \u201ccreativity\u201d it promotes. Subjects don\u2019t suddenly begin writing music or painting abstract art \u2014 rather, they make unseen connections.* via [The Lightbulb: Georgetown Researchers Spark Creative Thinking](https://college.georgetown.edu/news-story/georgetown-researchers-spark-creativity). (related to [[connected-creativity|Connected creativity]])\n\nIn schizophrenia, patternicity can be a feature of paranoia. If the brain is designed for pattern thinking, are neurodivergent people seeing more / too many connections?\n\nIn relation to autism: *\"I\u2019ve given A great deal of thought to the topic of different ways of thinking. In fact, my pursuit of this topic has led me to propose a new category of thinker in addition to the traditional visual and verbal: pattern thinkers.\"* via [How an Entirely New, Autistic Way of Thinking Powers Silicon Valley](https://www.wired.com/2013/05/silicon-valley-coders-and-autism-and-asperbergers-maybe-its-a-new-kind-of-design-thinking).\n\nPsychedelics also lead seeing more patterns, whether conceptual or visual. Are the mechanisms similar to the ones found in neurodivergence?\n\n*\"The recent renaissance of psychedelic science has reignited interest in the similarity of drug-induced experiences to those more commonly observed in psychiatric contexts such as the schizophrenia-spectrum.\"* \u2014 via [Hallucinations Under Psychedelics and in the Schizophrenia Spectrum: An Interdisciplinary and Multiscale Comparison](https://academic.oup.com/schizophreniabulletin/article/46/6/1396/5908041).\n\nBoth psychedelic and psychopathologic hallucinations have strong metaphysical meaning, but with 5-HT2A agonists reality monitoring & insight are usually preserved.\n\nPattern thinking + psychedelics: any link to the stoned ape theory?\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "pattern-thinking-psychosis-and-psychedelics",
+          "target_note_id": null,
+          "anchor_text": "How Many Variables Can Humans Process?",
+          "href": "https://journals.sagepub.com/doi/10.1111/j.0956-7976.2005.00782.x",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "pattern-thinking-psychosis-and-psychedelics",
+          "target_note_id": null,
+          "anchor_text": "The Lightbulb: Georgetown Researchers Spark Creative Thinking",
+          "href": "https://college.georgetown.edu/news-story/georgetown-researchers-spark-creativity",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "pattern-thinking-psychosis-and-psychedelics",
+          "target_note_id": "connected-creativity",
+          "anchor_text": "Connected creativity",
+          "href": "https://www.mentalnodes.com/connected-creativity",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "pattern-thinking-psychosis-and-psychedelics",
+          "target_note_id": null,
+          "anchor_text": "How an Entirely New, Autistic Way of Thinking Powers Silicon Valley",
+          "href": "https://www.wired.com/2013/05/silicon-valley-coders-and-autism-and-asperbergers-maybe-its-a-new-kind-of-design-thinking",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "pattern-thinking-psychosis-and-psychedelics",
+          "target_note_id": null,
+          "anchor_text": "Hallucinations Under Psychedelics and in the Schizophrenia Spectrum: An Interdisciplinary and Multiscale Comparison",
+          "href": "https://academic.oup.com/schizophreniabulletin/article/46/6/1396/5908041",
+          "is_internal": false
+        }
+      ]
+    },
+    {
+      "note_id": "universal-alphabet-of-emotion",
+      "source_url": "https://www.mentalnodes.com/universal-alphabet-of-emotion",
+      "title": "Universal Alphabet Of Emotion",
+      "markdown_path": "notes/universal-alphabet-of-emotion.md",
+      "text": "This is a note I started drafting at the [Diverse Intelligences Summer Institute](https://disi.org/) 2022. It describes the potential need for a Universal Alphabet of Emotion, and emerged from a collection of thoughts and experiences, which timeline is as follow:\n\n- One of the participants, Alex Wolf, presented their project - cards with a \"pattern alphabet\" for exploring nature, called patternABC, which breaks down into its most basic parts the way nature forms (see Kickstarter [here](https://www.kickstarter.com/projects/alexwolf/pattern-alphabet-cards-for-exploring-nature)). This was a fascinating demonstration of the usefulness of [[pattern-thinking-psychosis-and-psychedelics|pattern thinking]].\n- Soon after, I stumble upon [a tweet](https://twitter.com/Neuro_Skeptic/status/1553395824998105088) by Neuroskeptic sharing a paper about \"gheirat\", a complex emotion that's ubiquitous in Muslim Middle Eastern cultures, but untranslatable to English.\n- This made me wonder whether there would be a way to universally translate such human emotions that can only be found in specific languages, so other humans could not only understand them, but \"feel\" them \u2013 or at least be able to approximate the feeling based on building blocks from a universal alphabet of emotion.\n- I previously [looked into](https://twitter.com/anthilemoon/status/1338574783026499585) Leibniz's \"Alphabet of Human Thought\" which goal was to design a universal way to represent ideas by breaking down their component pieces. I'm unclear as to whether this ever came to fruition, but a universal alphabet of emotion would probably have a similar approach.\n- I also thought about studies from Berkeley that look at emotions across cultures. There are the 16 facial expressions most common to emotional situations worldwide ([paper](https://www.nature.com/articles/s41586-020-3037-7)), but when I tried to give it the \"gheirat test\" (trying to break down \"gheirat\" into a combination of those 16 building blocks) I was surprised to find quite a few missing, including disgust. So I searched for additional studies, and [another one](https://news.berkeley.edu/2017/09/06/27-emotions) seems more complete, with 27 emotions ([paper](http://www.pnas.org/content/early/2017/08/30/1702247114.abstract)) which seems like a better collection of building blocks, and seems to pass the gheirat test (disgust + anger).\n- A lot of emotions are linked to time. For example, joy + past may describe nostalgia, but joy + future may describe excitement or anticipation (these are rough examples). However, it's interesting how my mind immediately jumped to symbolic representations of time that are very much Western-centric, with a left-to-right model. A presentation at DISI mentioned how cultures don't represent future in the same way, and how for some cultures, everyday notions of time are anchored in topographic properties, e.g. the Yupno people of Papua New Guinea: \"For the Yupno the past is always downhill, in the direction of the mouth of the local river. The future, meanwhile, is towards the river\u2019s source, which lies uphill from Gua. This was true regardless of the direction they were facing.\" ([source](https://www.newscientist.com/article/mg21428675-400-time-flows-uphill-for-remote-papua-new-guinea-tribe)) In addition, some words, like Sukha in Sanskrit (lasting state of happiness), may require a building block to describe an \"eternal\" / \"long-term\" / \"infinite\" / \"lasting\" conception of time.\n\nAll of this results in a few considerations for the creation of a Universal Alphabet of Emotion:\n\n1. Must capture all basic building blocks of emotions across cultures - this can be tested by doing something similar to the gheirat test, taking words that don't have a universal translation, and checking whether it can be broken down using the building blocks of the alphabet of emotion.\n2. Must not rely on local symbolism, or at least not in ways that hamper understanding across cultures. (for example, I immediately thought that a whirlpool may be a good symbol for \"confusion\" but maybe it means something completely different in some cultures)\n3. Must be simple to use. Using symbols that are very easy to write, maybe relying on existing Unicode symbols so they could be typed / easily read by machines as well? Appending a corresponding phoneme to each grapheme, so words could be read out loud? (Japanese phonology could be good candidates as generally easy to pronounce for lots of native speakers of other languages)\n\nFinally, some thoughts as to why such an alphabet may be useful:\n\n- I don't expect such an alphabet to be widely adopted, but I imagine that in a research context, better translating emotions could lead to better cross-cultural communication, understanding, trust, collaboration, and potentially more universally applicable research output.\n- Maybe some applications when teaching kids how to communicate their emotions? I imagine some actual building blocks or cards that kids could pair together to communicate how they feel.\n- I could see this being helpful in therapeutic context, to help someone express complex emotions when they can't seem to find the right words, or even with people with communication difficulties. (there are probably some existing tools that aim to accomplish similar goals, which would be interesting to look at)\n\nAs of the last time this note was edited, this project is at the idea stage, but I always enjoy opportunities for [[mind-networks-modelling|networked thinking]] and [[connected-creativity|connected creativity]], so please [reach out](https://twitter.com/anthilemoon) if you find the concept of an Universal Alphabet of Emotion interesting and/or have thoughts to contribute!\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "universal-alphabet-of-emotion",
+          "target_note_id": null,
+          "anchor_text": "Diverse Intelligences Summer Institute",
+          "href": "https://disi.org/",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "universal-alphabet-of-emotion",
+          "target_note_id": null,
+          "anchor_text": "here",
+          "href": "https://www.kickstarter.com/projects/alexwolf/pattern-alphabet-cards-for-exploring-nature",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "universal-alphabet-of-emotion",
+          "target_note_id": "pattern-thinking-psychosis-and-psychedelics",
+          "anchor_text": "pattern thinking",
+          "href": "https://www.mentalnodes.com/pattern-thinking-psychosis-and-psychedelics",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "universal-alphabet-of-emotion",
+          "target_note_id": null,
+          "anchor_text": "a tweet",
+          "href": "https://twitter.com/Neuro_Skeptic/status/1553395824998105088",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "universal-alphabet-of-emotion",
+          "target_note_id": null,
+          "anchor_text": "looked into",
+          "href": "https://twitter.com/anthilemoon/status/1338574783026499585",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "universal-alphabet-of-emotion",
+          "target_note_id": null,
+          "anchor_text": "paper",
+          "href": "https://www.nature.com/articles/s41586-020-3037-7",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "universal-alphabet-of-emotion",
+          "target_note_id": null,
+          "anchor_text": "another one",
+          "href": "https://news.berkeley.edu/2017/09/06/27-emotions",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "universal-alphabet-of-emotion",
+          "target_note_id": null,
+          "anchor_text": "paper",
+          "href": "http://www.pnas.org/content/early/2017/08/30/1702247114.abstract",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "universal-alphabet-of-emotion",
+          "target_note_id": null,
+          "anchor_text": "source",
+          "href": "https://www.newscientist.com/article/mg21428675-400-time-flows-uphill-for-remote-papua-new-guinea-tribe",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "universal-alphabet-of-emotion",
+          "target_note_id": "mind-networks-modelling",
+          "anchor_text": "networked thinking",
+          "href": "https://www.mentalnodes.com/mind-networks-modelling",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "universal-alphabet-of-emotion",
+          "target_note_id": "connected-creativity",
+          "anchor_text": "connected creativity",
+          "href": "https://www.mentalnodes.com/connected-creativity",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "universal-alphabet-of-emotion",
+          "target_note_id": null,
+          "anchor_text": "reach out",
+          "href": "https://twitter.com/anthilemoon",
+          "is_internal": false
+        }
+      ]
+    },
+    {
+      "note_id": "the-credentials-of-brainbased-learning",
+      "source_url": "https://www.mentalnodes.com/the-credentials-of-brainbased-learning",
+      "title": "The Credentials Of Brainbased Learning",
+      "markdown_path": "notes/the-credentials-of-brainbased-learning.md",
+      "text": "The field of educational neuroscience is plagued with dubious \u201cevidence-based\u201d claims. Such biases include category mistakes\u2014where a property is ascribed to an object that could not possibly have that such property, for instance \u201cThe brain is essentially curious\u201d (Wolfe and Brandt, 1998)\u2014and conflation\u2014for instance con\ufb02ating neurophysiological connections and connections made by learners between pieces of knowledge (Davis, 2004).\n\nDavis, A. (2004). The credentials of brain\u2010based learning. Journal of philosophy of education, 38(1), 21-36.\n\nWolfe, P., & Brandt, R. (1998). What Do We Know from Brain Research?. Educational Leadership, 56(3), 8-13.\n",
+      "outgoing_links": []
+    },
+    {
+      "note_id": "the-temporality-of-complexity",
+      "source_url": "https://www.mentalnodes.com/the-temporality-of-complexity",
+      "title": "The Temporality Of Complexity",
+      "markdown_path": "notes/the-temporality-of-complexity.md",
+      "text": "From an interview with John L. Collins at Ness Labs:\n\n> I believe that complex systems are in fact complex systems of complex systems that are multiaxial and multidimensional and dynamic. That is they are moving through time. Usually, what we do is take a slice through this dynamic and take a pinpoint view out of it, and miss all the beauty and complexity of what is a very complicated description of what\u2019s going on around us, missing the interstitial information between the systems\u2019 nodes and losing understanding scale.\n\n[[mind-networks-modelling|Mind networks]] can also be studied at different time scales. Decision-trees can be infinitely nested. What may seem like linear thinking when zoomed out often appears like complex [[threaded-thinking-instead-of-linear-thinking|threaded thinking]] when zoomed in. The mental nodes on these threads do not only have a complex spacial relationship to each other, they have a complex temporal relationship. Which idea came first? What's [[the-revision-history-of-an-idea|the revision history of an idea]]?\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "the-temporality-of-complexity",
+          "target_note_id": "mind-networks-modelling",
+          "anchor_text": "Mind networks",
+          "href": "https://www.mentalnodes.com/mind-networks-modelling",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "the-temporality-of-complexity",
+          "target_note_id": "threaded-thinking-instead-of-linear-thinking",
+          "anchor_text": "threaded thinking",
+          "href": "https://www.mentalnodes.com/threaded-thinking-instead-of-linear-thinking",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "the-temporality-of-complexity",
+          "target_note_id": "the-revision-history-of-an-idea",
+          "anchor_text": "the revision history of an idea",
+          "href": "https://www.mentalnodes.com/the-revision-history-of-an-idea",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "how-to-take-smart-notes",
+      "source_url": "https://www.mentalnodes.com/how-to-take-smart-notes",
+      "title": "How To Take Smart Notes",
+      "markdown_path": "notes/how-to-take-smart-notes.md",
+      "text": "How to Take Smart Notes: One Simple Technique to Boost Writing, Learning and Thinking \u2013 for Students, Academics and Nonfiction Book Writers.\n",
+      "outgoing_links": []
+    },
+    {
+      "note_id": "a-non-linear-cadavre-exquis",
+      "source_url": "https://www.mentalnodes.com/a-non-linear-cadavre-exquis",
+      "title": "A Non Linear Cadavre Exquis",
+      "markdown_path": "notes/a-non-linear-cadavre-exquis.md",
+      "text": "The Internet is a giant [[mind-networks-modelling|mental network]]. In theory, it would be possible to create a miniature version of the web by creating one node with some content (an idea, a thought) and to ask people to create a branch off that node with a label of their own\u2014based on what the initial node made them think about. People would keep on adding nodes, which would create interesting stories, like a non-linear *cadavre exquis*.\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "a-non-linear-cadavre-exquis",
+          "target_note_id": "mind-networks-modelling",
+          "anchor_text": "mental network",
+          "href": "https://www.mentalnodes.com/mind-networks-modelling",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "noegraphy",
+      "source_url": "https://www.mentalnodes.com/noegraphy",
+      "title": "Noegraphy",
+      "markdown_path": "notes/noegraphy.md",
+      "text": "The noosphere is a philosophical concept: a collective sphere of consciousness where our [[mind-networks-modelling|minds interconnect]], which may explain why similar inventions independently popped up around the same time.\n\nThe concept of a global collective [[consciousness|consciousness]] is a philosophical construct with validity, especially in today's world where ideas travel so fast we have become a giant thinking organism.\n\nThe \"no\u00fbs\" in noosphere is the same \u03bd\u03cc\u03bf\u03c2 you find in \"noetics\", the study of the mind\u2014not to be confused with neuroscience, the study of the brain.\n\nA proposed [[neology|neologism]]: no\u00e9graphie / noegraphy, the study and practice of mapping thoughts and ideas.\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "noegraphy",
+          "target_note_id": "mind-networks-modelling",
+          "anchor_text": "minds interconnect",
+          "href": "https://www.mentalnodes.com/mind-networks-modelling",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "noegraphy",
+          "target_note_id": "consciousness",
+          "anchor_text": "consciousness",
+          "href": "https://www.mentalnodes.com/consciousness",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "noegraphy",
+          "target_note_id": "neology",
+          "anchor_text": "neologism",
+          "href": "https://www.mentalnodes.com/neology",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "the-revision-history-of-an-idea",
+      "source_url": "https://www.mentalnodes.com/the-revision-history-of-an-idea",
+      "title": "The Revision History Of An Idea",
+      "markdown_path": "notes/the-revision-history-of-an-idea.md",
+      "text": "When it comes to [[mind-networks-modelling|mind networks modelling]], we tend to look at an idea at a specific point in time, without considering its revision history. What branches were forked and never merged back? What edits were made and by who; in which circumstances? Could we revert back to a previous version if needed be?\n\nThis should be part of [[noegraphy|noegraphy]].\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "the-revision-history-of-an-idea",
+          "target_note_id": "mind-networks-modelling",
+          "anchor_text": "mind networks modelling",
+          "href": "https://www.mentalnodes.com/mind-networks-modelling",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "the-revision-history-of-an-idea",
+          "target_note_id": "noegraphy",
+          "anchor_text": "noegraphy",
+          "href": "https://www.mentalnodes.com/noegraphy",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "consciousness",
+      "source_url": "https://www.mentalnodes.com/consciousness",
+      "title": "Consciousness",
+      "markdown_path": "notes/consciousness.md",
+      "text": "I've been reading quite a few books about consciousness and need to import my notes here.\n\nBooks include:\n\n- Other Minds by Peter Godfrey-Smith #Peter Godfrey-Smith\n- Labyrinths by Jorge Luis Borges\n- Conscious by Annaka Harris\n- Consciousness by Susan Blackmore\n- How to change your mind by Michael Pollan\n- The Idea of the World by Bernardo Kastrup\n- The Doors of Perception by Aldous Huxley\n",
+      "outgoing_links": []
+    },
+    {
+      "note_id": "imagination-is-the-second-most-powerful-force-on-earth",
+      "source_url": "https://www.mentalnodes.com/imagination-is-the-second-most-powerful-force-on-earth",
+      "title": "Imagination Is The Second Most Powerful Force On Earth",
+      "markdown_path": "notes/imagination-is-the-second-most-powerful-force-on-earth.md",
+      "text": "While many of our mental faculties such as analyzing, calculating, linear thinking, etc. have allowed us to thrive as a species, anything that wasn't built by nature once originated from a human being's imagination. These other mental faculties allow us to take what we imagine and [[from-collector-to-creator|make it real]].\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "imagination-is-the-second-most-powerful-force-on-earth",
+          "target_note_id": "from-collector-to-creator",
+          "anchor_text": "make it real",
+          "href": "https://www.mentalnodes.com/from-collector-to-creator",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "simulation-hypothesis",
+      "source_url": "https://www.mentalnodes.com/simulation-hypothesis",
+      "title": "Simulation Hypothesis",
+      "markdown_path": "notes/simulation-hypothesis.md",
+      "text": "From Plato to The Matrix, the concept that our reality was not *the* reality is not new. The simulation hypothesis posits that our reality may be a sophisticated simulation emerging from something else. If I play The Sims and make them play a video game, what proves I'm not a Sim myself?\n\n(may be linked to [[the-big-illusion-of-consciousness|the big illusion of consciousness]]?)\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "simulation-hypothesis",
+          "target_note_id": "the-big-illusion-of-consciousness",
+          "anchor_text": "the big illusion of consciousness",
+          "href": "https://www.mentalnodes.com/the-big-illusion-of-consciousness",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "complex-thinking-is-impossible-without-external-scaffolding",
+      "source_url": "https://www.mentalnodes.com/complex-thinking-is-impossible-without-external-scaffolding",
+      "title": "Complex Thinking Is Impossible Without External Scaffolding",
+      "markdown_path": "notes/complex-thinking-is-impossible-without-external-scaffolding.md",
+      "text": "> \"Notes on paper, or on a computer screen \\[...\\] do not make contemporary physics or other kinds of intellectual endeavour easier, they make it possible.\" \u2014 Neil Levy in [Handbook of Neuroethics](https://link.springer.com/referencework/10.1007/978-94-007-4707-4) (2011)\n\nWhile for most day-to-day thinking it is acceptable to make decisions based on [[consciousness|unconscious]] mental shortcuts and cognitive biases\u2014automatic judgements such as: this alley has more light, hence it is safer; this brand looks fancier, hence it must be better; this book is bigger; hence it must have more information\u2014complex thinking requires external scaffolding. (however, [[good-thinking-is-impossible-without-internal-scaffolding|good thinking is impossible without internal scaffolding]])\n\n[[writing-is-thinking|The most efficient and accessible kind of external scaffolding for complex thinking is writing]], whether on paper or on a computer. (hand-written [[taking-raw-notes-is-useless|notes]] help better understand content because they're slower to write and thus force you to think to condense the original content while preserving meaning)\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "complex-thinking-is-impossible-without-external-scaffolding",
+          "target_note_id": null,
+          "anchor_text": "Handbook of Neuroethics",
+          "href": "https://link.springer.com/referencework/10.1007/978-94-007-4707-4",
+          "is_internal": false
+        },
+        {
+          "source_note_id": "complex-thinking-is-impossible-without-external-scaffolding",
+          "target_note_id": "consciousness",
+          "anchor_text": "unconscious",
+          "href": "https://www.mentalnodes.com/consciousness",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "complex-thinking-is-impossible-without-external-scaffolding",
+          "target_note_id": "good-thinking-is-impossible-without-internal-scaffolding",
+          "anchor_text": "good thinking is impossible without internal scaffolding",
+          "href": "https://www.mentalnodes.com/good-thinking-is-impossible-without-internal-scaffolding",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "complex-thinking-is-impossible-without-external-scaffolding",
+          "target_note_id": "writing-is-thinking",
+          "anchor_text": "The most efficient and accessible kind of external scaffolding for complex thinking is writing",
+          "href": "https://www.mentalnodes.com/writing-is-thinking",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "complex-thinking-is-impossible-without-external-scaffolding",
+          "target_note_id": "taking-raw-notes-is-useless",
+          "anchor_text": "notes",
+          "href": "https://www.mentalnodes.com/taking-raw-notes-is-useless",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "good-thinking-is-impossible-without-internal-scaffolding",
+      "source_url": "https://www.mentalnodes.com/good-thinking-is-impossible-without-internal-scaffolding",
+      "title": "Good Thinking Is Impossible Without Internal Scaffolding",
+      "markdown_path": "notes/good-thinking-is-impossible-without-internal-scaffolding.md",
+      "text": "While many daily decisions don't seem important enough to deeply think about their second-order differences, the impact of cognitive biases does add up over time. Mental models are a form of scaffolding.\n",
+      "outgoing_links": []
+    },
+    {
+      "note_id": "mind-expanding-tools",
+      "source_url": "https://www.mentalnodes.com/mind-expanding-tools",
+      "title": "Mind Expanding Tools",
+      "markdown_path": "notes/mind-expanding-tools.md",
+      "text": "- Reading\n- Journaling\n- Lucid dreaming\n- Meditating\n- Note-making\n- [[why-i-care-about-metacognition|Metacognition]]\n- Psychedelics\n- Good conversations\n- [[universal-alphabet-of-emotion|Universal Alphabet of Emotion]]\n- [[from-cartomancy-to-cartospection|Cartospection]]\n\n... What else? Please [let me know](https://twitter.com/intent/tweet)!\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "mind-expanding-tools",
+          "target_note_id": "why-i-care-about-metacognition",
+          "anchor_text": "Metacognition",
+          "href": "https://www.mentalnodes.com/why-i-care-about-metacognition",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "mind-expanding-tools",
+          "target_note_id": "universal-alphabet-of-emotion",
+          "anchor_text": "Universal Alphabet of Emotion",
+          "href": "https://www.mentalnodes.com/universal-alphabet-of-emotion",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "mind-expanding-tools",
+          "target_note_id": "from-cartomancy-to-cartospection",
+          "anchor_text": "Cartospection",
+          "href": "https://www.mentalnodes.com/from-cartomancy-to-cartospection",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "mind-expanding-tools",
+          "target_note_id": null,
+          "anchor_text": "let me know",
+          "href": "https://twitter.com/intent/tweet",
+          "is_internal": false
+        }
+      ]
+    },
+    {
+      "note_id": "writing-is-thinking",
+      "source_url": "https://www.mentalnodes.com/writing-is-thinking",
+      "title": "Writing Is Thinking",
+      "markdown_path": "notes/writing-is-thinking.md",
+      "text": "There is a [[a-text-renaissance|text renaissance]]. [[why-i-care-about-metacognition|Organic thinking tools]] include chatting with someone, doodling, mathematics, and writing. To me, writing is the most flexible and richest one of these thinking tools. Writing your thoughts (not [[taking-raw-notes-is-useless|taking raw notes]]) forces you to face them in a way I haven't found just talking does. It's a forcing vector to articulate ideas in a more definitive way\u2014definitive not meaning the idea is set in stone, but rather than it is captured at a t time and goes from fleeting to really coming into existence. A thought that's not written ceases to exist as soon as it's forgotten. A written thought starts to live a life of its own.\n\nIf the thought is written in a note that's then itself abandoned and forgotten about, it's a short, sad life, but a life nonetheless. However, if the thought is revisited, shared, edited, branched into more thoughts\u2014thought babies! Idea sex!\u2014then it can live a long, happy live, way [[living-beyond-your-expiration-date|beyond its expiration date]].\n\nIn my case, the thought often starts with the title I give to a new note. I see these as a prompt. I often only have a vague notion of what exactly this idea encapsulates. The act of writing is what allows me to unravel the thread of sub-ideas under the generic note title. Most of my insights and ideas happen during the process of writing, not before. Plus, [[complex-thinking-is-impossible-without-external-scaffolding|complex thinking is impossible without external scaffolding]] such as writing.\n\nI find that writing as if I had an audience is the most effective way to induce clear thinking. More often than note, the audience is my future self, with her new experiences and imperfect memory. Writing clearly today ensures I can understand myself tomorrow.\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "writing-is-thinking",
+          "target_note_id": "a-text-renaissance",
+          "anchor_text": "text renaissance",
+          "href": "https://www.mentalnodes.com/a-text-renaissance",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "writing-is-thinking",
+          "target_note_id": "why-i-care-about-metacognition",
+          "anchor_text": "Organic thinking tools",
+          "href": "https://www.mentalnodes.com/why-i-care-about-metacognition",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "writing-is-thinking",
+          "target_note_id": "taking-raw-notes-is-useless",
+          "anchor_text": "taking raw notes",
+          "href": "https://www.mentalnodes.com/taking-raw-notes-is-useless",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "writing-is-thinking",
+          "target_note_id": "living-beyond-your-expiration-date",
+          "anchor_text": "beyond its expiration date",
+          "href": "https://www.mentalnodes.com/living-beyond-your-expiration-date",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "writing-is-thinking",
+          "target_note_id": "complex-thinking-is-impossible-without-external-scaffolding",
+          "anchor_text": "complex thinking is impossible without external scaffolding",
+          "href": "https://www.mentalnodes.com/complex-thinking-is-impossible-without-external-scaffolding",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "folders-kill-creativity",
+      "source_url": "https://www.mentalnodes.com/folders-kill-creativity",
+      "title": "Folders Kill Creativity",
+      "markdown_path": "notes/folders-kill-creativity.md",
+      "text": "Thanks to traditional computer operating systems, folders have become ubiquitous. But folders are terrible for creativity.\n\n- Folders assume a specific piece of content fits into a unique, definable category.\n- Worse, you must categorize each piece of content, i.e. each piece of content must be placed in a folder. You can make copies, but then it's not the exact same piece of content, it becomes a separate entity.\n- This is extremely inefficient. If we applied the same \"one file\" = \"one dedicated folder\" concept to the human brain, it would mean each idea would have to be duplicated X amount of time to be available to each relevant part of the brain.\n- This leads to redundant ideas. Similar but not identical ideas are not bad\u2014noticing that an idea keeps on coming up can actually be a great way to discover [[on-the-newness-of-ideas|new patterns]] \u2014but folders obfuscate the redundancy and thus prevent the discovery of such patterns.\n- Folders assume an artificial hierarchy between ideas/pieces of content. As a piece of content needs to be placed in a folder, and folders are always placed within a folder, creating a piece of content automatically implies positioning it within a rigid hierarchical structure.\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "folders-kill-creativity",
+          "target_note_id": "on-the-newness-of-ideas",
+          "anchor_text": "new patterns",
+          "href": "https://www.mentalnodes.com/on-the-newness-of-ideas",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "being-intentional-about-the-content-we-consume-is-an-act-of-freedom",
+      "source_url": "https://www.mentalnodes.com/being-intentional-about-the-content-we-consume-is-an-act-of-freedom",
+      "title": "Being Intentional About The Content We Consume Is An Act Of Freedom",
+      "markdown_path": "notes/being-intentional-about-the-content-we-consume-is-an-act-of-freedom.md",
+      "text": "[[a-knowledge-workers-most-precious-tool-is-their-mind|A knowledge worker's most precious tool is their mind]]. The same way we take care of our body through a healthy diet and exercise, we need to take care of our mind through a healthy content consumption and proactive thinking. Only then can we hope to [[on-the-newness-of-ideas|generate new ideas]].\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "being-intentional-about-the-content-we-consume-is-an-act-of-freedom",
+          "target_note_id": "a-knowledge-workers-most-precious-tool-is-their-mind",
+          "anchor_text": "A knowledge worker's most precious tool is their mind",
+          "href": "https://www.mentalnodes.com/a-knowledge-workers-most-precious-tool-is-their-mind",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "being-intentional-about-the-content-we-consume-is-an-act-of-freedom",
+          "target_note_id": "on-the-newness-of-ideas",
+          "anchor_text": "generate new ideas",
+          "href": "https://www.mentalnodes.com/on-the-newness-of-ideas",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "processing-versus-creating",
+      "source_url": "https://www.mentalnodes.com/processing-versus-creating",
+      "title": "Processing Versus Creating",
+      "markdown_path": "notes/processing-versus-creating.md",
+      "text": "We have a processing mode\u2014answering emails, checking stuff off our to-do list\u2014and a creative mode, which is messier, slower, more frustrating, but ultimately more rewarding. I personally struggle to combine the two. The former makes me feel productive, the later makes me feel creative. The weird space in between is when I don't achieve much. I think combining both modes would result in better [[on-the-newness-of-ideas|intellectual output]].\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "processing-versus-creating",
+          "target_note_id": "on-the-newness-of-ideas",
+          "anchor_text": "intellectual output",
+          "href": "https://www.mentalnodes.com/on-the-newness-of-ideas",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "what-would-it-take-to-write-one-million-words",
+      "source_url": "https://www.mentalnodes.com/what-would-it-take-to-write-one-million-words",
+      "title": "What Would It Take To Write One Million Words",
+      "markdown_path": "notes/what-would-it-take-to-write-one-million-words.md",
+      "text": "I remember when I was participating in the National Novel Writing Month challenge (~NaNoWriMo)\u2014being able to write close to 500 words in 15 minutes. And these were not too bad. (granted, I was writing in French, which is much easier for me)\n\nIt's important I start writing fast again, because I have an idea for a project which requires a large dataset, and I don't want it to be any random kind of dataset. I want to use words which capture my voice.\n\nIt's been a few days I've been obsessed with the idea of better understanding what makes a person's voice. Our lives are ephemeral. Once we die, our voice disappears. The only voices that survive\u2014 [[living-beyond-your-expiration-date|the ones that live past a person's expiration date]] \u2014are the ones of famous authors and artists whose work is transcending the centuries.\n\nI have an *idea* of what Moli\u00e8re or Cicero sounded like. Obviously, nobody sounds the same way when they write compared to when they speak; that's why I only have an idea and not a perfect representation of Moli\u00e8re's and Cicero's voice. But the fact that I have access to their work, *que leur travail leur ait surv\u00e9cu*, this gives me a glimpse into what they sounded like.\n\nThe main question I'm struggling with right now is: is my voice in English the same as my voice in French? And the answer is, obviously: no. I don't have the same voice in French and in English. I'm not even sure someone who is truly bilingual has the same voice in two different languages. (by voice, I don't mean tone or pitch, but truly, the personal voice of a human being, their unique signature which I don't think has been truly captured and analysed in any form so far)\n\nThe project I have in mind consists in analysing my personal notes, and extracting interesting elements out of it. At first, I'll keep it practical: generating ideas to write about based on the themes I already wrote about. This is why I started learning Python today. From the little I have seen, there are many libraries making it quite easy to extract such meaning from many content formats. However, long term\u2014by the way, notice how I wrote \"however\" here, while I would have used \"but\" if I was having this conversation face-to-face with someone\u2014so, long term, my idea is to extract my own voice from these notes. I'm honestly not even sure what that \"voice\" is. I'll probably need to read some more research. Maybe ask smart people who have spent much longer thinking about this.\n\nLike most people, I don't want to die. And I don't want to lose the people I love. Of course, capturing one's voice\u2014truly capturing it\u2014opens the door to many Black Mirror scenarios with zombie-like robots used as placebo companions for grieving people. But that's not really what I have in mind. I'm specifically interested in the written medium. As much as I would want to capture my mom's voice, what I have in mind is not so much\u2014again\u2014about one's tone or pitch. It's about their personal voice: the way they think and the way they express themselves.\n\nThis experiment would only work with people who tend to think out loud. And writers are exactly the kind of people who tend to think out loud. Better yet, they think out loud in a way that makes it easy to perform data analysis.\n\nTo narrow it down even further, it would only work with extremely prolific writers. To capture a person's voice, you would probably need a mix of their conversations, notes, and essays. (I'm not sure how well these various formats could be cleaned up to work together, but I assume that's something I'll learn soon while studying Python)\n\nI'm a pretty prolific writer. I write about three articles a week on Ness Labs. The problem is these articles don't capture my voice. They're factual research articles that don't do a great job at capturing the intricacies of all the weird ways my mind sometimes wanders. Going back to the language issue, not only doing this work in English would mean I'd only capture part of my voice (more accurately, one of my voices), but if the English source material came from my professional blog, it would miss huge chunks of how I actually think and express myself.\n\nPart of me would like to honour my French heritage and do this exercise in French. But I have lost the habit of typing in French, even of thinking in French, and it would take me forever to produce the same amount of content. My muscle memory is unfortunately gone in my French-thinking mind. (I believe it could absolutely be revived if I made it a priority by reading French books and buying a French keyboard)\n\nSo\u2014English it's gonna be. I just want to acknowledge (I can never write this word properly and always have to use autocorrect) the fact that I'm leaving a massive part of my identity on the table. My French heritage (the language, the culture, the mental models) is not 50% of my identity, it's much, much more. Genetics aside, I'm 60% French, 30% Algerian, 10% Lost. Despite living, thinking, sometimes dreaming in English, no part of me feels British. But, for practical reasons, I can't tackle this project in French.\n\nThe idea of this project is to conduct a data analysis of some sort (I'm way too early to even have any idea of what that looks like) on my own notes and to: first, suggest topics to write about based on recurring themes, second, capture my voice. For both parts, I have no idea what the process would entail, and I'm starting this journey completely blind. The interesting part will be to use the notes I take during this project as material for the data analysis.\n\nHence the title of the first note in this project: what would it take to write one million words? 2740 words per day for one year. A thousand 1000-word articles. Whatever the approach, quite a bit of time and energy. Which brings me back to the ~NaNoWriMo and my average of 500 words in 15 minutes. (bear in mind that it was in French, a language that's\u2014I think\u2014much more verbose than English) If I was truly dedicated to this, I could write one million words in one year. That would make for a pretty solid snapshot of my voice at t = 2020.\n\nBut let's not get carried away. From a practical standpoint, I'm going to block time every day for one hour of free flow thinking. I should probably set a target number of words if I want to get to one million words, but I want to make it more about the thinking time than the number of outputted words for now. I need volume, but I need the words to sound like me and to reflect what I think, versus writing a bunch of platitudes just to hit a word count.\n\nI'll write these free flow notes into Roam, then paste them into my public-facing digital garden. That's something I'm still a bit hesitant about. I want to be able to think without worrying about what other people may think. But it's a good exercise to kill these inner worries. On the technical side of things, I'll also be able to export a JSON or a CSV file with all these notes, which will include a timestamp and any tags I wish to add. I have absolutely no idea how this will help in the future, but from skimming through some articles, python plays nicely with JSON and CSV files.\n\nTo summarise, I need to achieve three things. (not in order) First, learn enough Python to be able to perform basic data analysis and extract recurring themes to suggest ideas of what to write about based on the content of my notes. Even though I have no idea how to get there right now, this feels like the more practical part of this whole project. Second, extract my voice from my notes. That's the more esoteric part of the project. I don't even know what my \"voice\" means\u2014what variables I would need to create, what the output would look like. This is probably where I'll need to start learning about machine learning, neural networks, and all that jazz. (yes, at this point I have no idea if these make any sense in the context of this project) Third, write enough personal notes so that whatever analysis I perform is meaningful, aka statistically significant.\n\nIn terms of strategy for producing enough personal content (beyond Ness Labs), I will probably use a mix of in-the-moment inspiration and the big questions spaced repetition system, cycling through some of the important questions I care about and using them as prompts for a daily thinking practice.\n\nOne important rule I have for writing these\u2014and that I have been using to write the present note\u2014is to not look up anything online. When I write \"proper\" articles for Ness Labs, I spend a lot of time looking up research papers, or just checking for better synonyms in dictionaries, or using Google Translate to figure out how to say something. The goal of these notes is to capture how *I* think, so there will be no external input during any such thinking session. This may result in grammatical mistakes and factual errors, but I'm wiling to take that risk to avoid getting into research mode.\n\nFinally, I'll also create a spreadsheet to track my progress towards one million words. I love tracking stuff in spreadsheets. It gives you a nice illusion of control. And when you lose your motivation, it does help to look back so you don't feel like breaking your streak. (side note that I should really write about my mom and my grandma at some point - if I do I will link to it from here, or automatic backlinks will take care or it)\n\nIn the spirit of this very first free flow thinking session, the reason why I thought about my mom (and I can't think about my mom without thinking about my grandma) is because I wrote about losing motivation, which is something my mom doesn't really believe in. My mom truly, deeply believes in the power of compound interest. There is no small gain. As long as you keep on pushing forward, good things will happen. She comes from an extremely poor family, and this mentality has served her well. She went from working in a cotton swabs factory to cleaning houses to waitress to receptionist to director in a private clinic. But I'm not my mom, so I need a spreadsheet.\n\nAgain, feeling a bit weird putting this on the web, but also a bit excited because this is what blogging used to be about.\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "what-would-it-take-to-write-one-million-words",
+          "target_note_id": "living-beyond-your-expiration-date",
+          "anchor_text": "the ones that live past a person's expiration date",
+          "href": "https://www.mentalnodes.com/living-beyond-your-expiration-date",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "a-nostalgia-of-early-online-communities",
+      "source_url": "https://www.mentalnodes.com/a-nostalgia-of-early-online-communities",
+      "title": "A Nostalgia Of Early Online Communities",
+      "markdown_path": "notes/a-nostalgia-of-early-online-communities.md",
+      "text": "I created my first online community when I was 14. It coincided with the first time in my life I had my own computer, in my bedroom, connected to the Internet. When I was still living at my parents, we had one communal computer (as was common at the time), which was in my dad's office. If you wanted to use it, you had to ask, state what you would be doing, and my dad would put a timer on the kitchen's oven. Our Internet subscription only allowed for 50 hours a month, so you had to be strategic with this precious online time. Even after we had our first unlimited subscription, my dad tried for a while to enforce the intentional use of the Internet he thought was best for us.\n\nWhen I moved to Clermont Ferrand into my foster care family (I'm not sure if there's a better, less emotionally charged word for this, maybe my host family? but it was more than that)\u2014also, I really need to call Lizou\u2014they didn't bother to move the computer out of the bedroom they gave me. They did arrange the bedroom with lots of care and welcomed me with incredible love\u2014the reason they didn't bother is because they didn't think of the computer as something someone would *want* to use. To them, the computer was this big, cumbersome box they had to use from time to time to access an invoice or read an email. So they didn't think much of it and left it in my bedroom.\n\nThese three years in Clermont Ferrand have been when I got my Internet education. Every weekend\u2014during the week I was in boarding school\u2014I would spend most of the day and most of the night on this computer. I had already created a blog (first at anthilemoon.free.fr which was the free hosting we got with our hosting provider back at my parents' house, then at anthilemoon.net), but I started really investing my time and energy into growing it. It was my online home, with a close circle of online friends\u2014some I'm still in touch with today.\n\nWe each had a blog, a blogroll (a list of our online friends' blogs), a chat box (for people to leave nice messages and let us know when they had posted something new on their blog). We all spent lots of time carefully designing and coding these websites. They had quite unique styles compared to the bland, undifferentiated interfaces you see today. Arriving for the first time on one of these blogs often meant spending a couple of minutes literally figuring out your way around\u2014where's the menu, where's the chat box? In addition to diary entries, most people offered other goodies such as website templates, JavaScript widgets, Photoshop brushes, wallpapers, and so on. The bigger websites often had a phpBB forum board.\n\nI joined my first phpBB forum board when I moved to Clermont Ferrand. It was a role playing game. I genuinely can't remember the intricacies of the world and the back story, but it was a fairly large board with some sort of fantasy or superpowers aspect to it. My character\u2014as with all of my subsequent characters in all other RPGs I signed up to\u2014was a suicidal, tortured woman. I\u2014I'm saying I, because the connection between myself and my character was so transparent it would be ridiculous to ignore\u2014often ended up having complex, destructive relationships with characters played by other people. The ones I loved playing were also probably projecting themselves onto their characters, putting lots of care into writing answers that reflected their thoughts and feelings.\n\nTo date, this is the most interesting form of community I have ever been a part of. First, it was completely anonymous. There was no way of knowing who was behind a character. I imagine it must have been a haven of safety for LGBTQ kids. Second, the communication style was long-form written answers. You would write an answer\u2014not uncommon for an answer to be a couple of thousand words long\u2014then wait for the other person to take the story further. The answers were written in the third person, and were supposed to read like a novel when read in order. I don't think there are many places online today where people are being this thoughtful when interacting together. (one exception is a website I recently stumbled upon where people write online letters to each other, like a public penpal conversation)\n\nBecause the format lended itself to slow conversations, most people had several characters on the same board and were often members of several boards, so they could cycle through storylines. Usually, by the time you were done replying to someone for a specific storyline, another storyline had moved forward. You could spend hours just writing non-stop, immersed in a parallel universe.\n\nI soon created my own phpBB forum. It wasn't an RPG, it was a place for me to connect with all the friends I had made across various boards. I think the maximum number of members it reached was 100 people. (we had a virtual party to celebrate) I became really good friends with several members, chatting for hours on MSN Messenger. One of them I even considered flying to Canada to meet in person. Fifteen years later, we still write to each other from time to time.\n\nWhat would these kind of meaningful online communities look like today? Most communities I run today are chat-based, and hence lead to fast, utilitarian, transactional conversations. Perhaps online salons as my friend Anna organises with the ~InterIntellect are part of the solution, but they lack the wonderful flexibility of creating an avatar for yourself. I also think that most solutions in the communication space focus on speed\u2014how fast can we share information with other people? It may be shallow nostalgia on my part, but we have lost everything talking online brings versus talking in person: the potential for anonymity (which brings the potential for multiple identities), and the potential for slow, asynchronous conversations. Today, online communities require you to align your IRL identity with your online identity, and to talk fast.\n\nAnother aspect of talking with people which only online conversations can bring about in a more structured way is threaded conversations. When talking IRL, we usually tend to explore many related topics, and sometimes make a [[consciousness|conscious]] effort to keep the main, original topic of conversation in our working memory so we can come back to it. \"What was I saying?\" or \"What were we talking about already?\" are common utterances in an IRL conversation. Online, you could easily imagine conversations with infinite nesting. I would actually love to explore such a repository of nested long-form conversations people would have on various topics.\n\nBut as with all tools, and especially in the case of community tools, there is no use if people don't engage with them. Part of me thinks most people today wouldn't be interested in such slow, long-form, nested conversations. Another part\u2014the optimistic one\u2014thinks there may be a tiny group of nerds who may enjoy building a [[networked-thinking-can-happen-at-many-levels|giant idea playground]] by talking to others online. Surely I'm not the only one with a nostalgia of early online communities.\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "a-nostalgia-of-early-online-communities",
+          "target_note_id": "consciousness",
+          "anchor_text": "conscious",
+          "href": "https://www.mentalnodes.com/consciousness",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "a-nostalgia-of-early-online-communities",
+          "target_note_id": "networked-thinking-can-happen-at-many-levels",
+          "anchor_text": "giant idea playground",
+          "href": "https://www.mentalnodes.com/networked-thinking-can-happen-at-many-levels",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "a-knowledge-workers-most-precious-tool-is-their-mind",
+      "source_url": "https://www.mentalnodes.com/a-knowledge-workers-most-precious-tool-is-their-mind",
+      "title": "A Knowledge Workers Most Precious Tool Is Their Mind",
+      "markdown_path": "notes/a-knowledge-workers-most-precious-tool-is-their-mind.md",
+      "text": "Need to flesh this one out, but there's a book title which sums it up. *Mind Over Matter: Why Intellectual Capital is the Chief Source of Wealth.*\n\n[[keep-your-levels-of-consumption-and-creation-balanced|Balance your input/output levels]] and cultivate your curiosity to grow your intellectual capital.\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "a-knowledge-workers-most-precious-tool-is-their-mind",
+          "target_note_id": "keep-your-levels-of-consumption-and-creation-balanced",
+          "anchor_text": "Balance your input/output levels",
+          "href": "https://www.mentalnodes.com/keep-your-levels-of-consumption-and-creation-balanced",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "ideorama",
+      "source_url": "https://www.mentalnodes.com/ideorama",
+      "title": "Ideorama",
+      "markdown_path": "notes/ideorama.md",
+      "text": "I came across the word \u201ccosmorama\u201d in a short story by Borges. From Wikipedia: \"A **cosmorama** is an exhibition of perspective pictures of different places in the world, usually world landmarks. Careful use of illumination and lenses gives the images greater realism.\"\n\nThe word is derived from \u201cpanorama\u201d from the Greek words \u201cto see\u201d and \u201call.\u201d\n\nA bit of clicking around, and you discover a wealth of attempts to represent places in a way that makes the viewer feel as if they were *there*.\n\n\u201cA **cyclorama** is a panoramic image on the inside of a cylindrical platform, designed to give viewers standing in the middle of the cylinder a 360\u00b0 view, and also a building designed to show a panoramic image. The intended effect is to make viewers, surrounded by the panoramic image, feel as if they were standing in the midst of the place depicted in the image.\u201d\n\nThese inspired Poole's **myriorama** in the 1900's and the first **cinerama** screens in the 1950's.\n\nWhat would a cosmorama look like for ideas, for thoughts\u2014an ideorama, a phrenorama perhaps? What would the equivalent of the \u201ccareful use of illumination and lenses\u201c be for thinking outside one's mind?\n\nSee also: [[neology|Neology]]\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "ideorama",
+          "target_note_id": "neology",
+          "anchor_text": "Neology",
+          "href": "https://www.mentalnodes.com/neology",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "finding-balance-between-anthropomorphism-and-scientific-materialism",
+      "source_url": "https://www.mentalnodes.com/finding-balance-between-anthropomorphism-and-scientific-materialism",
+      "title": "Finding Balance Between Anthropomorphism And Scientific Materialism",
+      "markdown_path": "notes/finding-balance-between-anthropomorphism-and-scientific-materialism.md",
+      "text": "Most researchers start looking / thinking / acting like the subjects they study. For instance, Merlin Sheldrake reports in his book *Entangled Life* starting to see the world as much more interconnected as a result of studying mushrooms. See [[interconnectedness-of-things|interconnectedness of things]].\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "finding-balance-between-anthropomorphism-and-scientific-materialism",
+          "target_note_id": "interconnectedness-of-things",
+          "anchor_text": "interconnectedness of things",
+          "href": "https://www.mentalnodes.com/interconnectedness-of-things",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "from-cartomancy-to-cartospection",
+      "source_url": "https://www.mentalnodes.com/from-cartomancy-to-cartospection",
+      "title": "From Cartomancy To Cartospection",
+      "markdown_path": "notes/from-cartomancy-to-cartospection.md",
+      "text": "A few thoughts on using cards for introspection.\n\n**\\[1\\]** Throughout history, people have used cards for divination (cartomancy). They believed in gods and destiny because they didn\u2019t fully understand their own agency so they sought answers from external forces.\n\nToday, we have a better understanding of psychology and human behavior. Instead of trying to predict fate, cards can help us uncover our motivations and emotions. A deck of cards can serve as a tool for introspection and self-knowledge.\n\nBy using cards to explore their instinctive responses to imagery and develop their intuition, one can explore their inner world and gain insights into our own minds \u2013 a shift from seeking external answers to looking within.\n\n**\\[2\\]** I\u2018m reminded of the Rorschach Test, which uses inkblots to explore a person\u2018s perceptions and thoughts. Like the Rorschach Test, using cards allows you to project your inner thoughts and feelings onto the images you see. This process can reveal the subconscious and providing insights into one\u2019s psyche.\n\n**\\[3\\]** Much like journaling prompts, using cards for introspection can prompt thoughts and feelings / trigger associations we might not explore otherwise unprompted. Similar to journaling prompts that can help reflect on overlooked aspects of our lives cards.\n\n**\\[4\\]** Maybe also a meditative aspect, similar to other traditions of meditating on an image? e.g., icon gazing in Christianity (\u201dvisio divina\u201c) or Tibetan thangka meditation.\n\n**\\[5\\]** Role of archetypes? Many people find archetypes useful to understand their own psychology, which might explain the popularity of Tarot cards. Quite similar to Jungian archetypes - it would be interesting to map these, e.g., the Mother, the Fool, the Shadow.\n\n**\\[6\\]** Potential therapeutic applications when used solo; structured way to explore one\u2019s thoughts and feelings independently; reflecting on the images and symbols to gain insights into one\u2019s emotional state and subconscious mind.\n\n**\\[7\\]** Counter: one might argue that any kind of cards/prompts could work for introspection. But tarot cards are might be particularly good for this due to their rich archetypal imagery/symbolism. Each card can be interpreted in many ways which allows to project your thoughts and emotions onto them. This creates a dialogue with the cards \u2013 like a mirror of the subconscious; the essence of self-reflection.\n\nRelated: [[interconnectedness-of-things|Interconnectedness of things]], [[designing-a-thinking-practice|Designing a thinking practice]], [[noegraphy|Noegraphy]]\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "from-cartomancy-to-cartospection",
+          "target_note_id": "interconnectedness-of-things",
+          "anchor_text": "Interconnectedness of things",
+          "href": "https://www.mentalnodes.com/interconnectedness-of-things",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "from-cartomancy-to-cartospection",
+          "target_note_id": "designing-a-thinking-practice",
+          "anchor_text": "Designing a thinking practice",
+          "href": "https://www.mentalnodes.com/designing-a-thinking-practice",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "from-cartomancy-to-cartospection",
+          "target_note_id": "noegraphy",
+          "anchor_text": "Noegraphy",
+          "href": "https://www.mentalnodes.com/noegraphy",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "the-timeless-way-of-thinking",
+      "source_url": "https://www.mentalnodes.com/the-timeless-way-of-thinking",
+      "title": "The Timeless Way Of Thinking",
+      "markdown_path": "notes/the-timeless-way-of-thinking.md",
+      "text": "The book *The Timeless Way of Building* by Christopher Alexander explores the concept of design patterns in architecture. It has apparently had a big influence on creative thinking, especially in the areas of architecture and software design. Do mental models offer such design patterns for thinking?\n\nInitial thoughts:\n\n- Some mental models may be too brittle (context-dependent, worldview or experience-based) but many of these limitations are relevant to design patterns as well\n- Thought processes may be too [[the-temporality-of-complexity|complex]] and dynamic to link to fixed patterns\n- However, if design patterns can be used in architecture to solve problems inherent to complex and dynamic environments, there is a possibility they may be successfully applied to thought processes.\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "the-timeless-way-of-thinking",
+          "target_note_id": "the-temporality-of-complexity",
+          "anchor_text": "complex",
+          "href": "https://www.mentalnodes.com/the-temporality-of-complexity",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "neology",
+      "source_url": "https://www.mentalnodes.com/neology",
+      "title": "Neology",
+      "markdown_path": "notes/neology.md",
+      "text": "A collection of made-up words, invented both for fun and to describe particular experiences.\n\n---\n\nENGLISH\n\n**Mindframing.** *(n)* Actively shaping one's mind frames. \"I apply mindframing to improve my productivity.\"\n\n**To maze.** *(v)* To [[consciousness|consciously]] let oneself wander during the research journey. e.g. \"I got this idea while mazing around.\"\n\n**Noegraphy.** *(n)* The study and practice of mapping thoughts and ideas.\n\n---\n\nFRENCH\n\n**Espl\u00e9nitude.** *(n, f)* Pleine [[consciousness|conscience]], mindfulness. e.g. \"Je pratique l'espl\u00e9nitude\" or \"Elle a pris un cours d'espl\u00e9nitude.\"\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "neology",
+          "target_note_id": "consciousness",
+          "anchor_text": "consciously",
+          "href": "https://www.mentalnodes.com/consciousness",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "neology",
+          "target_note_id": "consciousness",
+          "anchor_text": "conscience",
+          "href": "https://www.mentalnodes.com/consciousness",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "flow-versus-consciousness",
+      "source_url": "https://www.mentalnodes.com/flow-versus-consciousness",
+      "title": "Flow Versus Consciousness",
+      "markdown_path": "notes/flow-versus-consciousness.md",
+      "text": "Is flow antithetic with [[consciousness|consciousness]]?\n\nFrom Andy Matuschak on October 18th, 2020:\n\n> I've noticed that consciousness recedes when I'm deep in a coding phase, many back-to-back days in flow. My mind narrows to tunnel-vision, fixated on the software and its issues. My sense of self shrinks; non-code ideas cease to arise; I get less curious; writing yields little.\n> \n> It's an odd feeling: flow is experientially satisfying, but the creeping self-abnegation is worrying. I also notice it takes quite a while to \"reset\" from this phase, to start hearing myself think again, to feel like less of an automaton.\n> \n> I don't experience this feeling when I spend many days back-to-back in flow doing other work: developing an idea, writing, designing. I wonder if it's bc those activities are more creative, involve more reflective thought. Or maybe it's that I'm worse at them\u2014so flow's less deep!\n> \n> Also, I haven't noticed this much until last year. Hypotheses: a) didn't happen before b/c I rarely stayed in flow for days at a time working on a team; b) I only notice it now b/c I've become more self aware; c) I only notice it now b/c I value insight more and execution less?\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "flow-versus-consciousness",
+          "target_note_id": "consciousness",
+          "anchor_text": "consciousness",
+          "href": "https://www.mentalnodes.com/consciousness",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "the-big-illusion-of-consciousness",
+      "source_url": "https://www.mentalnodes.com/the-big-illusion-of-consciousness",
+      "title": "The Big Illusion Of Consciousness",
+      "markdown_path": "notes/the-big-illusion-of-consciousness.md",
+      "text": "Is consciousness just an illusion?\n\n[[consciousness|Consciousness]] feels like it exists in space and time. In space, there are thoughts, ideas, and emotions *inside* my mind; and there are objects, facts, and realities *outside* my mind. In time, there are memories, regrets, and remorses in my past; and there are goals, predictions and hopes in my future.\n\nAs a result, events feel like they can be in consciousness or out of consciousness: \\* Outside/Past: historical events I'm not aware of \\* Outside/Future: unexpected events that haven't happened yet \\* Inside/Past: active recall (conscious) or passive memory (subconscious) \\* Inside/Future: events I expect\n\nHowever, evidence from [[physics-is-the-grammar-of-reality|physics]] and neuroscience suggests that the construct of a bounded consciousness in space and time is an illusion. First, the concept of an \u201cinner show\u201d with continuous mental representations ([[ideorama|a theatre of the mind]]) is disconnected from the discrete nature of consciousness.\n\n> \u201cUnconscious processing is continuous but conscious precepts are restricted to certain short moments of time.\u201d \u2014 Dr. Michael Herzog.\n\nSecond, altered states of consciousness challenge the unidimensional view of conscious states, suggesting instead a multidimensional perspective.\n\n> \u201cIt is clear that the analysis of the psychedelic state puts further pressure on the idea that conscious states can be understood in terms of levels of consciousness \\[...\\] The psychedelic state is neither higher nor lower than the state of ordinary waking awareness. Although there are certain respects in which the psychedelic state is arguably \u2018higher\u2019 than the state of ordinary waking awareness (e.g. it is associated with increases in the richness and vividness of mental imagery), there are other respects in which the psychedelic state is arguably \u2018lower\u2019 than the state of ordinary waking awareness (e.g. it is associated with impairments in cognitive capacities such as attention, memory, communication and abstract reasoning).\u201d \u2014 Tim Bayne and Olivia Carter in [Dimensions of consciousness and the psychedelic state](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6146157).\n\nIn addition, the flow of time itself may be a subjective feature of the Universe (see *The Order of Time* Carlo Rovelli).\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "the-big-illusion-of-consciousness",
+          "target_note_id": "consciousness",
+          "anchor_text": "Consciousness",
+          "href": "https://www.mentalnodes.com/consciousness",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "the-big-illusion-of-consciousness",
+          "target_note_id": "physics-is-the-grammar-of-reality",
+          "anchor_text": "physics",
+          "href": "https://www.mentalnodes.com/physics-is-the-grammar-of-reality",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "the-big-illusion-of-consciousness",
+          "target_note_id": "ideorama",
+          "anchor_text": "a theatre of the mind",
+          "href": "https://www.mentalnodes.com/ideorama",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "the-big-illusion-of-consciousness",
+          "target_note_id": null,
+          "anchor_text": "Dimensions of consciousness and the psychedelic state",
+          "href": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6146157",
+          "is_internal": false
+        }
+      ]
+    },
+    {
+      "note_id": "the-quantum-nature-of-consciousness",
+      "source_url": "https://www.mentalnodes.com/the-quantum-nature-of-consciousness",
+      "title": "The Quantum Nature Of Consciousness",
+      "markdown_path": "notes/the-quantum-nature-of-consciousness.md",
+      "text": "The following quote appears in the book *Consciousness* by Susan Blackmore:\n\n> According to Dennet the brain processes multiple parallel descriptions of the world all the time, and none of them is either 'in' or 'out' of consciousness. When the system is probed in a certain way\u2014say by asking someone to answer a question or respond to a stimulus\u2014he may decide what he is conscious of and tell you about it. But up to that point there was no truth of the matter about whether that thing was, or was not, 'in consciousness'.\n\nIt's hard not to think about quantum physics when reading such a statement. Could [[consciousness|consciousness]] be somewhat quantum-mechanical?\n\nFrom Wikipedia:\n\n> The quantum mind or quantum consciousness is a group of hypotheses proposing that classical mechanics cannot explain consciousness. It posits that quantum-mechanical phenomena, such as entanglement and superposition, may play an important part in the brain's function and could explain consciousness.\n\nHowever, this idea is still in the realm of philosophy, and considered pseudoscience by some. Even Daniel Dennett himself does not believe that quantum effects are needed to explain consciousness ([[to-be-verified|to be verified]]).\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "the-quantum-nature-of-consciousness",
+          "target_note_id": "consciousness",
+          "anchor_text": "consciousness",
+          "href": "https://www.mentalnodes.com/consciousness",
+          "is_internal": true
+        },
+        {
+          "source_note_id": "the-quantum-nature-of-consciousness",
+          "target_note_id": "to-be-verified",
+          "anchor_text": "to be verified",
+          "href": "https://www.mentalnodes.com/to-be-verified",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "recursive-reality",
+      "source_url": "https://www.mentalnodes.com/recursive-reality",
+      "title": "Recursive Reality",
+      "markdown_path": "notes/recursive-reality.md",
+      "text": "Akin to the infinite patterns of fractals found in natural creativity, networks of knowledge feed themselves, resulting in repetitive branching. In recursive reality, it's impossible to know which is the base reality. This leads to questions about the fabric of space and time, e.g. the [[simulation-hypothesis|simulation hypothesis]].\n\nSee *A dream within a dream* by Edgar Allan Poe, first published in 1849:\n\n> Take this kiss upon the brow! And, in parting from you now, Thus much let me avow\u2014 You are not wrong, who deem That my days have been a dream; Yet if hope has flown away In a night, or in a day, In a vision, or in none, Is it therefore the less gone? All that we see or seem Is but a dream within a dream.\n> \n> I stand amid the roar Of a surf-tormented shore, And I hold within my hand Grains of the golden sand\u2014 How few! yet how they creep Through my fingers to the deep, While I weep\u2014while I weep! O God! can I not grasp Them with a tighter clasp? O God! can I not save One from the pitiless wave? Is all that we see or seem But a dream within a dream?\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "recursive-reality",
+          "target_note_id": "simulation-hypothesis",
+          "anchor_text": "simulation hypothesis",
+          "href": "https://www.mentalnodes.com/simulation-hypothesis",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "a-text-renaissance",
+      "source_url": "https://www.mentalnodes.com/a-text-renaissance",
+      "title": "A Text Renaissance",
+      "markdown_path": "notes/a-text-renaissance.md",
+      "text": "> There is a renaissance underway in online text as a medium. The Four Horsemen of this emerging Textopia are:\n> - Roam, a hypertext publishing platform best understood as a medium for composing conspiracy theories and extended universes.\n> - Substack, a careful and thorough ground-up neoclassical reconstruction of the age-old email newsletter.\n> - Static websites, built out of frameworks like Jekyll or Gatsby (full disclosure: a consulting client).\n> - And finally, Threaded Twitter, a user-pioneered hack-turned-supported feature that has wonderfully revitalized the platform.\n> \u2014via [A Text Renaissance](https://www.ribbonfarm.com/2020/02/24/a-text-renaissance)\n\nThe main enablers are technology (React, Closure, Graph databases, automated transcription, machine-generated text e.g. deep learning algorithm known as GPT-2), economics (easier to pay and get paid as a creator, powered mostly by Stripe), culture (back to intimate Internet, craving for more authentic relationships).\n\n(it doesn't mean podcasting, VR, etc. are not important as well, they may thrive alongside the text renaissance)\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "a-text-renaissance",
+          "target_note_id": null,
+          "anchor_text": "A Text Renaissance",
+          "href": "https://www.ribbonfarm.com/2020/02/24/a-text-renaissance",
+          "is_internal": false
+        }
+      ]
+    },
+    {
+      "note_id": "potential-words-for-mindfulness-in-french",
+      "source_url": "https://www.mentalnodes.com/potential-words-for-mindfulness-in-french",
+      "title": "Potential Words For Mindfulness In French",
+      "markdown_path": "notes/potential-words-for-mindfulness-in-french.md",
+      "text": "The English language is much better than French at mixing words together and create new words with new meanings. For instance, there is no word for \"mindfulness\" in French. Instead, it's called \"pleine conscience\" (full awareness).\n\nAs a result, reading any content in French about mindfulness feels strange: \"full awareness is a way to be fully aware of...\"\n\nSome ideas for alternatives:\n\n- Suggesting espl\u00e9nitude: esprit (mind) + pl\u00e9nitude (fulness)\n- Ben Villi\u00e8re suggested pleinsoi (full + self) and contemplativit\u00e9\n- What else?\n\nSee also: [[neology|Neology]]\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "potential-words-for-mindfulness-in-french",
+          "target_note_id": "neology",
+          "anchor_text": "Neology",
+          "href": "https://www.mentalnodes.com/neology",
+          "is_internal": true
+        }
+      ]
+    },
+    {
+      "note_id": "physics-is-the-grammar-of-reality",
+      "source_url": "https://www.mentalnodes.com/physics-is-the-grammar-of-reality",
+      "title": "Physics Is The Grammar Of Reality",
+      "markdown_path": "notes/physics-is-the-grammar-of-reality.md",
+      "text": "Learning that grammar is learning to speak the language of the universe.\n",
+      "outgoing_links": []
+    },
+    {
+      "note_id": "to-be-verified",
+      "source_url": "https://www.mentalnodes.com/to-be-verified",
+      "title": "To Be Verified",
+      "markdown_path": "notes/to-be-verified.md",
+      "text": "Backlinks show a list of topics to research further.\n",
+      "outgoing_links": []
+    },
+    {
+      "note_id": "recursive-recording",
+      "source_url": "https://www.mentalnodes.com/recursive-recording",
+      "title": "Recursive Recording",
+      "markdown_path": "notes/recursive-recording.md",
+      "text": "What if I could be contained in my own work? What if I could create a perfect recording of every detail of my life, thoughts, memories, emotions, and relationships, each image containing an image of itself?\n\nAt the simplest level:\n\n> Anne-Laure was sitting at her desk, writing on her computer. She started typing the words: \"Anne-Laure was sitting at her desk, writing on her computer. She started...\"\n\nAt a more complex level, recursive recording would be akin to the impossible task of *Funes the Memorious* by Borges. By cataloguing my whole life in the most minute details, I would have to catalogue the action of cataloguing, including how and what I was cataloguing, and so on and so forth.\n\nMoving up higher levels in the recursion, maybe [[recursive-reality|reality itself is recursive]]?\n",
+      "outgoing_links": [
+        {
+          "source_note_id": "recursive-recording",
+          "target_note_id": "recursive-reality",
+          "anchor_text": "reality itself is recursive",
+          "href": "https://www.mentalnodes.com/recursive-reality",
+          "is_internal": true
+        }
+      ]
+    }
+  ],
+  "external_links": [
+    "http://www.pnas.org/content/early/2017/08/30/1702247114.abstract",
+    "http://www.uprtcl.io/",
+    "https://academic.oup.com/schizophreniabulletin/article/46/6/1396/5908041",
+    "https://alyssax.com/",
+    "https://college.georgetown.edu/news-story/georgetown-researchers-spark-creativity",
+    "https://disi.org/",
+    "https://docs.google.com/presentation/d/1GWSFltGp0Qr9YKzu4cc_4eGhFcWCrzGN0zn5G0vp3mE/mobilepresent",
+    "https://giffmex.org/gifts/tiddlyblink.html",
+    "https://journals.sagepub.com/doi/10.1111/j.0956-7976.2005.00782.x",
+    "https://link.springer.com/referencework/10.1007/978-94-007-4707-4",
+    "https://nesslabs.com/",
+    "https://nesslabs.com/digital-garden-tiddlywiki",
+    "https://neuronlined.org/",
+    "https://news.berkeley.edu/2017/09/06/27-emotions",
+    "https://notes.andymatuschak.org/",
+    "https://tacticaltypos.net/",
+    "https://tiddlywiki.com/",
+    "https://twitter.com/",
+    "https://twitter.com/Neuro_Skeptic/status/1553395824998105088",
+    "https://twitter.com/anthilemoon",
+    "https://twitter.com/anthilemoon/status/1338574783026499585",
+    "https://twitter.com/intent/tweet",
+    "https://www.govloop.com/community/blog/how-do-rocket-scientists-learn-aka-knowledge-management-lessons-learned-at-goddard-nasa",
+    "https://www.kickstarter.com/projects/alexwolf/pattern-alphabet-cards-for-exploring-nature",
+    "https://www.nature.com/articles/s41586-020-3037-7",
+    "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6146157",
+    "https://www.newscientist.com/article/mg21428675-400-time-flows-uphill-for-remote-papua-new-guinea-tribe",
+    "https://www.ribbonfarm.com/2020/02/24/a-text-renaissance",
+    "https://www.wired.com/2013/05/silicon-valley-coders-and-autism-and-asperbergers-maybe-its-a-new-kind-of-design-thinking",
+    "https://youtu.be/qRZeH680XWA"
+  ]
+}

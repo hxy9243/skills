@@ -1,0 +1,114 @@
+In [Machine Learning](https://braindump.jethro.dev/posts/machine_learning), the training set error is often called the *empirical error* or *empirical risk*, and this is the error the classifier incurs over the sample:
+
+\\begin{equation} L\_S(h) = \\frac{|\\{i \\in \[m\]: h(x\_i) \\ne y\_i\\}}{m} \\end{equation}
+
+Given a hypothesis class \\(H\\), finding the hypothesis \\(h \\in H\\) that minimizes the empirical risk is a simple learning strategy.
+
+#### Links to this note
+
+- [[posts-applying-forecasting-in-finance|Applying Forecasting in Finance]]
+- [[posts-artificial-intelligence|Artificial Intelligence]]
+- [[posts-blockchain|Blockchain]]
+- [[posts-byron-boots-perspectives-on-machine-learning-and-robotics|Byron Boots - Perspectives on Machine Learning and Robotics]]
+- [[posts-cplusplus|C++ Language]]
+- [[posts-cmake|CMake]]
+- [[posts-coding-interview|Coding Interview Preparation]]
+- [[posts-compilers|Compilers]]
+- [[posts-networking|Computer Networking]]
+- [[posts-computer-vision|Computer Vision]]
+- [[posts-control-as-inference|Control As Inference]]
+- [[posts-conversation|Conversation]]
+- [[posts-credit-assignment-snn|Credit Assignment in Spiking Neural Networks]]
+- [[posts-critical-thinking|Critical Thinking]]
+- [[posts-ds-algo|Data Structures and Algorithms]]
+- [[posts-data-viz|Data Visualization]]
+- [[posts-deep-learning|Deep Learning]]
+- [[posts-dl-tools|Deep Learning Tools]]
+- [[posts-deep-rl|Deep Reinforcement Learning]]
+- [[posts-henderson-deep-rl-that-matters|Deep Reinforcement Learning That Matters]]
+- [[posts-deploying-machine-learning-models|Deploying Machine Learning Models]]
+- [[posts-miconi-differentiable-plasticity|Differentiable plasticity: training plastic neural networks with backpropagation]]
+- [[posts-docker|Docker 101]]
+- [[posts-ekf-localization|EKF Localization]]
+- [[posts-entropy|Entropy]]
+- [[posts-event-based-vision|Event-based Vision]]
+- [[posts-evolving-snn|Evolving Spiking Neural Networks]]
+- [[posts-exchangeability|Exchangeability]]
+- [[posts-expectation-maximization|Expectation Maximization and Mixture Models]]
+- [[posts-gcc|GCC]]
+- [Gibbs Sampling](https://braindump.jethro.dev/posts/gibbs_sampling)
+- [Grid & Monte Carlo Localization](https://braindump.jethro.dev/posts/grid_mc_localization)
+- [Hadoop](https://braindump.jethro.dev/posts/hadoop)
+- [Haskell](https://braindump.jethro.dev/posts/haskell)
+- [Hopfield Network](https://braindump.jethro.dev/posts/hopfield_network)
+- [How To Be a Good Forecaster](https://braindump.jethro.dev/posts/how_to_be_a_good_forecaster)
+- [How To Take Smart Notes](https://braindump.jethro.dev/posts/how_to_take_smart_notes)
+- [How To Write a Technical Paper](https://braindump.jethro.dev/posts/how_to_write_a_technical_paper)
+- [If You're Not Writing a Programming Language, Don't Use A Programming Language - Leslie Lamport](https://braindump.jethro.dev/posts/leslie_lamport_2020)
+- [Ignore What Everyone Else is Doing](https://braindump.jethro.dev/posts/ignore_what_everyone_else_is_doing)
+- [Information Filter](https://braindump.jethro.dev/posts/information_filter)
+- [Information Theory](https://braindump.jethro.dev/posts/information_theory)
+- [Information-Theoretic Reinforcement Learning](https://braindump.jethro.dev/posts/information_theoretic_reinforcement_learning)
+- [Inverse Reinforcement Learning](https://braindump.jethro.dev/posts/inverse_rl)
+- [IS1103: Computing and Society](https://braindump.jethro.dev/posts/is1103)
+- [Ising Models](https://braindump.jethro.dev/posts/ising_models)
+- [Leaky Integrate-And-Fire](https://braindump.jethro.dev/posts/leaky_integrate_and_fire)
+- [Likelihood Field Model](https://braindump.jethro.dev/posts/likelihood_field_model)
+- [Linear Algebra](https://braindump.jethro.dev/posts/linear_algebra)
+- [Lottery Ticket Hypothesis](https://braindump.jethro.dev/posts/lottery_ticket_hypothesis)
+- [LU Decomposition](https://braindump.jethro.dev/posts/lu_decomposition)
+- [Machine Learning](https://braindump.jethro.dev/posts/machine_learning)
+- [Machine Teaching](https://braindump.jethro.dev/posts/machine_teaching)
+- [Markov Chains](https://braindump.jethro.dev/posts/markov_chains)
+- [Markov Decision Process](https://braindump.jethro.dev/posts/markov_decision_process)
+- [Multi-modal Alignment](https://braindump.jethro.dev/posts/multimodal_alignment)
+- [Multi-modal Representation](https://braindump.jethro.dev/posts/multimodal_representation)
+- [nasarGrandPursuitStory2011: Grand pursuit: The story of economic genius](https://braindump.jethro.dev/posts/nasargrandpursuitstory2011)
+- [Natural Language Processing](https://braindump.jethro.dev/posts/nlp)
+- [Negotiation](https://braindump.jethro.dev/posts/negotiation)
+- [Neural Ordinary Differential Equations](https://braindump.jethro.dev/posts/neural_ode)
+- [Normalizing Flows](https://braindump.jethro.dev/posts/normalizing_flows)
+- [Occam's Razor](https://braindump.jethro.dev/posts/occams_razor)
+- [Occupancy Grid Mapping](https://braindump.jethro.dev/posts/occupancy_grid_mapping)
+- [Operating Systems](https://braindump.jethro.dev/posts/operating_systems)
+- [Options Framework](https://braindump.jethro.dev/posts/options_framework)
+- [Outside/Inside View](https://braindump.jethro.dev/posts/outside_inside_view)
+- [PAC Learning](https://braindump.jethro.dev/posts/pac_learning)
+- [PARA Method](https://braindump.jethro.dev/posts/para_method)
+- [Partially Observable Markov Decision Processes (POMDPs)](https://braindump.jethro.dev/posts/pomdp)
+- [Policy Gradients](https://braindump.jethro.dev/posts/policy_gradients)
+- [Principles of Effective Research | Michael Nielsen](https://braindump.jethro.dev/posts/principles_of_effective_research_michael_nielsen)
+- [Probabilistic Graph Models](https://braindump.jethro.dev/posts/pgm)
+- [Programming Methodology](https://braindump.jethro.dev/posts/programming_methodology)
+- [Q-Learning](https://braindump.jethro.dev/posts/q_learning)
+- [Quantitative Reasoning](https://braindump.jethro.dev/posts/ger1000)
+- [Rademacher Complexity](https://braindump.jethro.dev/posts/rademacher)
+- [Random Variables](https://braindump.jethro.dev/posts/random_variables)
+- [Regression](https://braindump.jethro.dev/posts/regression)
+- [Reinforcement Learning](https://braindump.jethro.dev/posts/reinforcement_learning)
+- [Riken AIP Workshop 2019](https://braindump.jethro.dev/posts/riken_aip_2019)
+- [Robot Grasping](https://braindump.jethro.dev/posts/robot_grasping)
+- [Robot Localization](https://braindump.jethro.dev/posts/robot_localization)
+- [Robot Operating System (ROS)](https://braindump.jethro.dev/posts/ros)
+- [Rover](https://braindump.jethro.dev/posts/rover)
+- [Simultaneous Localization and Mapping](https://braindump.jethro.dev/posts/slam)
+- [Singapore Society](https://braindump.jethro.dev/posts/ges1028)
+- [Sleep](https://braindump.jethro.dev/posts/sleep)
+- [Software Engineering](https://braindump.jethro.dev/posts/software_engineering)
+- [Spiking Neural Networks](https://braindump.jethro.dev/posts/spiking_neurons_lit_review)
+- [SSNLP Conference Notes](https://braindump.jethro.dev/posts/ssnlp)
+- [Statistical Learning](https://braindump.jethro.dev/posts/statistical_learning)
+- [Synaptic Current Model](https://braindump.jethro.dev/posts/synaptic_current_model)
+- [Syntopic Reading](https://braindump.jethro.dev/posts/syntopic_reading)
+- [System Design](https://braindump.jethro.dev/posts/system_design)
+- [The Bias-Complexity Tradeoff](https://braindump.jethro.dev/posts/bias_complexity_tradeoff)
+- [The Economic Cycle](https://braindump.jethro.dev/posts/the_economic_cycle)
+- [The Fermi Estimate](https://braindump.jethro.dev/posts/the_fermi_estimate)
+- [The Learning Problem](https://braindump.jethro.dev/posts/the_learning_problem)
+- [Theory Of Computation](https://braindump.jethro.dev/posts/theory_of_computation)
+- [Transfer Learning](https://braindump.jethro.dev/posts/transfer_learning)
+- [Two Levels Of Inference](https://braindump.jethro.dev/posts/two_levels_of_inference)
+- [Wisdom](https://braindump.jethro.dev/posts/wisdom)
+- [Writing with Zettekasten](https://braindump.jethro.dev/posts/writing_with_zettekasten)
+- [XGBoost](https://braindump.jethro.dev/posts/xgboost)
+- [Zettelkasten](https://braindump.jethro.dev/posts/zettelkasten)

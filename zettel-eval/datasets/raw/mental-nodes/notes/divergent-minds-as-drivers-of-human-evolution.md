@@ -1,0 +1,1 @@
+Is there any good resource exploring neurodivergence as a potential drive for human evolution? Maybe a chronology with famous divergent minds and their contribution(s) to the progress of humankind? Or a book exploring the relationship between [[pattern-thinking-psychosis-and-psychedelics|pattern thinking, psychosis, and psychedelics]]?

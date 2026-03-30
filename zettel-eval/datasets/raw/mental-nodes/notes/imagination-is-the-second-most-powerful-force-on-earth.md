@@ -1,0 +1,1 @@
+While many of our mental faculties such as analyzing, calculating, linear thinking, etc. have allowed us to thrive as a species, anything that wasn't built by nature once originated from a human being's imagination. These other mental faculties allow us to take what we imagine and [[from-collector-to-creator|make it real]].

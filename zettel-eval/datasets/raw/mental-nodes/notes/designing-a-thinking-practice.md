@@ -1,0 +1,1 @@
+The constant flow of information and potential activities we are exposed to mean we need to be more intentional when it comes to generating original thoughts. We need to proactively block time to think and design a meaningful thinking practice. (akin to a meditation practice, but focused on taking [[taking-raw-notes-is-useless|smart notes]] or creative writing)

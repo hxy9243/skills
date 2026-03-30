@@ -1,0 +1,5 @@
+From an interview with John L. Collins at Ness Labs:
+
+> I believe that complex systems are in fact complex systems of complex systems that are multiaxial and multidimensional and dynamic. That is they are moving through time. Usually, what we do is take a slice through this dynamic and take a pinpoint view out of it, and miss all the beauty and complexity of what is a very complicated description of what’s going on around us, missing the interstitial information between the systems’ nodes and losing understanding scale.
+
+[[mind-networks-modelling|Mind networks]] can also be studied at different time scales. Decision-trees can be infinitely nested. What may seem like linear thinking when zoomed out often appears like complex [[threaded-thinking-instead-of-linear-thinking|threaded thinking]] when zoomed in. The mental nodes on these threads do not only have a complex spacial relationship to each other, they have a complex temporal relationship. Which idea came first? What's [[the-revision-history-of-an-idea|the revision history of an idea]]?

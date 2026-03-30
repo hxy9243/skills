@@ -1,0 +1,15 @@
+13 entries about this topic
+
+- [[ramblings|2025 · 07 If you're remote, ramble]]
+- [[self-guarantee|2024 · 12 Self-guaranteeing promises]]
+- [[vcware|2024 · 02 100% user-supported]]
+- [[quality-software|2023 · 10 Quality software deserves your hard‑earned cash]]
+- [[vault|2023 · 09 How I use Obsidian]]
+- [[concise|2023 · 08 Concise explanations accelerate progress]]
+- [[file-over-app|2023 · 07 File over app]]
+- [[todos|2023 · 05 How I do my to-dos]]
+- [[choose-to-be-bad|2022 · 11 Great tools choose to be bad at some things]]
+- [[photoshop-for-text|2022 · 10 Photoshop for text]]
+- [[evergreen-notes|2022 · 09 Evergreen notes turn ideas into objects that you can manipulate]]
+- [[40-questions-decade|2022 · 01 40 questions to ask yourself every decade]]
+- [[40-questions|2016 · 10 40 questions to ask yourself every year]]

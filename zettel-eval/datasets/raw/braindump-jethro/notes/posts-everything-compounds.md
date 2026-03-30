@@ -1,0 +1,7 @@
+Most things in life have compounding interest: money, health, knowledge capital.
+
+It is important to get the momentum on your side. This includes building healthy habits, accruing knowledge, saving up money.
+
+#### Links to this note
+
+- [Optionality](https://braindump.jethro.dev/posts/optionality)

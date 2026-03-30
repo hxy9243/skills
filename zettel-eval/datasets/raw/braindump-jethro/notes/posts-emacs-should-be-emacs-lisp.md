@@ -1,0 +1,28 @@
+talk
+
+[https://ftp.fau.de/fosdem/2020/UD2.119/emacsthoughts.webm](https://ftp.fau.de/fosdem/2020/UD2.119/emacsthoughts.webm)
+
+speaker
+
+[Tom Tromey](https://braindump.jethro.dev/posts/tom_tromey)
+
+tags
+
+[[posts-emacs|Emacs]], [[posts-emacs-lisp|Emacs Lisp]]
+
+## Several competing ideas and their problems
+
+- Guile Emacs
+	- Scheme is not Emacs Lisp! Impedance mismatch – largely solved by Guile Scheme, at the expense of Guile not being a proper Scheme
+		- Scripting fragmentation (rather than have)
+- Rebase on Common Lisp
+	- Experiment in 2012, an attempt to unify the type systems
+		- Impedance mismatch, hard to maintain
+
+## Emacs Should Be Emacs Lisp!
+
+- Easier to hack
+- Threads
+- GC
+- Library-only
+- FFI - [tromey/emacs-ffi](http://github.com/tromey/emacs-ffi)

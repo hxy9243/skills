@@ -1,0 +1,1 @@
+While many daily decisions don't seem important enough to deeply think about their second-order differences, the impact of cognitive biases does add up over time. Mental models are a form of scaffolding.

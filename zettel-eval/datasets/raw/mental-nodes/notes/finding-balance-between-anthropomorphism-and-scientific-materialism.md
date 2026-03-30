@@ -1,0 +1,1 @@
+Most researchers start looking / thinking / acting like the subjects they study. For instance, Merlin Sheldrake reports in his book *Entangled Life* starting to see the world as much more interconnected as a result of studying mushrooms. See [[interconnectedness-of-things|interconnectedness of things]].
