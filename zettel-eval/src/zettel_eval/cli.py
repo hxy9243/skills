@@ -1,62 +1,77 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 from zettel_eval.config import load_dataset_config, load_retrieval_config
 from zettel_eval.logging import append_log
-from zettel_eval.pipeline.optimize import build_optimizer_parser, run_optimization_from_args
-from zettel_eval.retrieval.search import evaluate_processed_datasets
 
 
-def _build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="zettel-eval")
-    subparsers = parser.add_subparsers(dest="command", required=True)
+def _build_parser(optimizer_command: str | None = None) -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Offline evaluation pipeline for Zettelkasten datasets.")
+    subparsers = parser.add_subparsers(dest="command_group", required=True)
 
-    # Subcommand: datasets
-    datasets_parser = subparsers.add_parser("datasets", help="Manage and validate Zettelkasten datasets.")
-    ds_subparsers = datasets_parser.add_subparsers(dest="subcommand", required=True)
-    ds_subparsers.add_parser("ingest", help="Run Phase 0 ingestion over configured datasets.")
-    ds_subparsers.add_parser("validate", help="Run Phase 1 dataset validation and ground truth generation.")
+    datasets_parser = subparsers.add_parser("datasets", help="Ingest and validate datasets.")
+    datasets_subparsers = datasets_parser.add_subparsers(dest="datasets_command", required=True)
+    datasets_subparsers.add_parser("ingest", help="Run Phase 0 ingestion over configured datasets.")
+    datasets_subparsers.add_parser("validate", help="Run Phase 1 dataset validation and ground truth generation.")
 
-    # Subcommand: retrieval
-    retrieval_parser = subparsers.add_parser("retrieval", help="Run Retrieval engine benchmarks.")
-    rt_subparsers = retrieval_parser.add_subparsers(dest="subcommand", required=True)
-    rt_subparsers.add_parser("benchmark", help="Run Phase 2 retrieval benchmarks.")
+    retrieval_parser = subparsers.add_parser("retrieval", help="Benchmark retrieval methods.")
+    retrieval_subparsers = retrieval_parser.add_subparsers(dest="retrieval_command", required=True)
+    retrieval_subparsers.add_parser("benchmark", help="Run Phase 2 retrieval benchmarks.")
 
-    # Subcommand: optimizer
-    optimizer_parser = subparsers.add_parser("optimizer", help="Optimize LLM reasoning prompts.")
-    opt_subparsers = optimizer_parser.add_subparsers(dest="subcommand", required=True)
-    
-    # 1. dspy (absolute)
-    opt_subparsers.add_parser(
-        "dspy",
-        help="Run Phase 3 absolute DSPy optimization.",
-        parents=[build_optimizer_parser()],
-    )
-    
-    # 2. pairwise (gepa)
-    pw_parser = opt_subparsers.add_parser("pairwise", help="Run Phase 3 custom Pairwise Elo Hill-Climbing optimization.")
-    pw_parser.add_argument("--processed-root", type=Path, default=Path("datasets/processed"))
-    pw_parser.add_argument("--output-root", type=Path, default=Path("output"))
-    pw_parser.add_argument("--task-model", required=True, help="DSPy task model, e.g. openai/gpt-5.1-codex-mini.")
-    pw_parser.add_argument("--judge-model", required=True, help="Dedicated judge model, e.g. openai/gpt-5.4.")
-    pw_parser.add_argument("--iterations", type=int, default=10, help="Maximum optimization iterations.")
-    
-    # 3. tournament
-    tour_parser = opt_subparsers.add_parser("tournament", help="Run Phase 4 Elo A/B tournament between Baseline and Optimized prompts.")
-    tour_parser.add_argument("--processed-root", type=Path, default=Path("datasets/processed"))
-    tour_parser.add_argument("--output-root", type=Path, default=Path("output"))
-    tour_parser.add_argument("--task-model", required=True, help="DSPy task model, e.g. openai/gpt-5.1-codex-mini.")
-    tour_parser.add_argument("--judge-model", required=True, help="Dedicated judge model, e.g. openai/gpt-5.4.")
-    tour_parser.add_argument("--matches", type=int, default=10, help="Number of head-to-head matches.")
-    tour_parser.add_argument("--run-dir", type=Path, required=True, help="Path to the optimization run directory containing the best prompts.")
+    optimizer_parser = subparsers.add_parser("optimizer", help="Run prompt optimization workflows.")
+    optimizer_subparsers = optimizer_parser.add_subparsers(dest="optimizer_command", required=True)
+    _add_optimizer_subcommands(optimizer_subparsers, optimizer_command)
 
     return parser
 
 
+def _add_optimizer_subcommands(
+    optimizer_subparsers: argparse._SubParsersAction[argparse.ArgumentParser],
+    optimizer_command: str | None,
+) -> None:
+    if optimizer_command == "dspy":
+        from zettel_eval.pipeline.optimize import build_optimizer_parser
+
+        optimizer_subparsers.add_parser(
+            "dspy",
+            help="Run Phase 3 DSPy optimization.",
+            parents=[build_optimizer_parser()],
+        )
+    else:
+        optimizer_subparsers.add_parser("dspy", help="Run Phase 3 DSPy optimization.")
+
+    if optimizer_command == "pairwise":
+        from zettel_eval.pipeline.pairwise_opt import build_pairwise_parser
+
+        optimizer_subparsers.add_parser(
+            "pairwise",
+            help="Run pairwise prompt optimization.",
+            parents=[build_pairwise_parser()],
+        )
+    else:
+        optimizer_subparsers.add_parser("pairwise", help="Run pairwise prompt optimization.")
+
+    if optimizer_command == "tournament":
+        from zettel_eval.pipeline.tournament import build_tournament_parser
+
+        optimizer_subparsers.add_parser(
+            "tournament",
+            help="Run an Elo tournament between baseline and optimized prompts.",
+            parents=[build_tournament_parser()],
+        )
+    else:
+        optimizer_subparsers.add_parser(
+            "tournament",
+            help="Run an Elo tournament between baseline and optimized prompts.",
+        )
+
+
 def _run_ingest() -> int:
     from zettel_eval.ingest.writer import run_ingest_phase
+
     dataset_config = load_dataset_config()
     run_ingest_phase(dataset_config)
     return 0
@@ -64,12 +79,15 @@ def _run_ingest() -> int:
 
 def _run_validate() -> int:
     from zettel_eval.validate.ground_truth import run_validate_phase
+
     dataset_config = load_dataset_config()
     run_validate_phase(dataset_config)
     return 0
 
 
 def _run_benchmark() -> int:
+    from zettel_eval.retrieval.search import evaluate_processed_datasets
+
     dataset_config = load_dataset_config()
     retrieval_config = load_retrieval_config()
     metrics_path = evaluate_processed_datasets(
@@ -82,56 +100,47 @@ def _run_benchmark() -> int:
 
 
 def _run_optimize_dspy(args: argparse.Namespace) -> int:
+    from zettel_eval.pipeline.optimize import run_optimization_from_args
+
     run_dir = run_optimization_from_args(args)
     append_log(Path("output") / "pipeline.log", f"Optimization artifacts written to {run_dir}")
     return 0
 
+
 def _run_optimize_pairwise(args: argparse.Namespace) -> int:
-    from zettel_eval.pipeline.pairwise_opt import run_pairwise_optimization
-    run_dir = run_pairwise_optimization(
-        output_root=args.output_root,
-        processed_root=args.processed_root,
-        task_model=args.task_model,
-        judge_model=args.judge_model,
-        iterations=args.iterations
-    )
-    append_log(Path("output") / "pipeline.log", f"Pairwise Optimization artifacts written to {run_dir}")
+    from zettel_eval.pipeline.pairwise_opt import run_pairwise_optimization_from_args
+
+    run_dir = run_pairwise_optimization_from_args(args)
+    append_log(Path("output") / "pipeline.log", f"Pairwise optimization artifacts written to {run_dir}")
     return 0
+
 
 def _run_optimize_tournament(args: argparse.Namespace) -> int:
-    from zettel_eval.pipeline.tournament import run_tournament
-    elo_opt, elo_base = run_tournament(
-        output_root=args.output_root,
-        processed_root=args.processed_root,
-        opt_run_dir=args.run_dir,
-        task_model=args.task_model,
-        judge_model=args.judge_model,
-        matches=args.matches
-    )
-    append_log(Path("output") / "pipeline.log", f"Tournament concluded. Optimized Elo: {int(elo_opt)}, Baseline Elo: {int(elo_base)}")
+    from zettel_eval.pipeline.tournament import run_tournament_from_args
+
+    run_dir = run_tournament_from_args(args)
+    append_log(Path("output") / "pipeline.log", f"Tournament artifacts written to {run_dir}")
     return 0
 
-def main() -> int:
-    parser = _build_parser()
-    args = parser.parse_args()
 
-    if args.command == "datasets":
-        if args.subcommand == "ingest":
-            return _run_ingest()
-        elif args.subcommand == "validate":
-            return _run_validate()
-            
-    elif args.command == "retrieval":
-        if args.subcommand == "benchmark":
-            return _run_benchmark()
-            
-    elif args.command == "optimizer":
-        if args.subcommand == "dspy":
-            return _run_optimize_dspy(args)
-        elif args.subcommand == "pairwise":
-            return _run_optimize_pairwise(args)
-        elif args.subcommand == "tournament":
-            return _run_optimize_tournament(args)
+def main(argv: list[str] | None = None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    optimizer_command = argv[1] if len(argv) >= 2 and argv[0] == "optimizer" else None
+    parser = _build_parser(optimizer_command=optimizer_command)
+    args = parser.parse_args(argv)
 
-    parser.error(f"Unknown command/subcommand: {args.command} {args.subcommand}")
+    if args.command_group == "datasets" and args.datasets_command == "ingest":
+        return _run_ingest()
+    if args.command_group == "datasets" and args.datasets_command == "validate":
+        return _run_validate()
+    if args.command_group == "retrieval" and args.retrieval_command == "benchmark":
+        return _run_benchmark()
+    if args.command_group == "optimizer" and args.optimizer_command == "dspy":
+        return _run_optimize_dspy(args)
+    if args.command_group == "optimizer" and args.optimizer_command == "pairwise":
+        return _run_optimize_pairwise(args)
+    if args.command_group == "optimizer" and args.optimizer_command == "tournament":
+        return _run_optimize_tournament(args)
+
+    parser.error("Unknown command")
     return 2

@@ -7,13 +7,12 @@ import sys
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any
-
-import dspy
+from typing import TYPE_CHECKING, Any
 
 from zettel_eval.logging import append_log, ensure_parent, write_json
-from zettel_eval.pipeline.dspy_program import BrainstormPipeline, RetrievedNote, export_predictor_prompt, format_retrieved_notes
-from zettel_eval.pipeline.judge import LLMJudgeMetric
+
+if TYPE_CHECKING:
+    import dspy
 
 csv.field_size_limit(sys.maxsize)
 
@@ -23,7 +22,7 @@ class OptimizationExample:
     dataset_slug: str
     source_note_id: str
     seed_note: str
-    retrieved_notes: list[RetrievedNote]
+    retrieved_notes: list[Any]
     target_note_ids: list[str]
     method: str
     params: dict[str, Any]
@@ -46,6 +45,11 @@ def build_optimizer_parser() -> argparse.ArgumentParser:
 
 
 def run_optimization_from_args(args: argparse.Namespace) -> Path:
+    import dspy
+
+    from zettel_eval.pipeline.dspy_program import BrainstormPipeline, export_predictor_prompt
+    from zettel_eval.pipeline.judge import LLMJudgeMetric
+
     metrics_path = args.retrieval_metrics or discover_retrieval_metrics(args.output_root)
     run_id = datetime.now().strftime("%Y%m%d-%H%M%S")
     run_dir = args.output_root / "runs" / run_id
@@ -190,7 +194,7 @@ def load_phase2_examples(
             continue
         retrieved_ids = json.loads(row["retrieved_ids"])[:10]
         retrieved_notes = [
-            RetrievedNote(note_id=note_id, text=corpus[note_id])
+            _retrieved_note(note_id=note_id, text=corpus[note_id])
             for note_id in retrieved_ids
             if note_id in corpus
         ]
@@ -244,6 +248,10 @@ def serialize_example(example: OptimizationExample) -> dict[str, Any]:
 
 
 def to_dspy_examples(examples: list[OptimizationExample]) -> list[dspy.Example]:
+    import dspy
+
+    from zettel_eval.pipeline.dspy_program import format_retrieved_notes
+
     return [
         dspy.Example(
             seed_note=example.seed_note,
@@ -267,6 +275,8 @@ def build_optimizer(
     iterations: int,
     seed: int,
 ) -> Any:
+    import dspy
+
     if optimizer_name == "bootstrap":
         return dspy.BootstrapFewShotWithRandomSearch(
             metric=metric,
@@ -282,7 +292,8 @@ def build_optimizer(
         task_model=task_lm,
         max_bootstrapped_demos=1,
         max_labeled_demos=1,
-        auto=None, num_candidates=7,
+        auto=None,
+        num_candidates=7,
         num_threads=1,
         seed=seed,
         verbose=False,
@@ -293,13 +304,13 @@ def build_optimizer(
 def compile_program(
     *,
     optimizer: Any,
-    student: BrainstormPipeline,
+    student: Any,
     trainset: list[dspy.Example],
     valset: list[dspy.Example],
     optimizer_name: str,
     iterations: int,
     seed: int,
-) -> BrainstormPipeline:
+) -> Any:
     if optimizer_name == "bootstrap":
         return optimizer.compile(student, trainset=trainset, valset=valset)
 
@@ -312,3 +323,9 @@ def compile_program(
         seed=seed,
         requires_permission_to_run=False,
     )
+
+
+def _retrieved_note(*, note_id: str, text: str) -> Any:
+    from zettel_eval.pipeline.dspy_program import RetrievedNote
+
+    return RetrievedNote(note_id=note_id, text=text)
