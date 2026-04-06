@@ -1,5 +1,5 @@
 dataset_slug,source_note_id,target_note_ids,query_text,retrieval_condition
-steph-ango,topics-ai,"[""earth"", ""photoshop-for-text"", ""synthography"", ""choose-to-be-bad"", ""precious""]","5 entries about this topic
+steph-ango,topics-ai,"[""earth"", ""photoshop-for-text"", ""precious"", ""choose-to-be-bad"", ""synthography""]","5 entries about this topic
 
 - [[earth|2024 · 02 Earth is becoming sentient]]
 - [[precious|2023 · 07 Caloric energy is precious]]
@@ -7,7 +7,7 @@ steph-ango,topics-ai,"[""earth"", ""photoshop-for-text"", ""synthography"", ""ch
 - [[photoshop-for-text|2022 · 10 Photoshop for text]]
 - [[synthography|2022 · 07 A camera for ideas]]
 ",anchor_preserved
-steph-ango,topics-ai,"[""earth"", ""photoshop-for-text"", ""synthography"", ""choose-to-be-bad"", ""precious""]","5 entries about this topic
+steph-ango,topics-ai,"[""earth"", ""photoshop-for-text"", ""precious"", ""choose-to-be-bad"", ""synthography""]","5 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
@@ -15,19 +15,19 @@ steph-ango,topics-ai,"[""earth"", ""photoshop-for-text"", ""synthography"", ""ch
 - [[MASKED]]
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-competition,"[""always-learning-always-teaching"", ""quality-software"", ""self-guarantee""]","3 entries about this topic
+steph-ango,topics-competition,"[""quality-software"", ""self-guarantee"", ""always-learning-always-teaching""]","3 entries about this topic
 
 - [[self-guarantee|2024 · 12 Self-guaranteeing promises]]
 - [[quality-software|2023 · 10 Quality software deserves your hard‑earned cash]]
 - [[always-learning-always-teaching|2013 · 04 Always learning, always teaching]]
 ",anchor_preserved
-steph-ango,topics-competition,"[""always-learning-always-teaching"", ""quality-software"", ""self-guarantee""]","3 entries about this topic
+steph-ango,topics-competition,"[""quality-software"", ""self-guarantee"", ""always-learning-always-teaching""]","3 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-defaults,"[""vanilla"", ""self-guarantee"", ""file-over-app"", ""remove"", ""style"", ""design-is-compromise"", ""saw""]","7 entries about this topic
+steph-ango,topics-defaults,"[""style"", ""design-is-compromise"", ""file-over-app"", ""saw"", ""self-guarantee"", ""vanilla"", ""remove""]","7 entries about this topic
 
 - [[saw|2025 · 10 Use the saw, fear the saw]]
 - [[self-guarantee|2024 · 12 Self-guaranteeing promises]]
@@ -37,7 +37,7 @@ steph-ango,topics-defaults,"[""vanilla"", ""self-guarantee"", ""file-over-app"",
 - [[design-is-compromise|2018 · 12 Design is compromise]]
 - [[vanilla|2013 · 07 Be vanilla]]
 ",anchor_preserved
-steph-ango,topics-defaults,"[""vanilla"", ""self-guarantee"", ""file-over-app"", ""remove"", ""style"", ""design-is-compromise"", ""saw""]","7 entries about this topic
+steph-ango,topics-defaults,"[""style"", ""design-is-compromise"", ""file-over-app"", ""saw"", ""self-guarantee"", ""vanilla"", ""remove""]","7 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
@@ -47,7 +47,7 @@ steph-ango,topics-defaults,"[""vanilla"", ""self-guarantee"", ""file-over-app"",
 - [[MASKED]]
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-empathy,"[""stadium-of-selves"", ""empathy"", ""in-good-hands"", ""scars"", ""pain"", ""precious"", ""love"", ""optimism""]","8 entries about this topic
+steph-ango,topics-empathy,"[""in-good-hands"", ""optimism"", ""stadium-of-selves"", ""empathy"", ""love"", ""pain"", ""precious"", ""scars""]","8 entries about this topic
 
 - [[love|2024 · 05 Love is freedom]]
 - [[optimism|2023 · 12 Choose optimism]]
@@ -58,7 +58,7 @@ steph-ango,topics-empathy,"[""stadium-of-selves"", ""empathy"", ""in-good-hands"
 - [[scars|2015 · 11 Scars are beautiful]]
 - [[empathy|2015 · 11 Default to empathy]]
 ",anchor_preserved
-steph-ango,topics-empathy,"[""stadium-of-selves"", ""empathy"", ""in-good-hands"", ""scars"", ""pain"", ""precious"", ""love"", ""optimism""]","8 entries about this topic
+steph-ango,topics-empathy,"[""in-good-hands"", ""optimism"", ""stadium-of-selves"", ""empathy"", ""love"", ""pain"", ""precious"", ""scars""]","8 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
@@ -69,7 +69,7 @@ steph-ango,topics-empathy,"[""stadium-of-selves"", ""empathy"", ""in-good-hands"
 - [[MASKED]]
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-evergreen,"[""in-good-hands"", ""evergreen-notes"", ""a-little-bit-every-day"", ""scars"", ""pain"", ""nibble"", ""concise"", ""calmness"", ""design-is-compromise""]","9 entries about this topic
+steph-ango,topics-evergreen,"[""in-good-hands"", ""evergreen-notes"", ""a-little-bit-every-day"", ""calmness"", ""design-is-compromise"", ""pain"", ""concise"", ""nibble"", ""scars""]","9 entries about this topic
 
 - [[pain|2023 · 11 Pain is information]]
 - [[concise|2023 · 08 Concise explanations accelerate progress]]
@@ -81,7 +81,7 @@ steph-ango,topics-evergreen,"[""in-good-hands"", ""evergreen-notes"", ""a-little
 - [[a-little-bit-every-day|2018 · 09 A little bit every day]]
 - [[scars|2015 · 11 Scars are beautiful]]
 ",anchor_preserved
-steph-ango,topics-evergreen,"[""in-good-hands"", ""evergreen-notes"", ""a-little-bit-every-day"", ""scars"", ""pain"", ""nibble"", ""concise"", ""calmness"", ""design-is-compromise""]","9 entries about this topic
+steph-ango,topics-evergreen,"[""in-good-hands"", ""evergreen-notes"", ""a-little-bit-every-day"", ""calmness"", ""design-is-compromise"", ""pain"", ""concise"", ""nibble"", ""scars""]","9 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
@@ -101,7 +101,7 @@ steph-ango,topics-friendship,"[""love""]","1 entry about this topic
 
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-habits,"[""40-questions-decade"", ""40-questions"", ""a-little-bit-every-day"", ""remove"", ""nibble"", ""buy-wisely"", ""style"", ""todos"", ""optimism""]","9 entries about this topic
+steph-ango,topics-habits,"[""optimism"", ""40-questions-decade"", ""a-little-bit-every-day"", ""40-questions"", ""style"", ""todos"", ""nibble"", ""buy-wisely"", ""remove""]","9 entries about this topic
 
 - [[remove|2024 · 06 What can we remove?]]
 - [[optimism|2023 · 12 Choose optimism]]
@@ -113,7 +113,7 @@ steph-ango,topics-habits,"[""40-questions-decade"", ""40-questions"", ""a-little
 - [[a-little-bit-every-day|2018 · 09 A little bit every day]]
 - [[40-questions|2016 · 10 40 questions to ask yourself every year]]
 ",anchor_preserved
-steph-ango,topics-habits,"[""40-questions-decade"", ""40-questions"", ""a-little-bit-every-day"", ""remove"", ""nibble"", ""buy-wisely"", ""style"", ""todos"", ""optimism""]","9 entries about this topic
+steph-ango,topics-habits,"[""optimism"", ""40-questions-decade"", ""a-little-bit-every-day"", ""40-questions"", ""style"", ""todos"", ""nibble"", ""buy-wisely"", ""remove""]","9 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
@@ -137,7 +137,7 @@ steph-ango,topics-hardware,"[""the-elusiveness-of-digital-paper"", ""precious"",
 - [[MASKED]]
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-learning,"[""hybridize"", ""pain"", ""solving-problem-finding"", ""love"", ""concise"", ""always-learning-always-teaching"", ""understand"", ""saw""]","8 entries about this topic
+steph-ango,topics-learning,"[""hybridize"", ""always-learning-always-teaching"", ""saw"", ""love"", ""solving-problem-finding"", ""pain"", ""concise"", ""understand""]","8 entries about this topic
 
 - [[saw|2025 · 10 Use the saw, fear the saw]]
 - [[love|2024 · 05 Love is freedom]]
@@ -148,7 +148,7 @@ steph-ango,topics-learning,"[""hybridize"", ""pain"", ""solving-problem-finding"
 - [[solving-problem-finding|2018 · 09 Solving problem-finding]]
 - [[always-learning-always-teaching|2013 · 04 Always learning, always teaching]]
 ",anchor_preserved
-steph-ango,topics-learning,"[""hybridize"", ""pain"", ""solving-problem-finding"", ""love"", ""concise"", ""always-learning-always-teaching"", ""understand"", ""saw""]","8 entries about this topic
+steph-ango,topics-learning,"[""hybridize"", ""always-learning-always-teaching"", ""saw"", ""love"", ""solving-problem-finding"", ""pain"", ""concise"", ""understand""]","8 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
@@ -159,7 +159,7 @@ steph-ango,topics-learning,"[""hybridize"", ""pain"", ""solving-problem-finding"
 - [[MASKED]]
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-leverage,"[""understand"", ""buy-wisely"", ""style"", ""precious"", ""concise"", ""quality-software"", ""vcware"", ""saw""]","8 entries about this topic
+steph-ango,topics-leverage,"[""style"", ""vcware"", ""saw"", ""concise"", ""understand"", ""precious"", ""quality-software"", ""buy-wisely""]","8 entries about this topic
 
 - [[saw|2025 · 10 Use the saw, fear the saw]]
 - [[vcware|2024 · 02 100% user-supported]]
@@ -170,7 +170,7 @@ steph-ango,topics-leverage,"[""understand"", ""buy-wisely"", ""style"", ""precio
 - [[understand|2023 · 08 Don't delegate understanding]]
 - [[precious|2023 · 07 Caloric energy is precious]]
 ",anchor_preserved
-steph-ango,topics-leverage,"[""understand"", ""buy-wisely"", ""style"", ""precious"", ""concise"", ""quality-software"", ""vcware"", ""saw""]","8 entries about this topic
+steph-ango,topics-leverage,"[""style"", ""vcware"", ""saw"", ""concise"", ""understand"", ""precious"", ""quality-software"", ""buy-wisely""]","8 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
@@ -181,7 +181,7 @@ steph-ango,topics-leverage,"[""understand"", ""buy-wisely"", ""style"", ""precio
 - [[MASKED]]
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-love,"[""stadium-of-selves"", ""scars"", ""in-good-hands"", ""love"", ""optimism""]","5 entries about this topic
+steph-ango,topics-love,"[""in-good-hands"", ""optimism"", ""stadium-of-selves"", ""love"", ""scars""]","5 entries about this topic
 
 - [[love|2024 · 05 Love is freedom]]
 - [[optimism|2023 · 12 Choose optimism]]
@@ -189,7 +189,7 @@ steph-ango,topics-love,"[""stadium-of-selves"", ""scars"", ""in-good-hands"", ""
 - [[stadium-of-selves|2020 · 01 Stadium of selves]]
 - [[scars|2015 · 11 Scars are beautiful]]
 ",anchor_preserved
-steph-ango,topics-love,"[""stadium-of-selves"", ""scars"", ""in-good-hands"", ""love"", ""optimism""]","5 entries about this topic
+steph-ango,topics-love,"[""in-good-hands"", ""optimism"", ""stadium-of-selves"", ""love"", ""scars""]","5 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
@@ -197,21 +197,21 @@ steph-ango,topics-love,"[""stadium-of-selves"", ""scars"", ""in-good-hands"", ""
 - [[MASKED]]
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-manufacturing,"[""earth"", ""precious"", ""black-pixels"", ""announcing-slash-packaging""]","4 entries about this topic
+steph-ango,topics-manufacturing,"[""earth"", ""precious"", ""announcing-slash-packaging"", ""black-pixels""]","4 entries about this topic
 
 - [[earth|2024 · 02 Earth is becoming sentient]]
 - [[precious|2023 · 07 Caloric energy is precious]]
 - [[black-pixels|2023 · 06 Black pixels]]
 - [[announcing-slash-packaging|2020 · 04 Announcing Slash Packaging]]
 ",anchor_preserved
-steph-ango,topics-manufacturing,"[""earth"", ""precious"", ""black-pixels"", ""announcing-slash-packaging""]","4 entries about this topic
+steph-ango,topics-manufacturing,"[""earth"", ""precious"", ""announcing-slash-packaging"", ""black-pixels""]","4 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
 - [[MASKED]]
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-media,"[""photoshop-for-text"", ""in-good-hands"", ""synthography"", ""style"", ""the-elusiveness-of-digital-paper"", ""black-pixels""]","6 entries about this topic
+steph-ango,topics-media,"[""in-good-hands"", ""the-elusiveness-of-digital-paper"", ""style"", ""black-pixels"", ""photoshop-for-text"", ""synthography""]","6 entries about this topic
 
 - [[style|2023 · 09 Style is consistent constraint]]
 - [[in-good-hands|2023 · 08 In good hands]]
@@ -220,7 +220,7 @@ steph-ango,topics-media,"[""photoshop-for-text"", ""in-good-hands"", ""synthogra
 - [[synthography|2022 · 07 A camera for ideas]]
 - [[the-elusiveness-of-digital-paper|2019 · 12 The elusiveness of digital paper]]
 ",anchor_preserved
-steph-ango,topics-media,"[""photoshop-for-text"", ""in-good-hands"", ""synthography"", ""style"", ""the-elusiveness-of-digital-paper"", ""black-pixels""]","6 entries about this topic
+steph-ango,topics-media,"[""in-good-hands"", ""the-elusiveness-of-digital-paper"", ""style"", ""black-pixels"", ""photoshop-for-text"", ""synthography""]","6 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
@@ -229,7 +229,7 @@ steph-ango,topics-media,"[""photoshop-for-text"", ""in-good-hands"", ""synthogra
 - [[MASKED]]
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-minimalism,"[""vanilla"", ""scars"", ""remove"", ""style"", ""todos"", ""concise"", ""calmness""]","7 entries about this topic
+steph-ango,topics-minimalism,"[""style"", ""calmness"", ""todos"", ""concise"", ""scars"", ""vanilla"", ""remove""]","7 entries about this topic
 
 - [[remove|2024 · 06 What can we remove?]]
 - [[style|2023 · 09 Style is consistent constraint]]
@@ -239,7 +239,7 @@ steph-ango,topics-minimalism,"[""vanilla"", ""scars"", ""remove"", ""style"", ""
 - [[scars|2015 · 11 Scars are beautiful]]
 - [[vanilla|2013 · 07 Be vanilla]]
 ",anchor_preserved
-steph-ango,topics-minimalism,"[""vanilla"", ""scars"", ""remove"", ""style"", ""todos"", ""concise"", ""calmness""]","7 entries about this topic
+steph-ango,topics-minimalism,"[""style"", ""calmness"", ""todos"", ""concise"", ""scars"", ""vanilla"", ""remove""]","7 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
@@ -249,7 +249,7 @@ steph-ango,topics-minimalism,"[""vanilla"", ""scars"", ""remove"", ""style"", ""
 - [[MASKED]]
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-money,"[""earth"", ""buy-wisely"", ""precious"", ""vcware"", ""quality-software"", ""understand""]","6 entries about this topic
+steph-ango,topics-money,"[""earth"", ""vcware"", ""precious"", ""understand"", ""quality-software"", ""buy-wisely""]","6 entries about this topic
 
 - [[earth|2024 · 02 Earth is becoming sentient]]
 - [[vcware|2024 · 02 100% user-supported]]
@@ -258,7 +258,7 @@ steph-ango,topics-money,"[""earth"", ""buy-wisely"", ""precious"", ""vcware"", "
 - [[understand|2023 · 08 Don't delegate understanding]]
 - [[precious|2023 · 07 Caloric energy is precious]]
 ",anchor_preserved
-steph-ango,topics-money,"[""earth"", ""buy-wisely"", ""precious"", ""vcware"", ""quality-software"", ""understand""]","6 entries about this topic
+steph-ango,topics-money,"[""earth"", ""vcware"", ""precious"", ""understand"", ""quality-software"", ""buy-wisely""]","6 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
@@ -275,7 +275,7 @@ steph-ango,topics-packaging,"[""announcing-slash-packaging""]","1 entry about th
 
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-perfectionism,"[""in-good-hands"", ""a-little-bit-every-day"", ""scars"", ""remove"", ""nibble"", ""always-learning-always-teaching"", ""optimism""]","7 entries about this topic
+steph-ango,topics-perfectionism,"[""in-good-hands"", ""optimism"", ""a-little-bit-every-day"", ""always-learning-always-teaching"", ""nibble"", ""scars"", ""remove""]","7 entries about this topic
 
 - [[remove|2024 · 06 What can we remove?]]
 - [[optimism|2023 · 12 Choose optimism]]
@@ -285,7 +285,7 @@ steph-ango,topics-perfectionism,"[""in-good-hands"", ""a-little-bit-every-day"",
 - [[scars|2015 · 11 Scars are beautiful]]
 - [[always-learning-always-teaching|2013 · 04 Always learning, always teaching]]
 ",anchor_preserved
-steph-ango,topics-perfectionism,"[""in-good-hands"", ""a-little-bit-every-day"", ""scars"", ""remove"", ""nibble"", ""always-learning-always-teaching"", ""optimism""]","7 entries about this topic
+steph-ango,topics-perfectionism,"[""in-good-hands"", ""optimism"", ""a-little-bit-every-day"", ""always-learning-always-teaching"", ""nibble"", ""scars"", ""remove""]","7 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
@@ -295,7 +295,7 @@ steph-ango,topics-perfectionism,"[""in-good-hands"", ""a-little-bit-every-day"",
 - [[MASKED]]
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-popular,"[""hybridize"", ""40-questions"", ""photoshop-for-text"", ""in-good-hands"", ""a-little-bit-every-day"", ""file-over-app"", ""pain"", ""buy-wisely"", ""concise"", ""optimism""]","10 entries about this topic
+steph-ango,topics-popular,"[""in-good-hands"", ""optimism"", ""40-questions"", ""a-little-bit-every-day"", ""hybridize"", ""file-over-app"", ""photoshop-for-text"", ""pain"", ""concise"", ""buy-wisely""]","10 entries about this topic
 
 - [[optimism|2023 · 12 Choose optimism]]
 - [[pain|2023 · 11 Pain is information]]
@@ -308,7 +308,7 @@ steph-ango,topics-popular,"[""hybridize"", ""40-questions"", ""photoshop-for-tex
 - [[a-little-bit-every-day|2018 · 09 A little bit every day]]
 - [[40-questions|2016 · 10 40 questions to ask yourself every year]]
 ",anchor_preserved
-steph-ango,topics-popular,"[""hybridize"", ""40-questions"", ""photoshop-for-text"", ""in-good-hands"", ""a-little-bit-every-day"", ""file-over-app"", ""pain"", ""buy-wisely"", ""concise"", ""optimism""]","10 entries about this topic
+steph-ango,topics-popular,"[""in-good-hands"", ""optimism"", ""40-questions"", ""a-little-bit-every-day"", ""hybridize"", ""file-over-app"", ""photoshop-for-text"", ""pain"", ""concise"", ""buy-wisely""]","10 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
@@ -329,21 +329,21 @@ steph-ango,topics-projects,"[""vault""]","1 entry about this topic
 
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-rituals,"[""a-little-bit-every-day"", ""todos"", ""40-questions-decade"", ""40-questions""]","4 entries about this topic
+steph-ango,topics-rituals,"[""todos"", ""40-questions-decade"", ""40-questions"", ""a-little-bit-every-day""]","4 entries about this topic
 
 - [[todos|2023 · 05 How I do my to-dos]]
 - [[40-questions-decade|2022 · 01 40 questions to ask yourself every decade]]
 - [[a-little-bit-every-day|2018 · 09 A little bit every day]]
 - [[40-questions|2016 · 10 40 questions to ask yourself every year]]
 ",anchor_preserved
-steph-ango,topics-rituals,"[""a-little-bit-every-day"", ""todos"", ""40-questions-decade"", ""40-questions""]","4 entries about this topic
+steph-ango,topics-rituals,"[""todos"", ""40-questions-decade"", ""40-questions"", ""a-little-bit-every-day""]","4 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
 - [[MASKED]]
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-startups,"[""self-guarantee"", ""understand"", ""remove"", ""style"", ""ramblings"", ""concise"", ""always-learning-always-teaching"", ""quality-software"", ""vcware"", ""design-is-compromise""]","10 entries about this topic
+steph-ango,topics-startups,"[""ramblings"", ""style"", ""design-is-compromise"", ""vcware"", ""always-learning-always-teaching"", ""self-guarantee"", ""concise"", ""understand"", ""quality-software"", ""remove""]","10 entries about this topic
 
 - [[ramblings|2025 · 07 If you're remote, ramble]]
 - [[self-guarantee|2024 · 12 Self-guaranteeing promises]]
@@ -356,7 +356,7 @@ steph-ango,topics-startups,"[""self-guarantee"", ""understand"", ""remove"", ""s
 - [[design-is-compromise|2018 · 12 Design is compromise]]
 - [[always-learning-always-teaching|2013 · 04 Always learning, always teaching]]
 ",anchor_preserved
-steph-ango,topics-startups,"[""self-guarantee"", ""understand"", ""remove"", ""style"", ""ramblings"", ""concise"", ""always-learning-always-teaching"", ""quality-software"", ""vcware"", ""design-is-compromise""]","10 entries about this topic
+steph-ango,topics-startups,"[""ramblings"", ""style"", ""design-is-compromise"", ""vcware"", ""always-learning-always-teaching"", ""self-guarantee"", ""concise"", ""understand"", ""quality-software"", ""remove""]","10 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
@@ -369,19 +369,19 @@ steph-ango,topics-startups,"[""self-guarantee"", ""understand"", ""remove"", ""s
 - [[MASKED]]
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-synthography,"[""photoshop-for-text"", ""choose-to-be-bad"", ""synthography""]","3 entries about this topic
+steph-ango,topics-synthography,"[""photoshop-for-text"", ""synthography"", ""choose-to-be-bad""]","3 entries about this topic
 
 - [[choose-to-be-bad|2022 · 11 Great tools choose to be bad at some things]]
 - [[photoshop-for-text|2022 · 10 Photoshop for text]]
 - [[synthography|2022 · 07 A camera for ideas]]
 ",anchor_preserved
-steph-ango,topics-synthography,"[""photoshop-for-text"", ""choose-to-be-bad"", ""synthography""]","3 entries about this topic
+steph-ango,topics-synthography,"[""photoshop-for-text"", ""synthography"", ""choose-to-be-bad""]","3 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-teaching,"[""hybridize"", ""pain"", ""solving-problem-finding"", ""concise"", ""always-learning-always-teaching"", ""understand""]","6 entries about this topic
+steph-ango,topics-teaching,"[""hybridize"", ""always-learning-always-teaching"", ""solving-problem-finding"", ""pain"", ""concise"", ""understand""]","6 entries about this topic
 
 - [[pain|2023 · 11 Pain is information]]
 - [[concise|2023 · 08 Concise explanations accelerate progress]]
@@ -390,7 +390,7 @@ steph-ango,topics-teaching,"[""hybridize"", ""pain"", ""solving-problem-finding"
 - [[solving-problem-finding|2018 · 09 Solving problem-finding]]
 - [[always-learning-always-teaching|2013 · 04 Always learning, always teaching]]
 ",anchor_preserved
-steph-ango,topics-teaching,"[""hybridize"", ""pain"", ""solving-problem-finding"", ""concise"", ""always-learning-always-teaching"", ""understand""]","6 entries about this topic
+steph-ango,topics-teaching,"[""hybridize"", ""always-learning-always-teaching"", ""solving-problem-finding"", ""pain"", ""concise"", ""understand""]","6 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
@@ -399,7 +399,7 @@ steph-ango,topics-teaching,"[""hybridize"", ""pain"", ""solving-problem-finding"
 - [[MASKED]]
 - [[MASKED]]
 ",anchor_masked
-steph-ango,topics-writing,"[""40-questions-decade"", ""40-questions"", ""photoshop-for-text"", ""file-over-app"", ""concise"", ""evergreen-notes""]","6 entries about this topic
+steph-ango,topics-writing,"[""evergreen-notes"", ""40-questions-decade"", ""40-questions"", ""file-over-app"", ""photoshop-for-text"", ""concise""]","6 entries about this topic
 
 - [[concise|2023 · 08 Concise explanations accelerate progress]]
 - [[file-over-app|2023 · 07 File over app]]
@@ -408,7 +408,7 @@ steph-ango,topics-writing,"[""40-questions-decade"", ""40-questions"", ""photosh
 - [[40-questions-decade|2022 · 01 40 questions to ask yourself every decade]]
 - [[40-questions|2016 · 10 40 questions to ask yourself every year]]
 ",anchor_preserved
-steph-ango,topics-writing,"[""40-questions-decade"", ""40-questions"", ""photoshop-for-text"", ""file-over-app"", ""concise"", ""evergreen-notes""]","6 entries about this topic
+steph-ango,topics-writing,"[""evergreen-notes"", ""40-questions-decade"", ""40-questions"", ""file-over-app"", ""photoshop-for-text"", ""concise""]","6 entries about this topic
 
 - [[MASKED]]
 - [[MASKED]]
@@ -461,7 +461,7 @@ Because they are so free and loose, some of our best ideas emerge from ramblings
 
 About once a year, we do a week-long in-person meetup. Ramblings have been one successful way we keep the human connection going throughout the rest of the year.
 ",anchor_masked
-steph-ango,self-guarantee,"[""file-over-app"", ""vcware""]","Companies break promises all the time. A self-guaranteeing promise is verifiable and non-reversible. It does not require you to trust anyone.
+steph-ango,self-guarantee,"[""vcware"", ""file-over-app""]","Companies break promises all the time. A self-guaranteeing promise is verifiable and non-reversible. It does not require you to trust anyone.
 
 [[file-over-app|File over app]] is a self-guaranteeing promise. If files are in your control, in an open format, you can use those files in another app at any time. Not an export. The exact same files. It’s good practice to test this with any self-proclaimed file-over-app app you use.
 
@@ -479,7 +479,7 @@ When you choose a tool, the future of that tool is always ambiguous. On a long e
 
 It is possible to accept the ambiguousness of a tool’s future if you choose tools that make self-guaranteeing promises.
 ",anchor_preserved
-steph-ango,self-guarantee,"[""file-over-app"", ""vcware""]","Companies break promises all the time. A self-guaranteeing promise is verifiable and non-reversible. It does not require you to trust anyone.
+steph-ango,self-guarantee,"[""vcware"", ""file-over-app""]","Companies break promises all the time. A self-guaranteeing promise is verifiable and non-reversible. It does not require you to trust anyone.
 
 [[MASKED]] is a self-guaranteeing promise. If files are in your control, in an open format, you can use those files in another app at any time. Not an export. The exact same files. It’s good practice to test this with any self-proclaimed file-over-app app you use.
 
@@ -705,7 +705,7 @@ They say “knowledge is power”. If pain is information, then pain can be conv
 
 If you felt pain, ask what information it gave you. If that information was useful, seek the next pain. You are learning.
 ",anchor_masked
-steph-ango,quality-software,"[""buy-wisely"", ""file-over-app"", ""vcware""]","Quality software from independent makers is like quality food from the farmer’s market. A jar of handmade organic jam is not the same as mass-produced corn syrup-laden jam from the supermarket.
+steph-ango,quality-software,"[""vcware"", ""file-over-app"", ""buy-wisely""]","Quality software from independent makers is like quality food from the farmer’s market. A jar of handmade organic jam is not the same as mass-produced corn syrup-laden jam from the supermarket.
 
 Industrial fruit jam is filled with cheap ingredients and shelf stabilizers. Industrial software is filled with privacy-invasive trackers and proprietary formats.
 
@@ -735,7 +735,7 @@ Independent software makers are people you can talk to. Like quality jam from th
 
 If you want to live in a world with more than a handful of software makers, then spend a bit more on quality independent software. It deserves your hard-earned cash.
 ",anchor_preserved
-steph-ango,quality-software,"[""buy-wisely"", ""file-over-app"", ""vcware""]","Quality software from independent makers is like quality food from the farmer’s market. A jar of handmade organic jam is not the same as mass-produced corn syrup-laden jam from the supermarket.
+steph-ango,quality-software,"[""vcware"", ""file-over-app"", ""buy-wisely""]","Quality software from independent makers is like quality food from the farmer’s market. A jar of handmade organic jam is not the same as mass-produced corn syrup-laden jam from the supermarket.
 
 Industrial fruit jam is filled with cheap ingredients and shelf stabilizers. Industrial software is filled with privacy-invasive trackers and proprietary formats.
 
@@ -765,7 +765,7 @@ Independent software makers are people you can talk to. Like quality jam from th
 
 If you want to live in a world with more than a handful of software makers, then spend a bit more on quality independent software. It deserves your hard-earned cash.
 ",anchor_masked
-steph-ango,buy-wisely,"[""scars"", ""style"", ""pain""]","Whenever I buy things I try to prioritize *cost per use*. Sometimes I consider other priorities such as *cost per smile*, *cost per thrill*, *cost per externality*, and *cost per lesson*.
+steph-ango,buy-wisely,"[""scars"", ""pain"", ""style""]","Whenever I buy things I try to prioritize *cost per use*. Sometimes I consider other priorities such as *cost per smile*, *cost per thrill*, *cost per externality*, and *cost per lesson*.
 
 ## Cost per use
 
@@ -859,7 +859,7 @@ You might learn more about investing by purchasing a handful of shares in public
 
 Acquiring new ideas and perspectives can have a worthwhile cost. Being an early adopter of a product often has a poor *cost per use*, but its value is in the learning and experience per dollar.
 ",anchor_preserved
-steph-ango,buy-wisely,"[""scars"", ""style"", ""pain""]","Whenever I buy things I try to prioritize *cost per use*. Sometimes I consider other priorities such as *cost per smile*, *cost per thrill*, *cost per externality*, and *cost per lesson*.
+steph-ango,buy-wisely,"[""scars"", ""pain"", ""style""]","Whenever I buy things I try to prioritize *cost per use*. Sometimes I consider other priorities such as *cost per smile*, *cost per thrill*, *cost per externality*, and *cost per lesson*.
 
 ## Cost per use
 
@@ -953,7 +953,7 @@ You might learn more about investing by purchasing a handful of shares in public
 
 Acquiring new ideas and perspectives can have a worthwhile cost. Being an early adopter of a product often has a poor *cost per use*, but its value is in the learning and experience per dollar.
 ",anchor_masked
-steph-ango,style,"[""40-questions"", ""in-good-hands"", ""file-over-app"", ""about"", ""concise""]","Oscar Wilde once said:
+steph-ango,style,"[""in-good-hands"", ""40-questions"", ""about"", ""file-over-app"", ""concise""]","Oscar Wilde once said:
 
 > “Consistency is the last refuge of the unimaginative.”
 
@@ -1003,7 +1003,7 @@ I am starting a collection of interesting personal style choices. Please [[about
 - Jesper Kouthoofd of [Teenage Engineering](https://teenage.engineering/) [only uses lowercase](https://scandinavianmind.com/feature/human-touch-interview-jesper-kouthoofd-teenage-engineering) because uppercase communicates too much authority
 - Osvaldo Cavandoli created the cartoon [La Linea](https://en.wikipedia.org/wiki/La_Linea_\(TV_series\)) using an animated white line, colored backgrounds, and unintelligible vocalizations
 ",anchor_preserved
-steph-ango,style,"[""40-questions"", ""in-good-hands"", ""file-over-app"", ""about"", ""concise""]","Oscar Wilde once said:
+steph-ango,style,"[""in-good-hands"", ""40-questions"", ""about"", ""file-over-app"", ""concise""]","Oscar Wilde once said:
 
 > “Consistency is the last refuge of the unimaginative.”
 
@@ -1125,7 +1125,7 @@ You should want the files you create to be durable, not only for posterity, but 
 
 These days I write using an app I help make called [[MASKED]], but it’s a delusion to think it will last forever. The app will eventually become obsolete. It’s the plain text files I create that are designed to last. Who knows if anyone will want to read them besides me, but *future me* is enough of an audience to make it worthwhile.
 ",anchor_masked
-steph-ango,bicycle-for-the-senses,"[""hybridize"", ""every-app-is-a-superpower"", ""black-pixels""]","For the past seven decades, computers have been designed to enhance what your brain can do — think and remember. New kinds of computers will enhance what your senses can do — see, hear, touch, smell, taste.
+steph-ango,bicycle-for-the-senses,"[""every-app-is-a-superpower"", ""black-pixels"", ""hybridize""]","For the past seven decades, computers have been designed to enhance what your brain can do — think and remember. New kinds of computers will enhance what your senses can do — see, hear, touch, smell, taste.
 
 The term *spatial computing* is emerging to encompass both augmented and virtual reality. I believe we are exploring an even broader paradigm: *sensory computing*. The phone was a keyhole for peering into this world, and now we’re opening the door.
 
@@ -1201,7 +1201,7 @@ Sensory computing opens up many new questions that I am curious to explore, and 
 
 *This essay is a revised compilation of personal notes written between 2011-2013 while [[black-pixels|working on a headset]] that never shipped. Apple’s Vision Pro inspired me to dust off these ideas and update them.*
 ",anchor_preserved
-steph-ango,bicycle-for-the-senses,"[""hybridize"", ""every-app-is-a-superpower"", ""black-pixels""]","For the past seven decades, computers have been designed to enhance what your brain can do — think and remember. New kinds of computers will enhance what your senses can do — see, hear, touch, smell, taste.
+steph-ango,bicycle-for-the-senses,"[""every-app-is-a-superpower"", ""black-pixels"", ""hybridize""]","For the past seven decades, computers have been designed to enhance what your brain can do — think and remember. New kinds of computers will enhance what your senses can do — see, hear, touch, smell, taste.
 
 The term *spatial computing* is emerging to encompass both augmented and virtual reality. I believe we are exploring an even broader paradigm: *sensory computing*. The phone was a keyhole for peering into this world, and now we’re opening the door.
 
@@ -1309,7 +1309,7 @@ Ask yourself, what can you afford to make more costly?
 
 Resist criticizing tools for what they are bad at. Resist designing tools that are well-rounded. Instead, choose to be bad at something.
 ",anchor_masked
-steph-ango,photoshop-for-text,"[""file-over-app"", ""synthography""]","When I think about editing images, a vast array of options come to mind: contrast, saturation, sharpen, blur, airbrush, clone stamp, etc. Even basic image editors offer dozens of useful image manipulation tools.
+steph-ango,photoshop-for-text,"[""synthography"", ""file-over-app""]","When I think about editing images, a vast array of options come to mind: contrast, saturation, sharpen, blur, airbrush, clone stamp, etc. Even basic image editors offer dozens of useful image manipulation tools.
 
 When I think about editing text, a much narrower definition comes to mind: cut, copy, paste, find, replace, spell check — nothing that modifies the totality of the writing. This is changing.
 
@@ -1331,7 +1331,7 @@ These capabilities are all possible today, but will take time to refine. To make
 
 While some of these capabilities sound a bit scary at first, they will eventually become as mundane as “desaturate”, “Gaussian blur” or any other image filter, and unlock new creative potential.
 ",anchor_preserved
-steph-ango,photoshop-for-text,"[""file-over-app"", ""synthography""]","When I think about editing images, a vast array of options come to mind: contrast, saturation, sharpen, blur, airbrush, clone stamp, etc. Even basic image editors offer dozens of useful image manipulation tools.
+steph-ango,photoshop-for-text,"[""synthography"", ""file-over-app""]","When I think about editing images, a vast array of options come to mind: contrast, saturation, sharpen, blur, airbrush, clone stamp, etc. Even basic image editors offer dozens of useful image manipulation tools.
 
 When I think about editing text, a much narrower definition comes to mind: cut, copy, paste, find, replace, spell check — nothing that modifies the totality of the writing. This is changing.
 
@@ -1353,7 +1353,7 @@ These capabilities are all possible today, but will take time to refine. To make
 
 While some of these capabilities sound a bit scary at first, they will eventually become as mundane as “desaturate”, “Gaussian blur” or any other image filter, and unlock new creative potential.
 ",anchor_masked
-steph-ango,evergreen-notes,"[""calmness"", ""obsidian"", ""concise""]","Evergreen notes allow you to think about complex ideas by building them up from smaller composable ideas.
+steph-ango,evergreen-notes,"[""concise"", ""obsidian"", ""calmness""]","Evergreen notes allow you to think about complex ideas by building them up from smaller composable ideas.
 
 My evergreen notes have titles that distill each idea in a succinct and memorable way, that I can use in a sentence. For example:
 
@@ -1379,7 +1379,7 @@ Evergreen notes turn ideas into objects. By turning ideas into objects you can m
 
 *The term evergreen notes was coined by [Andy Matuschak](https://andymatuschak.org/) and you can find more about this method [on his site](https://notes.andymatuschak.org/Evergreen_notes). You can also [listen to my interview on the Metamuse podcast](https://museapp.com/podcast/81-evergreen-notes) for more thoughts on evergreen notes and how I use them in [[obsidian|Obsidian]].*
 ",anchor_preserved
-steph-ango,evergreen-notes,"[""calmness"", ""obsidian"", ""concise""]","Evergreen notes allow you to think about complex ideas by building them up from smaller composable ideas.
+steph-ango,evergreen-notes,"[""concise"", ""obsidian"", ""calmness""]","Evergreen notes allow you to think about complex ideas by building them up from smaller composable ideas.
 
 My evergreen notes have titles that distill each idea in a succinct and memorable way, that I can use in a sentence. For example:
 
@@ -1849,7 +1849,7 @@ steph-ango,subscribe,"[""feed""]","I send occasional email updates with new idea
 - Bluesky: [@stephango.com](https://bsky.app/profile/stephango.com)
 - Threads: [@kepano](https://www.threads.net/@kepano)
 ",anchor_masked
-steph-ango,lumi,"[""vertical-commerce"", ""lumi-series-a"", ""earth-needs-progress-not-perfection"", ""inkodye"", ""announcing-slash-packaging""]","## 2015–2022
+steph-ango,lumi,"[""vertical-commerce"", ""inkodye"", ""lumi-series-a"", ""earth-needs-progress-not-perfection"", ""announcing-slash-packaging""]","## 2015–2022
 
 I co-founded [Lumi](https://en.wikipedia.org/wiki/Lumi_\(company\)) with Jesse Genet in 2015. We created a software platform to help businesses find and collaborate with factories. Lumi was acquired in 2021.
 
@@ -1860,7 +1860,7 @@ Lumi was my second company with Jesse after [[inkodye|Inkodye]]. We started Lumi
 - [[earth-needs-progress-not-perfection|Earth needs progress not perfection]]
 - [[announcing-slash-packaging|Announcing Slash Packaging]]
 ",anchor_preserved
-steph-ango,lumi,"[""vertical-commerce"", ""lumi-series-a"", ""earth-needs-progress-not-perfection"", ""inkodye"", ""announcing-slash-packaging""]","## 2015–2022
+steph-ango,lumi,"[""vertical-commerce"", ""inkodye"", ""lumi-series-a"", ""earth-needs-progress-not-perfection"", ""announcing-slash-packaging""]","## 2015–2022
 
 I co-founded [Lumi](https://en.wikipedia.org/wiki/Lumi_\(company\)) with Jesse Genet in 2015. We created a software platform to help businesses find and collaborate with factories. Lumi was acquired in 2021.
 
@@ -1982,7 +1982,7 @@ December 2022
 
 ](https://stephango.com/chocolate-chip-cookies)
 ",anchor_masked
-steph-ango,impulse,"[""rusty-heaven"", ""devastate""]","## 2004
+steph-ango,impulse,"[""devastate"", ""rusty-heaven""]","## 2004
 
 A Winamp skin I designed to showcase the new freeform skin design capabilities introduced with Winamp 5. This was a collaboration with R. Peter Clark who coded the interactions.
 
@@ -1992,7 +1992,7 @@ See [[rusty-heaven|Rusty Heaven]] and [[devastate|devASTATE]] for examples of Wi
 
 ![Devastate skin](https://stephango.com/assets/impulse.jpg)
 ",anchor_preserved
-steph-ango,impulse,"[""rusty-heaven"", ""devastate""]","## 2004
+steph-ango,impulse,"[""devastate"", ""rusty-heaven""]","## 2004
 
 A Winamp skin I designed to showcase the new freeform skin design capabilities introduced with Winamp 5. This was a collaboration with R. Peter Clark who coded the interactions.
 
@@ -2002,7 +2002,7 @@ See [[MASKED]] and [[MASKED]] for examples of Winamp 2 skins, which had strict l
 
 ![Devastate skin](https://stephango.com/assets/impulse.jpg)
 ",anchor_masked
-steph-ango,well-made,"[""lumi"", ""vertical-commerce"", ""edgemade""]","## 2016–2021, 152 episodes
+steph-ango,well-made,"[""lumi"", ""edgemade"", ""vertical-commerce""]","## 2016–2021, 152 episodes
 
 My second podcast series after [[edgemade|Edgemade]], created while running [[lumi|Lumi]].
 
@@ -2020,7 +2020,7 @@ The show also documented the rise of the [[vertical-commerce|direct-to-consumer 
 
 This show wouldn’t have been possible without the help of my producer Katelan Cunningham, and our editor Evan Goodchild.
 ",anchor_preserved
-steph-ango,well-made,"[""lumi"", ""vertical-commerce"", ""edgemade""]","## 2016–2021, 152 episodes
+steph-ango,well-made,"[""lumi"", ""edgemade"", ""vertical-commerce""]","## 2016–2021, 152 episodes
 
 My second podcast series after [[MASKED]], created while running [[MASKED]].
 
@@ -2094,7 +2094,7 @@ The video was released October 14, 2015. Rewatching it in 2018, I enjoy seeing J
 
 ![Behind the scenes of Computer Show with Adam Lisagor](https://kepano.s3.amazonaws.com/12142190_437654869755430_135226080_n.jpg) *Behind the scenes of Computer Show with Adam Lisagor*
 ",anchor_masked
-steph-ango,flexoki,"[""lumi"", ""scars"", ""flexoki"", ""minimal"", ""stephango-com"", ""the-elusiveness-of-digital-paper"", ""inkodye"", ""obsidian"", ""flexo""]","Flexoki is an inky color scheme for prose and code. Flexoki is designed for reading and writing on digital screens. It is inspired by analog inks and warm shades of paper.
+steph-ango,flexoki,"[""the-elusiveness-of-digital-paper"", ""flexo"", ""inkodye"", ""minimal"", ""flexoki"", ""scars"", ""stephango-com"", ""lumi"", ""obsidian""]","Flexoki is an inky color scheme for prose and code. Flexoki is designed for reading and writing on digital screens. It is inspired by analog inks and warm shades of paper.
 
 Flexoki is minimalistic and high-contrast. The colors are calibrated for legibility and perceptual balance across devices and when switching between light and dark modes.
 
@@ -2789,7 +2789,7 @@ Flexoki is MIT licensed. You are free to port Flexoki to any app. Please include
 
 [^1]: [![](https://stephango.com/assets/flexo.jpg)](https://stephango.com/flexo) I also have a [[flexo|dog named Flexo]] whose greatness deserved to be immortalized.
 ",anchor_preserved
-steph-ango,flexoki,"[""lumi"", ""scars"", ""flexoki"", ""minimal"", ""stephango-com"", ""the-elusiveness-of-digital-paper"", ""inkodye"", ""obsidian"", ""flexo""]","Flexoki is an inky color scheme for prose and code. Flexoki is designed for reading and writing on digital screens. It is inspired by analog inks and warm shades of paper.
+steph-ango,flexoki,"[""the-elusiveness-of-digital-paper"", ""flexo"", ""inkodye"", ""minimal"", ""flexoki"", ""scars"", ""stephango-com"", ""lumi"", ""obsidian""]","Flexoki is an inky color scheme for prose and code. Flexoki is designed for reading and writing on digital screens. It is inspired by analog inks and warm shades of paper.
 
 Flexoki is minimalistic and high-contrast. The colors are calibrated for legibility and perceptual balance across devices and when switching between light and dark modes.
 
@@ -3646,7 +3646,7 @@ The plugin has three settings:
 
 Use the command palette or hotkeys to open the current page. If no permalink is set the title is slugified using kebab case.
 ",anchor_masked
-steph-ango,piano,"[""flexoki"", ""assets-piano-scales-cheat-sheet-color-pdf"", ""assets-piano-scales-cheat-sheet-pdf""]","I am learning to play piano and made this cheat sheet to help me learn scales. [Watch this video](https://x.com/kepano/status/1826291265786503525) to see how you can use the printable version with your piano.
+steph-ango,piano,"[""assets-piano-scales-cheat-sheet-color-pdf"", ""assets-piano-scales-cheat-sheet-pdf"", ""flexoki""]","I am learning to play piano and made this cheat sheet to help me learn scales. [Watch this video](https://x.com/kepano/status/1826291265786503525) to see how you can use the printable version with your piano.
 
 ## Interactive scales
 
@@ -3712,7 +3712,7 @@ The cheat sheet is scaled for letter-sized paper (8.5 × 11 inches), and a keybo
 
 The colors on this page come from my [[flexoki|Flexoki]] palette.
 ",anchor_preserved
-steph-ango,piano,"[""flexoki"", ""assets-piano-scales-cheat-sheet-color-pdf"", ""assets-piano-scales-cheat-sheet-pdf""]","I am learning to play piano and made this cheat sheet to help me learn scales. [Watch this video](https://x.com/kepano/status/1826291265786503525) to see how you can use the printable version with your piano.
+steph-ango,piano,"[""assets-piano-scales-cheat-sheet-color-pdf"", ""assets-piano-scales-cheat-sheet-pdf"", ""flexoki""]","I am learning to play piano and made this cheat sheet to help me learn scales. [Watch this video](https://x.com/kepano/status/1826291265786503525) to see how you can use the printable version with your piano.
 
 ## Interactive scales
 
@@ -3794,7 +3794,7 @@ The JSON Canvas format was created to provide longevity, readability, interopera
 
 JSON Canvas was originally created for [[MASKED]]. JSON Canvas can be implemented freely as an import, export, and storage format for any app or tool. All the resources associated with it are [open source](https://github.com/obsidianmd/jsoncanvas) under the MIT license.
 ",anchor_masked
-steph-ango,edgemade,"[""vanilla"", ""well-made"", ""always-learning-always-teaching"", ""inkodye"", ""every-app-is-a-superpower"", ""design-is-compromise""]","## 2013–2014, 11 episodes
+steph-ango,edgemade,"[""well-made"", ""every-app-is-a-superpower"", ""design-is-compromise"", ""inkodye"", ""always-learning-always-teaching"", ""vanilla""]","## 2013–2014, 11 episodes
 
 [edgemade.com](http://edgemade.com/)
 
@@ -3809,7 +3809,7 @@ A short-lived blog and podcast about independent hardware that I created while r
 - [[design-is-compromise|Design is compromise]]
 - [[every-app-is-a-superpower|Every app is a superpower]]
 ",anchor_preserved
-steph-ango,edgemade,"[""vanilla"", ""well-made"", ""always-learning-always-teaching"", ""inkodye"", ""every-app-is-a-superpower"", ""design-is-compromise""]","## 2013–2014, 11 episodes
+steph-ango,edgemade,"[""well-made"", ""every-app-is-a-superpower"", ""design-is-compromise"", ""inkodye"", ""always-learning-always-teaching"", ""vanilla""]","## 2013–2014, 11 episodes
 
 [edgemade.com](http://edgemade.com/)
 
@@ -4194,7 +4194,7 @@ Inspired by my work on [[MASKED]] I created [Defuddle](https://defuddle.md/), an
 
 The simplest way to use it is to add `defuddle.md` before any URL, which will return Markdown.
 ",anchor_masked
-steph-ango,tidyurl,"[""obsidian"", ""tidy"", ""obsidian-web-clipper""]","Tidy URL removes unnecessary cruft in URLs such as UTM parameters and copies the link to your clipboard. This removes tracking info and makes links nicer to share.
+steph-ango,tidyurl,"[""obsidian-web-clipper"", ""obsidian"", ""tidy""]","Tidy URL removes unnecessary cruft in URLs such as UTM parameters and copies the link to your clipboard. This removes tracking info and makes links nicer to share.
 
 To install Tidy URL, simply drag the `TidyURL` link below into your bookmarks. Then click the bookmark to get a tidy URL and copy it to your clipboard.
 
@@ -4217,7 +4217,7 @@ javascript:(function(){
 })();
 ```
 ",anchor_preserved
-steph-ango,tidyurl,"[""obsidian"", ""tidy"", ""obsidian-web-clipper""]","Tidy URL removes unnecessary cruft in URLs such as UTM parameters and copies the link to your clipboard. This removes tracking info and makes links nicer to share.
+steph-ango,tidyurl,"[""obsidian-web-clipper"", ""obsidian"", ""tidy""]","Tidy URL removes unnecessary cruft in URLs such as UTM parameters and copies the link to your clipboard. This removes tracking info and makes links nicer to share.
 
 To install Tidy URL, simply drag the `TidyURL` link below into your bookmarks. Then click the bookmark to get a tidy URL and copy it to your clipboard.
 
@@ -4240,7 +4240,7 @@ javascript:(function(){
 })();
 ```
 ",anchor_masked
-steph-ango,tidy,"[""tidyurl"", ""obsidian-web-clipper"", ""obsidian"", ""defuddle""]","Tidy is a simple [open source](https://github.com/kepano/tidy) bookmarklet that uses [[defuddle|Defuddle]] to tidy up web pages for easy reading.
+steph-ango,tidy,"[""obsidian-web-clipper"", ""tidyurl"", ""obsidian"", ""defuddle""]","Tidy is a simple [open source](https://github.com/kepano/tidy) bookmarklet that uses [[defuddle|Defuddle]] to tidy up web pages for easy reading.
 
 To install Tidy, simply drag the “Tidy!” link below into your bookmarks. Then click the bookmark to clean up an article page.
 
@@ -4275,7 +4275,7 @@ javascript: (function() {
 }());
 ```
 ",anchor_preserved
-steph-ango,tidy,"[""tidyurl"", ""obsidian-web-clipper"", ""obsidian"", ""defuddle""]","Tidy is a simple [open source](https://github.com/kepano/tidy) bookmarklet that uses [[MASKED]] to tidy up web pages for easy reading.
+steph-ango,tidy,"[""obsidian-web-clipper"", ""tidyurl"", ""obsidian"", ""defuddle""]","Tidy is a simple [open source](https://github.com/kepano/tidy) bookmarklet that uses [[MASKED]] to tidy up web pages for easy reading.
 
 To install Tidy, simply drag the “Tidy!” link below into your bookmarks. Then click the bookmark to clean up an article page.
 

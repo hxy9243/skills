@@ -1,58 +1,92 @@
 ---
 name: wiki
-description: Manage an LLM-driven knowledge base (Karpathy pattern). Parses raw notes, infers taxonomy categories, updates index.md, and writes structured concept nodes to _WIKI/nodes/.
-metadata:
-  openclaw:
-    install:
-      script: |
-        npm install
+description: Build and maintain a formal notebook wiki with concept pages, hierarchy summaries, incremental indexing, semantic search, and linting. Use this whenever the user wants to turn notes into a browsable knowledge base, organize an Obsidian notebook into categories, regenerate a wiki index, search across synthesized concepts, or validate wiki integrity.
 ---
 
-# Wiki Skill 📚
+# Wiki
 
-This skill implements the **Wiki Pattern** (conceptualized by Andrej Karpathy) for OpenClaw. It shifts the burden of maintaining a Zettelkasten or knowledge base from the human to the LLM. 
+This skill formalizes a notebook into a generated wiki workspace. Keep model-driven interpretation in the subagents and keep deterministic processing in `scripts/wiki.py`.
 
-Instead of dumping files and relying on query-time embeddings (RAG), this skill *ingests* raw files, extracts concepts, infers a 3-layer taxonomy (`Category -> Subcategory -> Topic`), and maintains a highly structured, semantic Markdown index (`index.md`) alongside clean concept nodes.
+## What This Skill Owns
 
-## Features
-- **Semantic Ingestion**: Uses an LLM to read a raw source, extract the core concept, and infer its place in your ontology.
-- **Auto-Indexing**: Automatically places new concepts into a hierarchical `index.md` file.
-- **Bookkeeping**: Automatically logs actions to `log.md` and moves raw files to an archive directory.
-- **Linting**: Finds orphan nodes that are missing from the index.
+- Source notes stay in the notebook.
+- Generated wiki artifacts live in a separate wiki root.
+- Concept pages are the leaf knowledge objects.
+- Category, subcategory, and topic layers each get a generated markdown synthesis page.
+- Search uses persisted lexical and semantic indexes.
+- Incremental indexing is the default operating mode.
 
-## Configuration
+## Dispatch
 
-You can use the `config` command to generate a local `~/.wiki.json` settings file:
+Choose one of these four subagent workflows before touching the script:
 
-```bash
-node ~/.openclaw/skills/wiki/index.js config --api-key "sk-..."
+1. `agents/add.md`
+Use for targeted note ingestion or when the user wants to add a few notes into the wiki.
+
+2. `agents/index.md`
+Use for notebook-wide or folder-wide indexing, incremental refreshes, and rebuilds.
+
+3. `agents/search.md`
+Use when the user wants answers or browsing help from the generated wiki.
+
+4. `agents/lint.md`
+Use when the user wants validation, cleanup guidance, or integrity checks.
+
+## Config Contract
+
+The backend loads config from `~/.wiki/config.json` by default, or from `--config <path>`.
+
+Supported config fields:
+
+```json
+{
+  "notebook_root": "/absolute/path/to/notebook",
+  "include_roots": [".", "Projects"],
+  "exclude_globs": ["_WIKI/**", ".obsidian/**", "Templates/**"],
+  "generated_root": "/absolute/path/to/notebook/_WIKI",
+  "search": {
+    "lexical_limit": 8,
+    "semantic_limit": 8
+  },
+  "model": {
+    "provider": "inherit-from-skill",
+    "chat_model": "inherit-from-skill",
+    "embedding_model": "inherit-from-skill"
+  }
+}
 ```
 
+Environment overrides:
+- `WIKI_CONFIG_PATH`
+- `WIKI_NOTEBOOK_ROOT`
+- `WIKI_INCLUDE_ROOTS`
+- `WIKI_EXCLUDE_GLOBS`
+- `WIKI_GENERATED_ROOT`
 
-By default, the skill assumes your Obsidian vault is located at `~/Documents/kevinhusnotes`. You can override these paths by setting environment variables in your OpenClaw environment or local `.env` file:
+`include_roots` are resolved relative to `notebook_root` unless absolute.
 
-- `WIKI_ROOT`: Path to the compiled wiki directory (Default: `~/Documents/kevinhusnotes/_WIKI`)
-- `INBOX_DIR`: Path to raw staging (Default: `~/Documents/kevinhusnotes/00_Inbox`)
-- `RAW_ARCHIVE_DIR`: Path to archive raw sources (Default: `~/Documents/kevinhusnotes/30_Resources/Raw`)
-- `OPENAI_API_KEY`: Required for the ingestion LLM call.
+## Generated Artifacts
 
-## Commands
+The Python backend maintains:
+- `concepts/`: generated concept pages
+- `hierarchy/`: generated category synthesis pages
+- `manifests/concepts.json`: normalized concept records
+- `manifests/hierarchy.json`: hierarchy node records
+- `manifests/sources.json`: source-note fingerprints
+- `search/index.json`: persisted lexical and semantic search data
+- `state/state.json`: incremental state
+- `index.md`: top-level browse entrypoint
 
-Run the CLI tool via Node:
+## Operating Rules
+
+- Let subagents interpret notes and queries.
+- Let `scripts/wiki.py` own file IO, manifests, hierarchy regeneration, indexing, search ranking, and lint checks.
+- Prefer `index` for broad refreshes and `add` for small targeted updates.
+- Use packet mode when a subagent has already normalized concept data:
 
 ```bash
-# Ingest a raw markdown file into the wiki
-node ~/.openclaw/skills/wiki/index.js add ~/Documents/kevinhusnotes/00_Inbox/some_raw_file.md
-
-# Lint the wiki for orphan nodes
-node ~/.openclaw/skills/wiki/index.js lint
-
-# Search the semantic index
-node ~/.openclaw/skills/wiki/index.js search "Agent"
+python wiki/scripts/wiki.py add --packet /tmp/wiki_packets.json
 ```
 
-## How it works
-
-1. **Add**: The script passes the raw file text and your current `index.md` to an LLM. The LLM returns a structured JSON object containing the `title`, `description`, `l1`, `l2`, `l3` taxonomy levels, and the synthesized `content`.
-2. **Compile**: A new node is created in `_WIKI/nodes/` using a standardized YAML frontmatter format.
-3. **Index & Log**: The script parses `index.md`, injects the new link under the correct heading, and writes to `log.md`.
+- Keep the hierarchy at exactly three layers before concept leaves.
+- Treat source notes as references; do not rewrite them in place.
