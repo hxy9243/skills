@@ -57,6 +57,9 @@ Supported config fields:
   "category_overrides": {
     "00_Inbox/Some Note.md": ["Computer Science", "AI Systems", "Agents"]
   },
+  "category_prefix_overrides": {
+    "20_Subjects/Computer Science/Computer Systems/Distributed Systems": ["Computer Science", "Computer Systems", "Distributed Systems"]
+  },
   "search": {
     "lexical_limit": 8
   }
@@ -65,6 +68,7 @@ Supported config fields:
 
 `include_roots` are resolved relative to `notebook_root` unless absolute.
 Use `category_overrides` for notebook-specific placements that should survive future rebuilds.
+Use `category_prefix_overrides` for stable folder-level placements where many notes should share the same branch.
 
 Model choice is not part of the backend config. Subagents should inherit the active model from the invoking skill/session.
 
@@ -75,6 +79,8 @@ The generated wiki always uses exactly three hierarchy layers before note leaves
 Rule of thumb:
 - Keep each level to roughly 5-10 children.
 - Prefer broad, durable buckets over narrow one-off branches.
+- Prefer real topics over generic buckets like `Research`, `Papers`, `General`, or `Misc`.
+- Do not shoehorn notes into an existing branch when they point to a clearer topical subtree.
 - Expand the tree only when a concept clearly does not fit an existing branch.
 - Prefix each category row with its depth marker so the tree stays machine- and prompt-friendly.
 
@@ -117,6 +123,7 @@ The Python backend maintains:
 - Keep `index.md` focused on the category tree itself. Do not regenerate a second browse-by-category section below it.
 - Prefer `index` for broad refreshes and `add` for small targeted updates.
 - For notebook-wide indexing, classify new notes with subagents in parallel when feasible, but cap concurrency at 8 notes at a time.
+- For broad or ambiguous note sets, have subagents propose better topical branches instead of forcing notes into a weak existing category.
 - Use packet mode when a subagent has already normalized note classification data:
 
 ```bash

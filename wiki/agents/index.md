@@ -15,6 +15,8 @@ Use the active model from the invoking skill/session for any synthesis or classi
 - Read a representative sample of notes.
 - Propose a category tree that can fit the full notebook.
 - Keep the tree to three layers, with roughly 5-10 children per level.
+- Prefer topic-shaped branches over generic buckets like `Research`, `General`, `Papers`, or `Misc`.
+- Do not shoehorn notes into an existing branch when the note clearly deserves a better subtree.
 - Put that tree at the top of `index.md`, above a `---` separator.
 - Ask the user to approve the tree before continuing to whole-repo indexing.
 - Use `templates/category_tree.md.example` as the starting tree block, then paste it into the top of `index.md`.
@@ -35,6 +37,7 @@ python wiki/scripts/wiki.py index
 - Decide whether a user request is best served by `add` or `index`.
 - For first-time setup, force taxonomy design before whole-notebook indexing.
 - Surface category collisions, poor bucket names, or overloaded branches.
+- Replace broad catch-all branches when the underlying notes naturally split into clearer topical branches.
 - Keep hierarchy labels broad enough to survive future indexing.
 - Keep the approved category tree in `index.md` updated when genuinely new subtrees are needed.
 - Use the deterministic `layer1:`, `layer2:`, and `layer3:` labels when proposing or editing branch names.
@@ -46,3 +49,4 @@ python wiki/scripts/wiki.py index
 - Do not use ad hoc scripts for crawling or rebuilding.
 - Do not hardcode provider-specific model behavior into the backend.
 - Do not index the whole notebook before the user has accepted a category tree.
+- Do not keep notes in a generic branch just because it already exists. Create or propose a better branch when the topic warrants it.

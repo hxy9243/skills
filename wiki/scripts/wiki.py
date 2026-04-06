@@ -30,7 +30,6 @@ CATEGORY_RULES = [
     (["agent", "assistant", "tool", "workflow", "automation"], ["Computer Science", "AI Systems", "Agents"]),
     (["infra", "infrastructure", "cluster", "runtime", "container", "vm", "orchestration", "deploy"], ["Computer Science", "AI Systems", "Infrastructure"]),
     (["memory", "context", "recall", "buffer", "state"], ["Computer Science", "AI Systems", "Memory"]),
-    (["research", "paper", "trend", "survey", "arxiv"], ["Computer Science", "AI Systems", "Research"]),
     (["search", "retrieval", "index", "embedding", "vector"], ["Computer Science", "Knowledge Systems", "Retrieval"]),
     (["product", "market", "strategy", "company", "startup"], ["Culture", "Technology", "Product Strategy"]),
     (["design", "typography", "layout", "color", "ui"], ["Design", "Interface Design", "Visual Systems"]),
@@ -251,9 +250,20 @@ def configured_category(config: WikiConfig, source_relpath: str) -> list[str] | 
     config_path = config.generated_root / "config.json"
     raw = read_json(config_path, {}) if config_path.exists() else {}
     override = (raw.get("category_overrides") or {}).get(source_relpath)
-    if not override:
+    if override:
+        category = [safe_title(part) for part in override[:3]]
+        if len(category) == 3:
+            return category
+    prefix_overrides = raw.get("category_prefix_overrides") or {}
+    best_prefix = None
+    for prefix in prefix_overrides:
+        normalized_prefix = prefix.rstrip("/")
+        if source_relpath.startswith(normalized_prefix + "/") or source_relpath == normalized_prefix:
+            if best_prefix is None or len(normalized_prefix) > len(best_prefix):
+                best_prefix = normalized_prefix
+    if best_prefix is None:
         return None
-    category = [safe_title(part) for part in override[:3]]
+    category = [safe_title(part) for part in prefix_overrides[best_prefix][:3]]
     return category if len(category) == 3 else None
 
 

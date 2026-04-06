@@ -99,6 +99,39 @@ class WikiScriptTests(unittest.TestCase):
         self.assertEqual(config.generated_root, self.generated.resolve())
         self.assertEqual(config.include_roots, [self.notebook.resolve()])
 
+    def test_prefix_override_applies_to_matching_paths(self) -> None:
+        local_config_path = self.generated / "config.json"
+        local_config_path.write_text(
+            json.dumps(
+                {
+                    "notebook_root": str(self.notebook),
+                    "include_roots": ["."],
+                    "generated_root": str(self.generated),
+                    "category_prefix_overrides": {
+                        "20_Subjects/Computer Science/Computer Systems/Distributed Systems": [
+                            "Computer Science",
+                            "Computer Systems",
+                            "Distributed Systems",
+                        ]
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+        write_note(
+            self.notebook / "20_Subjects" / "Computer Science" / "Computer Systems" / "Distributed Systems" / "BBoltDB.md",
+            "# BBoltDB\n\nEmbedded storage for system design notes.",
+        )
+
+        packet = wiki.extract_packet_from_note(
+            self.notebook / "20_Subjects" / "Computer Science" / "Computer Systems" / "Distributed Systems" / "BBoltDB.md",
+            wiki.load_config(str(self.config_path)),
+        )
+        self.assertEqual(
+            packet["category_path"],
+            ["Computer Science", "Computer Systems", "Distributed Systems"],
+        )
+
     def test_add_packet_updates_log_index_and_categories(self) -> None:
         write_note(self.notebook / "Notes" / "Delegation.md", "# Delegation\n\nDelegate work to subagents when tasks are well scoped.")
         packet_path = self.root / "packet.json"
