@@ -1,0 +1,58 @@
+# Category Tree
+
+Use this file to establish the approved classification tree before indexing the full notebook.
+
+Rules of thumb:
+- Keep exactly three hierarchy layers before concept pages.
+- Aim for roughly 5-10 children at each level.
+- Prefer durable category names over narrow project-specific labels.
+- Add a new subtree only when several concepts clearly do not fit the current tree.
+
+## Proposed Tree
+
+### Computer Science
+- AI Systems
+  - Agents
+  - Memory
+  - Evaluation
+- Knowledge Systems
+  - Retrieval
+  - Wikis
+  - Notes Infrastructure
+- Software Engineering
+  - Tooling
+  - Testing
+  - Architecture
+
+### Business
+- Strategy
+  - Product Strategy
+  - Distribution
+  - Positioning
+- Organizations
+  - Team Design
+  - Management
+  - Operations
+- Markets
+  - Competition
+  - Pricing
+  - Customer Segments
+
+### Design
+- Interface Design
+  - Layout
+  - Typography
+  - Visual Systems
+- Research
+  - User Insight
+  - Interaction Patterns
+  - Information Architecture
+- Creative Direction
+  - Brand
+  - Voice
+  - Motion
+
+## Notes
+
+- Add comments below the tree for branches that feel overloaded or under-specified.
+- Mark uncertain branches before asking the user for approval.

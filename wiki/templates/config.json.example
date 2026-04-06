@@ -1,0 +1,18 @@
+{
+  "notebook_root": "/absolute/path/to/notebook",
+  "include_roots": [
+    ".",
+    "Projects"
+  ],
+  "exclude_globs": [
+    "_WIKI/**",
+    ".obsidian/**",
+    "Templates/**",
+    "Archive/**"
+  ],
+  "generated_root": "/absolute/path/to/notebook/_WIKI",
+  "search": {
+    "lexical_limit": 8,
+    "semantic_limit": 8
+  }
+}
