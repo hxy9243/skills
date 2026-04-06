@@ -41,13 +41,6 @@ By default, the skill assumes your Obsidian vault is located at `~/Documents/kev
 Run the CLI tool via Node:
 
 ```bash
-# Set your configuration
-node ~/.openclaw/skills/wiki/index.js config --api-key "your_openai_key" --wiki-root "/path/to/wiki"
-
-
-Run the CLI tool via Node:
-
-```bash
 # Ingest a raw markdown file into the wiki
 node ~/.openclaw/skills/wiki/index.js add ~/Documents/kevinhusnotes/00_Inbox/some_raw_file.md
 
