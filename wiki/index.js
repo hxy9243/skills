@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 
-const CONFIG_PATH = path.join(process.env.HOME, '.llm-wiki.json');
+const CONFIG_PATH = path.join(process.env.HOME, '.wiki.json');
 
 function loadConfig() {
     let cfg = {
@@ -34,12 +34,12 @@ function initDirectories() {
     [config.WIKI_ROOT, config.INBOX_DIR, config.RAW_ARCHIVE_DIR, NODES_DIR].forEach(dir => {
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
     });
-    if (!fs.existsSync(INDEX_FILE)) fs.writeFileSync(INDEX_FILE, '# LLM-Wiki Catalog\n');
-    if (!fs.existsSync(LOG_FILE)) fs.writeFileSync(LOG_FILE, '# LLM-Wiki Log\n');
+    if (!fs.existsSync(INDEX_FILE)) fs.writeFileSync(INDEX_FILE, '# Wiki Catalog\n');
+    if (!fs.existsSync(LOG_FILE)) fs.writeFileSync(LOG_FILE, '# Wiki Log\n');
 }
 
 async function extractConcepts(content) {
-    if (!config.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not set. Run 'llm-wiki config --api-key <key>' or set the environment variable.");
+    if (!config.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not set. Run 'wiki config --api-key <key>' or set the environment variable.");
     
     let currentIndex = "";
     if (fs.existsSync(INDEX_FILE)) currentIndex = fs.readFileSync(INDEX_FILE, 'utf8');
@@ -111,7 +111,7 @@ function updateIndex(data, filename) {
 }
 
 program.command('config')
-    .description('Generate or update the local configuration file (~/.llm-wiki.json)')
+    .description('Generate or update the local configuration file (~/.wiki.json)')
     .option('--wiki-root <path>', 'Set WIKI_ROOT')
     .option('--inbox-dir <path>', 'Set INBOX_DIR')
     .option('--raw-archive-dir <path>', 'Set RAW_ARCHIVE_DIR')
@@ -135,7 +135,7 @@ program.command('config')
     });
 
 program.command('add <file>')
-    .description('Ingest a raw file into the LLM-Wiki')
+    .description('Ingest a raw file into the Wiki')
     .action(async (file) => {
         try {
             initDirectories();
@@ -153,7 +153,7 @@ program.command('add <file>')
             const nodeContent = `---
 Created: '${dateStr}'
 Updated: '${dateStr}'
-Tags: ['#concept', '#llm-wiki']
+Tags: ['#concept', '#wiki']
 ---
 # ${data.title}
 

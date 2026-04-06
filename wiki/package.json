@@ -1,5 +1,5 @@
 {
-  "name": "llm-wiki",
+  "name": "wiki",
   "version": "1.0.0",
   "description": "LLM-Wiki manager based on Karpathy pattern",
   "main": "index.js",

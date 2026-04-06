@@ -1,5 +1,5 @@
 ---
-name: llm-wiki
+name: wiki
 description: Manage an LLM-driven knowledge base (Karpathy pattern). Parses raw notes, infers taxonomy categories, updates index.md, and writes structured concept nodes to _WIKI/nodes/.
 metadata:
   openclaw:
@@ -8,9 +8,9 @@ metadata:
         npm install
 ---
 
-# LLM-Wiki Skill 📚
+# Wiki Skill 📚
 
-This skill implements the **LLM-Wiki Pattern** (conceptualized by Andrej Karpathy) for OpenClaw. It shifts the burden of maintaining a Zettelkasten or knowledge base from the human to the LLM. 
+This skill implements the **Wiki Pattern** (conceptualized by Andrej Karpathy) for OpenClaw. It shifts the burden of maintaining a Zettelkasten or knowledge base from the human to the LLM. 
 
 Instead of dumping files and relying on query-time embeddings (RAG), this skill *ingests* raw files, extracts concepts, infers a 3-layer taxonomy (`Category -> Subcategory -> Topic`), and maintains a highly structured, semantic Markdown index (`index.md`) alongside clean concept nodes.
 
@@ -22,10 +22,10 @@ Instead of dumping files and relying on query-time embeddings (RAG), this skill 
 
 ## Configuration
 
-You can use the `config` command to generate a local `~/.llm-wiki.json` settings file:
+You can use the `config` command to generate a local `~/.wiki.json` settings file:
 
 ```bash
-node ~/.openclaw/skills/llm-wiki/index.js config --api-key "sk-..."
+node ~/.openclaw/skills/wiki/index.js config --api-key "sk-..."
 ```
 
 
@@ -42,20 +42,20 @@ Run the CLI tool via Node:
 
 ```bash
 # Set your configuration
-node ~/.openclaw/skills/llm-wiki/index.js config --api-key "your_openai_key" --wiki-root "/path/to/wiki"
+node ~/.openclaw/skills/wiki/index.js config --api-key "your_openai_key" --wiki-root "/path/to/wiki"
 
 
 Run the CLI tool via Node:
 
 ```bash
 # Ingest a raw markdown file into the wiki
-node ~/.openclaw/skills/llm-wiki/index.js add ~/Documents/kevinhusnotes/00_Inbox/some_raw_file.md
+node ~/.openclaw/skills/wiki/index.js add ~/Documents/kevinhusnotes/00_Inbox/some_raw_file.md
 
 # Lint the wiki for orphan nodes
-node ~/.openclaw/skills/llm-wiki/index.js lint
+node ~/.openclaw/skills/wiki/index.js lint
 
 # Search the semantic index
-node ~/.openclaw/skills/llm-wiki/index.js search "Agent"
+node ~/.openclaw/skills/wiki/index.js search "Agent"
 ```
 
 ## How it works
