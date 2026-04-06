@@ -46,12 +46,13 @@ async function extractConcepts(content) {
 
     const prompt = `You are a wiki librarian. Extract the single main concept from the provided raw text. 
 Format your output as a strict JSON object with:
-- "title": a concise, safe filename (e.g., "Virtual_Filesystems_for_Agents", no spaces or special chars)
+- "title": MUST match an existing node title if synthesizing into it, otherwise a new concise filename (no spaces/special chars)
 - "description": a one-line summary
 - "l1": The top-level category (e.g. Artificial Intelligence)
 - "l2": The mid-level category (e.g. Agentic Systems)
 - "l3": The granular category (e.g. Architecture & Memory)
-- "content": A markdown section summarizing the core ideas, formatted with '## Core Ideas' and '## Evolution / Contradictions'.
+- "content": A markdown section summarizing the core ideas. If synthesizing into an existing concept, update its summary. Formatted with '## Core Ideas' and '## Evolution / Contradictions'.
+- "is_new": boolean (true if creating a new node, false if updating an existing node found in the index)
     
 Use this current taxonomy context to route the file appropriately, or invent a new category if it doesn't fit:
 ${currentIndex.substring(0, 1500)}
@@ -150,7 +151,41 @@ async function ingestFile(file, options = {}) {
     const dateStr = new Date().toISOString().split('T')[0];
     const baseFileName = path.basename(rawPath, '.md');
 
-    const nodeContent = `---
+    
+                const nodePath = path.join(NODES_DIR, `${data.title}.md`);
+                let nodeContent = "";
+                if (!data.is_new && fs.existsSync(nodePath)) {
+                    console.log(`Synthesizing into existing node: ${data.title}`);
+                    let existingContent = fs.readFileSync(nodePath, 'utf8');
+                    // Simple append for sources, and replace body (in a real system, we'd use an LLM edit pass)
+                    // For now, we will just let the LLM rewrite the whole body
+                    nodeContent = `---
+Created: '${dateStr}'
+Updated: '${dateStr}'
+Tags: ['#concept', '#llm-wiki']
+---
+# ${data.title}
+
+${data.description}
+
+${data.content}
+
+## Sources
+- [[${baseFileName}]]
+`;
+                    // naive append sources - we should preserve old sources
+                    const oldSourcesMatch = existingContent.match(/## Sources[\s\S]*/);
+                    if (oldSourcesMatch) {
+                        const oldSources = oldSourcesMatch[0].replace('## Sources', '').trim();
+                        if (!oldSources.includes(baseFileName)) {
+                             nodeContent = nodeContent.replace('- [[' + baseFileName + ']]', oldSources + '\n- [[' + baseFileName + ']]');
+                        } else {
+                             nodeContent = nodeContent.replace('- [[' + baseFileName + ']]', oldSources);
+                        }
+                    }
+                } else {
+                    console.log(`Creating new node: ${data.title}`);
+                    nodeContent = `---
 Created: '${dateStr}'
 Updated: '${dateStr}'
 Tags: ['#concept', '#wiki']
@@ -169,7 +204,7 @@ ${data.content}
     fs.writeFileSync(nodePath, nodeContent);
     console.log(`Created node: ${nodePath}`);
 
-    updateIndex(data, data.title);
+    if (data.is_new) updateIndex(data, data.title);
     console.log('Updated index.md with new link.');
 
     const logEntry = `\n## [${dateStr}] Ingest | ${baseFileName} | Pages touched: [[${data.title}]]`;
