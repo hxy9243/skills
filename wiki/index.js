@@ -110,6 +110,83 @@ function updateIndex(data, filename) {
     fs.writeFileSync(INDEX_FILE, newIndex.join('\n'));
 }
 
+function isHiddenPath(targetPath) {
+    return targetPath.split(path.sep).some(part => part.startsWith('.') && part.length > 1);
+}
+
+function collectMarkdownFiles(dirPath) {
+    const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+    let files = [];
+
+    for (const entry of entries) {
+        if (entry.name.startsWith('.')) continue;
+
+        const entryPath = path.join(dirPath, entry.name);
+        if (entry.isDirectory()) {
+            files = files.concat(collectMarkdownFiles(entryPath));
+            continue;
+        }
+
+        if (entry.isFile() && entry.name.endsWith('.md') && !isHiddenPath(entryPath)) {
+            files.push(entryPath);
+        }
+    }
+
+    return files;
+}
+
+async function ingestFile(file, options = {}) {
+    const keep = Boolean(options.keep);
+
+    initDirectories();
+    const rawPath = path.resolve(file);
+    console.log(`Reading raw file: ${rawPath}`);
+    const content = fs.readFileSync(rawPath, 'utf8');
+
+    console.log('Extracting concepts and inferring taxonomy via LLM...');
+    const data = await extractConcepts(content);
+    console.log(`Inferred: ${data.l1} -> ${data.l2} -> ${data.l3}`);
+
+    const dateStr = new Date().toISOString().split('T')[0];
+    const baseFileName = path.basename(rawPath, '.md');
+
+    const nodeContent = `---
+Created: '${dateStr}'
+Updated: '${dateStr}'
+Tags: ['#concept', '#wiki']
+---
+# ${data.title}
+
+${data.description}
+
+${data.content}
+
+## Sources
+- [[${baseFileName}]]
+`;
+
+    const nodePath = path.join(NODES_DIR, `${data.title}.md`);
+    fs.writeFileSync(nodePath, nodeContent);
+    console.log(`Created node: ${nodePath}`);
+
+    updateIndex(data, data.title);
+    console.log('Updated index.md with new link.');
+
+    const logEntry = `\n## [${dateStr}] Ingest | ${baseFileName} | Pages touched: [[${data.title}]]`;
+    fs.appendFileSync(LOG_FILE, logEntry);
+
+    if (keep) {
+        console.log('Keeping original raw file in place (--keep enabled).');
+    } else {
+        const archivePath = path.join(config.RAW_ARCHIVE_DIR, path.basename(rawPath));
+        fs.copyFileSync(rawPath, archivePath);
+        fs.unlinkSync(rawPath);
+        console.log(`Archived raw file to ${archivePath}`);
+    }
+
+    console.log('Ingest complete.');
+}
+
 program.command('config')
     .description('Generate or update the local configuration file (~/.wiki.json)')
     .option('--wiki-root <path>', 'Set WIKI_ROOT')
@@ -136,24 +213,72 @@ program.command('config')
 
 program.command('add <file>')
     .description('Ingest a raw file into the Wiki')
-    .action(async (file) => {
+    .option('--keep', 'Keep the original raw file instead of archiving it')
+    .action(async (file, options) => {
         try {
-            initDirectories();
-            const rawPath = path.resolve(file);
-            console.log(`Reading raw file: ${rawPath}`);
-            const content = fs.readFileSync(rawPath, 'utf8');
-            
-            console.log('Extracting concepts and inferring taxonomy via LLM...');
-            const data = await extractConcepts(content);
-            console.log(`Inferred: ${data.l1} -> ${data.l2} -> ${data.l3}`);
-            
-            const dateStr = new Date().toISOString().split('T')[0];
-            const baseFileName = path.basename(rawPath, '.md');
-            
-            const nodeContent = `---
+            await ingestFile(file, { keep: options.keep });
+        } catch (e) {
+            console.error('Error:', e.message);
+        }
+    });
+
+program.command('batch <dir>')
+    .description('Recursively ingest all markdown files in a directory while keeping originals')
+    .action(async (dir) => {
+        try {
+            const rootDir = path.resolve(dir);
+            const files = collectMarkdownFiles(rootDir);
+            console.log(`Found ${files.length} markdown files in ${rootDir}`);
+
+            for (let i = 0; i < files.length; i++) {
+                console.log(`\n[${i + 1}/${files.length}] Ingesting ${files[i]}`);
+                await ingestFile(files[i], { keep: true });
+            }
+
+            console.log(`Batch ingest complete. Processed ${files.length} files.`);
+        } catch (e) {
+            console.error('Error:', e.message);
+        }
+    });
+
+
+function findMarkdownFiles(dir, fileList = []) {
+    const files = fs.readdirSync(dir);
+    for (const file of files) {
+        if (file.startsWith('.')) continue; // skip hidden
+        const filePath = path.join(dir, file);
+        if (fs.statSync(filePath).isDirectory()) {
+            findMarkdownFiles(filePath, fileList);
+        } else if (file.endsWith('.md')) {
+            fileList.push(filePath);
+        }
+    }
+    return fileList;
+}
+
+program.command('batch <dir>')
+    .description('Batch ingest all markdown files in a directory')
+    .option('--keep', 'Do not move or delete the raw files', true)
+    .action(async (dir, options) => {
+        initDirectories();
+        const fullDir = path.resolve(dir);
+        console.log(`Scanning directory: ${fullDir}`);
+        const files = findMarkdownFiles(fullDir);
+        console.log(`Found ${files.length} markdown files. Beginning batch ingest...`);
+        
+        for (const file of files) {
+            console.log(`\n--- Processing ${file} ---`);
+            // we simulate the 'add' action logic here or we can just extract it to a function
+            try {
+                const content = fs.readFileSync(file, 'utf8');
+                const data = await extractConcepts(content);
+                const dateStr = new Date().toISOString().split('T')[0];
+                const baseFileName = path.basename(file, '.md');
+                
+                const nodeContent = `---
 Created: '${dateStr}'
 Updated: '${dateStr}'
-Tags: ['#concept', '#wiki']
+Tags: ['#concept', '#llm-wiki']
 ---
 # ${data.title}
 
@@ -164,26 +289,24 @@ ${data.content}
 ## Sources
 - [[${baseFileName}]]
 `;
-            
-            const nodePath = path.join(NODES_DIR, `${data.title}.md`);
-            fs.writeFileSync(nodePath, nodeContent);
-            console.log(`Created node: ${nodePath}`);
-            
-            updateIndex(data, data.title);
-            console.log(`Updated index.md with new link.`);
-            
-            const logEntry = `\n## [${dateStr}] Ingest | ${baseFileName} | Pages touched: [[${data.title}]]`;
-            fs.appendFileSync(LOG_FILE, logEntry);
-            
-            const archivePath = path.join(config.RAW_ARCHIVE_DIR, path.basename(rawPath));
-            fs.copyFileSync(rawPath, archivePath);
-            fs.unlinkSync(rawPath);
-            console.log(`Archived raw file to ${archivePath}`);
-            
-            console.log('Ingest complete.');
-        } catch (e) {
-            console.error('Error:', e.message);
+                const nodePath = path.join(NODES_DIR, `${data.title}.md`);
+                fs.writeFileSync(nodePath, nodeContent);
+                console.log(`Created/Updated node: ${nodePath}`);
+                updateIndex(data, data.title);
+                
+                const logEntry = `\n## [${dateStr}] Batch Ingest | ${baseFileName} | Pages touched: [[${data.title}]]`;
+                fs.appendFileSync(LOG_FILE, logEntry);
+                
+                if (!options.keep) {
+                    const archivePath = path.join(config.RAW_ARCHIVE_DIR, path.basename(file));
+                    fs.copyFileSync(file, archivePath);
+                    fs.unlinkSync(file);
+                }
+            } catch (e) {
+                console.error(`Failed to process ${file}: ${e.message}`);
+            }
         }
+        console.log('\nBatch processing complete.');
     });
 
 program.command('lint')
