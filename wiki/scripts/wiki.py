@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import fnmatch
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -27,11 +28,47 @@ DEFAULT_EXCLUDES = [
 ]
 CATEGORY_RULES = [
     (["agent", "assistant", "tool", "workflow", "automation"], ["Computer Science", "AI Systems", "Agents"]),
+    (["infra", "infrastructure", "cluster", "runtime", "container", "vm", "orchestration", "deploy"], ["Computer Science", "AI Systems", "Infrastructure"]),
     (["memory", "context", "recall", "buffer", "state"], ["Computer Science", "AI Systems", "Memory"]),
+    (["research", "paper", "trend", "survey", "arxiv"], ["Computer Science", "AI Systems", "Research"]),
     (["search", "retrieval", "index", "embedding", "vector"], ["Computer Science", "Knowledge Systems", "Retrieval"]),
-    (["product", "market", "strategy", "company", "startup"], ["Business", "Strategy", "Product Strategy"]),
+    (["product", "market", "strategy", "company", "startup"], ["Culture", "Technology", "Product Strategy"]),
     (["design", "typography", "layout", "color", "ui"], ["Design", "Interface Design", "Visual Systems"]),
 ]
+SYSTEM_NOTE_NAMES = {
+    "dashboard",
+    "dashboard-index",
+    "index",
+    "readme",
+    "summary",
+    "log",
+}
+LAYER_LABEL_RE = re.compile(r"^layer[123]\s*:\s*", re.IGNORECASE)
+STOPWORDS = {
+    "a",
+    "an",
+    "and",
+    "are",
+    "as",
+    "at",
+    "be",
+    "by",
+    "for",
+    "from",
+    "how",
+    "in",
+    "is",
+    "it",
+    "of",
+    "on",
+    "or",
+    "that",
+    "the",
+    "this",
+    "to",
+    "use",
+    "with",
+}
 
 
 @dataclass
@@ -55,7 +92,7 @@ class WikiConfig:
 
     @property
     def category_tree_path(self) -> Path:
-        return self.generated_root / "category_tree.md"
+        return self.generated_root / "index.md"
 
 
 def utc_now() -> str:
@@ -77,17 +114,51 @@ def safe_title(value: str) -> str:
     return value or "Untitled"
 
 
+def strip_layer_label(value: str) -> str:
+    return safe_title(LAYER_LABEL_RE.sub("", value.strip()))
+
+
+def format_layer_label(depth: int, value: str) -> str:
+    return f"layer{depth}: {safe_title(value)}"
+
+
+def markdown_label(value: str) -> str:
+    match = re.match(r"\[([^\]]+)\]\([^)]+\)$", value.strip())
+    if match:
+        return match.group(1)
+    return value.strip()
+
+
 def read_json(path: Path, default: Any) -> Any:
     if not path.exists():
         return default
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def merge_dicts(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
+    merged = dict(base)
+    for key, value in override.items():
+        if isinstance(value, dict) and isinstance(merged.get(key), dict):
+            merged[key] = merge_dicts(merged[key], value)
+        else:
+            merged[key] = value
+    return merged
+
+
 def load_config(config_path: str | None) -> WikiConfig:
     explicit_path = Path(config_path).expanduser().resolve() if config_path else None
-    default_path = Path("~/.wiki/config.json").expanduser()
-    source_path = explicit_path if explicit_path else default_path
-    raw = read_json(source_path, {}) if source_path.exists() else {}
+    global_path = Path("~/.wiki/config.json").expanduser()
+
+    if explicit_path:
+        raw = read_json(explicit_path, {}) if explicit_path.exists() else {}
+    else:
+        raw = read_json(global_path, {}) if global_path.exists() else {}
+        hinted_notebook_root = Path(raw.get("notebook_root") or str(Path.home() / "Documents" / "kevinhusnotes")).expanduser().resolve()
+        hinted_generated_root = Path(raw.get("generated_root") or str(hinted_notebook_root / "_WIKI")).expanduser().resolve()
+        local_path = hinted_generated_root / "config.json"
+        if local_path.exists():
+            local_raw = read_json(local_path, {})
+            raw = merge_dicts(raw, local_raw)
 
     notebook_root = Path(raw.get("notebook_root") or str(Path.home() / "Documents" / "kevinhusnotes")).expanduser().resolve()
     generated_root = Path(raw.get("generated_root") or str(notebook_root / "_WIKI")).expanduser().resolve()
@@ -104,6 +175,8 @@ def ensure_layout(config: WikiConfig) -> None:
     config.categories_dir.mkdir(parents=True, exist_ok=True)
     if not config.log_path.exists():
         config.log_path.write_text("# Wiki Log\n\n", encoding="utf-8")
+    if not config.index_path.exists():
+        config.index_path.write_text("# Wiki Index\n\n## Category Tree\n\n---\n\n## Skipped System Notes\n- None\n", encoding="utf-8")
 
 
 def parse_frontmatter(text: str) -> tuple[dict[str, Any], str]:
@@ -171,15 +244,17 @@ def infer_category(title: str, text: str, source_relpath: str) -> list[str]:
         if score > best_score:
             best_score = score
             best = category
-    if best_score == 0:
-        parts = Path(source_relpath).parts[:-1]
-        if len(parts) >= 3:
-            return [safe_title(part.replace("_", " ")) for part in parts[:3]]
-        if len(parts) == 2:
-            return [safe_title(parts[0]), safe_title(parts[1]), "General"]
-        if len(parts) == 1 and parts[0]:
-            return [safe_title(parts[0]), "Notes", "General"]
     return best
+
+
+def configured_category(config: WikiConfig, source_relpath: str) -> list[str] | None:
+    config_path = config.generated_root / "config.json"
+    raw = read_json(config_path, {}) if config_path.exists() else {}
+    override = (raw.get("category_overrides") or {}).get(source_relpath)
+    if not override:
+        return None
+    category = [safe_title(part) for part in override[:3]]
+    return category if len(category) == 3 else None
 
 
 def gather_source_files(config: WikiConfig) -> list[Path]:
@@ -201,23 +276,46 @@ def gather_source_files(config: WikiConfig) -> list[Path]:
     return sorted(set(files))
 
 
-def parse_category_tree(path: Path) -> set[tuple[str, str, str]]:
+def extract_tree_section_from_index(path: Path) -> str | None:
     if not path.exists():
-        return set()
-    allowed: set[tuple[str, str, str]] = set()
-    current_l1 = None
-    current_l2 = None
-    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        return None
+    text = path.read_text(encoding="utf-8")
+    if "## Category Tree" not in text or "\n---\n" not in text:
+        return None
+    after_header = text.split("## Category Tree", 1)[1]
+    tree_block, _, _ = after_header.partition("\n---\n")
+    return tree_block.strip()
+
+
+def parse_category_tree_structure(path: Path) -> list[dict[str, Any]]:
+    text = extract_tree_section_from_index(path)
+    if not text:
+        return []
+    tree: list[dict[str, Any]] = []
+    current_l1: dict[str, Any] | None = None
+    current_l2: dict[str, Any] | None = None
+    for raw_line in text.splitlines():
         line = raw_line.rstrip()
         if line.startswith("### "):
-            current_l1 = safe_title(line[4:])
+            current_l1 = {"name": strip_layer_label(markdown_label(line[4:])), "children": []}
+            tree.append(current_l1)
             current_l2 = None
             continue
-        if line.startswith("- ") and current_l1:
-            current_l2 = safe_title(line[2:])
+        if line.startswith("- ") and current_l1 and not line.startswith("  - "):
+            current_l2 = {"name": strip_layer_label(markdown_label(line[2:])), "children": []}
+            current_l1["children"].append(current_l2)
             continue
         if line.startswith("  - ") and current_l1 and current_l2:
-            allowed.add((current_l1, current_l2, safe_title(line[4:])))
+            current_l2["children"].append(strip_layer_label(markdown_label(line[4:])))
+    return tree
+
+
+def parse_category_tree(path: Path) -> set[tuple[str, str, str]]:
+    allowed: set[tuple[str, str, str]] = set()
+    for l1 in parse_category_tree_structure(path):
+        for l2 in l1["children"]:
+            for l3 in l2["children"]:
+                allowed.add((l1["name"], l2["name"], l3))
     return allowed
 
 
@@ -247,10 +345,11 @@ def extract_packet_from_note(path: Path, config: WikiConfig) -> dict[str, Any]:
     sentences = split_sentences(cleaned)
     summary = summarize_text(sentences[0] if sentences else cleaned or title)
     rel = normalize_path(path.relative_to(config.notebook_root))
+    category_override = configured_category(config, rel)
     return {
         "title": title,
         "summary": summary,
-        "category_path": infer_category(title, cleaned, rel),
+        "category_path": category_override or infer_category(title, cleaned, rel),
         "tags": [],
         "source": rel,
     }
@@ -297,6 +396,11 @@ def active_catalog(config: WikiConfig) -> dict[str, dict[str, Any]]:
     return catalog
 
 
+def is_system_note(source: str) -> bool:
+    lowered = slugify(Path(source).stem)
+    return lowered in SYSTEM_NOTE_NAMES
+
+
 def category_page_path(config: WikiConfig, path_parts: Sequence[str]) -> Path:
     current = config.categories_dir
     for part in path_parts:
@@ -304,77 +408,161 @@ def category_page_path(config: WikiConfig, path_parts: Sequence[str]) -> Path:
     return current / "index.md"
 
 
-def summarize_branch(path_parts: Sequence[str], notes: list[dict[str, Any]], child_names: list[str]) -> str:
+def branch_intro(path_parts: Sequence[str], notes: list[dict[str, Any]], child_names: list[str]) -> str:
     if child_names:
-        return summarize_text(f"This branch covers {', '.join(child_names[:4])} and {len(notes)} indexed notes under {' -> '.join(path_parts)}.")
+        return summarize_text(
+            f"{' -> '.join(path_parts)} groups {', '.join(child_names[:5])}. "
+            f"It currently references {len(notes)} notes that help future retrieval and Q&A for this branch."
+        )
     titles = [note["title"] for note in notes[:4]]
-    return summarize_text(f"This branch covers {', '.join(titles) or 'indexed notes'} under {' -> '.join(path_parts)}.")
+    return summarize_text(
+        f"{' -> '.join(path_parts)} focuses on {', '.join(titles) or 'the linked notes'}. "
+        f"Use this page as the compact retrieval context for this topic."
+    )
+
+
+def layer_metadata(path_parts: Sequence[str]) -> list[str]:
+    return [f"- {format_layer_label(index + 1, part)}" for index, part in enumerate(path_parts)]
+
+
+def relative_category_link(path_parts: Sequence[str], target_parts: Sequence[str]) -> str:
+    target = Path(*[slugify(part) for part in target_parts]) / "index.md"
+    if not path_parts:
+        return normalize_path(Path("categories") / target)
+    current = Path(*[slugify(part) for part in path_parts]) / "index.md"
+    return normalize_path(Path(os.path.relpath(target, start=current.parent)))
+
+
+def branch_keywords(path_parts: Sequence[str], notes: list[dict[str, Any]], child_names: list[str]) -> list[str]:
+    tokens = Counter()
+    for part in path_parts:
+        tokens.update(tokenize(part))
+    for child in child_names:
+        tokens.update(tokenize(child))
+    for note in notes:
+        tokens.update(tokenize(note["title"]))
+        tokens.update(tokenize(note.get("summary", "")))
+        for tag in note.get("tags", []):
+            tokens.update(tokenize(tag))
+    banned = {"layer1", "layer2", "layer3", "notes", "note", *STOPWORDS}
+    return [token for token, _ in tokens.most_common(12) if token not in banned][:8]
 
 
 def render_category_page(path_parts: Sequence[str], child_names: list[str], notes: list[dict[str, Any]]) -> str:
+    depth = len(path_parts)
     lines = [
-        f"# {' / '.join(path_parts)}",
+        f"# {format_layer_label(depth, path_parts[-1])}",
         "",
-        summarize_branch(path_parts, notes, child_names),
+        "## Layer Path",
+        *layer_metadata(path_parts),
         "",
-        "## Subcategories",
+        "## Brief Intro",
+        branch_intro(path_parts, notes, child_names),
+        "",
+        "## Topics Covered",
     ]
-    if child_names:
+    if child_names or notes:
         for child in child_names:
-            lines.append(f"- {child}")
+            lines.append(f"- [{format_layer_label(depth + 1, child)}]({relative_category_link(path_parts, [*path_parts, child])})")
+        for note in sorted(notes, key=lambda item: item["title"].lower()):
+            lines.append(f"- [[{note['source']}]] - {note['title']}")
     else:
         lines.append("- None")
-    lines.extend(["", "## Notes"])
+    lines.extend(["", "## References"])
     if notes:
         for note in sorted(notes, key=lambda item: item["title"].lower()):
             tag_text = f" ({' '.join(note['tags'])})" if note.get("tags") else ""
-            lines.append(f"- [[{note['source']}]] - {note['title']}: {note['summary']}{tag_text}")
+            lines.append(f"- [[{note['source']}]] - {note['summary']}{tag_text}")
     else:
         lines.append("- None")
+    lines.extend(["", "## Search Cues"])
+    keywords = branch_keywords(path_parts, notes, child_names)
+    lines.append(f"- Keywords: {', '.join(keywords)}" if keywords else "- Keywords: none yet")
     return "\n".join(lines).rstrip() + "\n"
 
 
-def render_index(config: WikiConfig, catalog: dict[str, dict[str, Any]], unindexed: list[str]) -> str:
-    grouped: dict[str, dict[str, dict[str, list[dict[str, Any]]]]] = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
-    for note in catalog.values():
-        l1, l2, l3 = note["category_path"]
-        grouped[l1][l2][l3].append(note)
+def suggest_unindexed_packets(config: WikiConfig, sources: list[str]) -> list[dict[str, Any]]:
+    packets = []
+    for source in sources:
+        if is_system_note(source):
+            continue
+        source_path = config.notebook_root / source
+        if not source_path.exists():
+            continue
+        packets.append(extract_packet_from_note(source_path, config))
+    return packets
+
+
+def combined_notes(catalog: dict[str, dict[str, Any]], suggested: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    merged = {source: dict(note) for source, note in catalog.items()}
+    for note in suggested:
+        merged.setdefault(note["source"], dict(note))
+    return sorted(merged.values(), key=lambda item: item["source"].lower())
+
+
+def tree_from_paths(paths: set[tuple[str, str, str]]) -> list[dict[str, Any]]:
+    grouped: dict[str, dict[str, set[str]]] = defaultdict(lambda: defaultdict(set))
+    for l1, l2, l3 in sorted(paths):
+        grouped[l1][l2].add(l3)
+    tree: list[dict[str, Any]] = []
+    for l1 in sorted(grouped):
+        second_level = []
+        for l2 in sorted(grouped[l1]):
+            third_level = sorted(grouped[l1][l2])
+            if third_level:
+                second_level.append({"name": l2, "children": third_level})
+        if second_level:
+            tree.append({"name": l1, "children": second_level})
+    return tree
+
+
+def render_category_tree(tree: list[dict[str, Any]], notes: list[dict[str, Any]]) -> str:
+    notes_by_path: dict[tuple[str, str, str], list[dict[str, Any]]] = defaultdict(list)
+    declared_paths = {
+        (l1["name"], l2["name"], l3)
+        for l1 in tree
+        for l2 in l1["children"]
+        for l3 in l2["children"]
+    }
+    note_paths = {tuple(note["category_path"]) for note in notes}
+    effective = tree_from_paths(declared_paths | note_paths)
+    for note in notes:
+        notes_by_path[tuple(note["category_path"])].append(note)
+
     lines = [
-        "# Wiki Index",
+        "## Category Tree",
         "",
-        f"_Last rebuilt: {utc_now()}_",
-        "",
-        f"- Indexed notes: {len(catalog)}",
+        "This tree is the classification reference for the wiki. Each branch uses deterministic layer labels so add and search can target a specific depth.",
         "",
     ]
-    for l1 in sorted(grouped):
-        lines.append(f"## {l1}")
-        l1_rel = normalize_path(Path("categories") / slugify(l1) / "index.md")
-        lines.append(f"- [Overview]({l1_rel})")
-        for l2 in sorted(grouped[l1]):
-            lines.append(f"### {l2}")
-            l2_rel = normalize_path(Path("categories") / slugify(l1) / slugify(l2) / "index.md")
-            lines.append(f"- [Overview]({l2_rel})")
-            for l3 in sorted(grouped[l1][l2]):
-                l3_rel = normalize_path(Path("categories") / slugify(l1) / slugify(l2) / slugify(l3) / "index.md")
-                count = len(grouped[l1][l2][l3])
-                lines.append(f"- [{l3}]({l3_rel}) ({count} notes)")
+    for l1 in effective:
+        l1_name = l1["name"]
+        l1_rel = normalize_path(Path("categories") / slugify(l1_name) / "index.md")
+        lines.append(f"### [{format_layer_label(1, l1_name)}]({l1_rel})")
+        for l2 in l1["children"]:
+            l2_name = l2["name"]
+            l2_rel = normalize_path(Path("categories") / slugify(l1_name) / slugify(l2_name) / "index.md")
+            lines.append(f"- [{format_layer_label(2, l2_name)}]({l2_rel})")
+            for l3 in l2["children"]:
+                l3_rel = normalize_path(Path("categories") / slugify(l1_name) / slugify(l2_name) / slugify(l3) / "index.md")
+                lines.append(f"  - [{format_layer_label(3, l3)}]({l3_rel})")
+                for note in sorted(notes_by_path.get((l1_name, l2_name, l3), []), key=lambda item: item["source"].lower()):
+                    lines.append(f"    - [[{note['source']}]]")
         lines.append("")
-    lines.append("## Unindexed Notes")
-    if unindexed:
-        for source in unindexed:
-            lines.append(f"- [[{source}]]")
-    else:
-        lines.append("- None")
     return "\n".join(lines).rstrip() + "\n"
 
 
 def rebuild_generated_views(config: WikiConfig, unindexed: list[str] | None = None) -> dict[str, Any]:
     ensure_layout(config)
     catalog = active_catalog(config)
+    unindexed = sorted(unindexed or [])
+    suggested = suggest_unindexed_packets(config, unindexed)
+    skipped_system = [source for source in unindexed if is_system_note(source)]
+    tree = parse_category_tree_structure(config.category_tree_path)
+    all_notes = combined_notes(catalog, suggested)
     groups: dict[tuple[str, ...], list[dict[str, Any]]] = defaultdict(list)
     children: dict[tuple[str, ...], set[str]] = defaultdict(set)
-    for note in catalog.values():
+    for note in all_notes:
         path = tuple(note["category_path"])
         for depth in range(1, 4):
             groups[path[:depth]].append(note)
@@ -399,16 +587,25 @@ def rebuild_generated_views(config: WikiConfig, unindexed: list[str] | None = No
             except OSError:
                 pass
 
-    config.index_path.write_text(render_index(config, catalog, sorted(unindexed or [])), encoding="utf-8")
-    return {"catalog": catalog, "category_pages": len(valid_pages)}
+    tree_section = render_category_tree(tree, all_notes) if tree or all_notes else "## Category Tree\n\n- None\n"
+    body_section = "## Skipped System Notes\n"
+    if skipped_system:
+        for source in skipped_system:
+            body_section += f"- [[{source}]]\n"
+    else:
+        body_section += "- None\n"
+    combined = "# Wiki Index\n\n" + tree_section + "\n\n---\n\n" + body_section
+    config.index_path.write_text(combined, encoding="utf-8")
+    return {"catalog": catalog, "category_pages": len(valid_pages), "suggested": suggested, "all_notes": all_notes}
 
 
 def obsidian_search(config: WikiConfig, query: str) -> list[dict[str, Any]] | None:
     if not shutil.which("obsidian-cli"):
         return None
     try:
+        vault_name = config.notebook_root.name
         result = subprocess.run(
-            ["obsidian-cli", "search", query],
+            ["obsidian-cli", "search-content", query, "--vault", vault_name],
             cwd=str(config.notebook_root),
             capture_output=True,
             text=True,
@@ -464,7 +661,6 @@ def cmd_add(args: argparse.Namespace) -> int:
     if not config.category_tree_path.exists():
         raise SystemExit(f"missing category tree: {config.category_tree_path}")
 
-    allowed = parse_category_tree(config.category_tree_path)
     packets: list[dict[str, Any]] = []
     if args.packet:
         payload = read_json(Path(args.packet).expanduser().resolve(), None)
@@ -477,9 +673,6 @@ def cmd_add(args: argparse.Namespace) -> int:
     added = []
     for packet in packets:
         normalized = normalize_packet(packet, config)
-        category_tuple = tuple(normalized["category_path"])
-        if allowed and category_tuple not in allowed:
-            raise SystemExit(f"category path not present in category_tree.md: {' -> '.join(normalized['category_path'])}")
         source_path = (config.notebook_root / normalized["source"]).resolve()
         if not source_path.exists():
             raise SystemExit(f"missing source note: {normalized['source']}")
@@ -529,7 +722,7 @@ def cmd_search(args: argparse.Namespace) -> int:
     config = load_config(args.config)
     note_matches = obsidian_search(config, args.query)
     backend = "obsidian-cli"
-    if note_matches is None:
+    if not note_matches:
         backend = "rg"
         note_matches = rg_search(config.notebook_root, args.query)
     generated_matches = generated_search(config, args.query)
@@ -552,7 +745,7 @@ def cmd_lint(args: argparse.Namespace) -> int:
     ensure_layout(config)
     issues: list[str] = []
     if not config.category_tree_path.exists():
-        issues.append("missing category_tree.md")
+        issues.append("missing index.md")
 
     allowed = parse_category_tree(config.category_tree_path)
     catalog = active_catalog(config)

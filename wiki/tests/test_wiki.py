@@ -2,24 +2,27 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from os import environ
+from unittest.mock import patch
 
 from wiki.scripts import wiki
 
 
-TREE_TEXT = """# Category Tree
+TREE_TEXT = """## Category Tree
 
 ### Computer Science
 - AI Systems
   - Agents
   - Memory
+  - Research
 - Knowledge Systems
   - Retrieval
   - Wikis
 
-### Business
-- Strategy
-  - Product Strategy
-  - Positioning
+### Culture
+- Technology
+  - Society
+  - Briefings
 """
 
 
@@ -36,7 +39,12 @@ class WikiScriptTests(unittest.TestCase):
         self.notebook.mkdir()
         self.generated = self.notebook / "_WIKI"
         self.generated.mkdir()
-        (self.generated / "category_tree.md").write_text(TREE_TEXT, encoding="utf-8")
+        (self.generated / "index.md").write_text(
+            "# Wiki Index\n\n"
+            + TREE_TEXT
+            + "\n\n---\n\n## Skipped System Notes\n- None\n",
+            encoding="utf-8",
+        )
         self.config_path = self.root / "config.json"
         self.config_path.write_text(
             json.dumps(
@@ -59,6 +67,38 @@ class WikiScriptTests(unittest.TestCase):
     def load_text(self, path: Path) -> str:
         return path.read_text(encoding="utf-8")
 
+    def test_local_generated_root_config_overrides_global(self) -> None:
+        global_config_dir = self.root / ".wiki"
+        global_config_dir.mkdir()
+        global_config_path = global_config_dir / "config.json"
+        global_config_path.write_text(
+            json.dumps(
+                {
+                    "notebook_root": str(self.notebook),
+                    "include_roots": ["Wrong"],
+                    "generated_root": str(self.generated),
+                }
+            ),
+            encoding="utf-8",
+        )
+        local_config_path = self.generated / "config.json"
+        local_config_path.write_text(
+            json.dumps(
+                {
+                    "notebook_root": str(self.notebook),
+                    "include_roots": ["."],
+                    "generated_root": str(self.generated),
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        with patch.dict(environ, {"HOME": str(self.root)}):
+            config = wiki.load_config(None)
+
+        self.assertEqual(config.generated_root, self.generated.resolve())
+        self.assertEqual(config.include_roots, [self.notebook.resolve()])
+
     def test_add_packet_updates_log_index_and_categories(self) -> None:
         write_note(self.notebook / "Notes" / "Delegation.md", "# Delegation\n\nDelegate work to subagents when tasks are well scoped.")
         packet_path = self.root / "packet.json"
@@ -79,11 +119,14 @@ class WikiScriptTests(unittest.TestCase):
         self.assertEqual(rc, 0)
         self.assertIn('"action": "add"', self.load_text(self.generated / "log.md"))
         self.assertIn("Computer Science", self.load_text(self.generated / "index.md"))
+        self.assertIn("## Category Tree", self.load_text(self.generated / "index.md"))
+        self.assertIn("[layer1: Computer Science](categories/computer-science/index.md)", self.load_text(self.generated / "index.md"))
+        self.assertIn("[[Notes/Delegation.md]]", self.load_text(self.generated / "index.md"))
         category_page = self.generated / "categories" / "computer-science" / "ai-systems" / "agents" / "index.md"
         self.assertTrue(category_page.exists())
         self.assertIn("[[Notes/Delegation.md]]", self.load_text(category_page))
 
-    def test_add_requires_category_in_tree(self) -> None:
+    def test_add_can_extend_tree(self) -> None:
         write_note(self.notebook / "Notes" / "Odd.md", "# Odd\n\nA note with an unsupported category.")
         packet_path = self.root / "packet.json"
         packet_path.write_text(
@@ -99,8 +142,10 @@ class WikiScriptTests(unittest.TestCase):
             encoding="utf-8",
         )
 
-        with self.assertRaises(SystemExit):
-            self.run_cli("add", "--packet", str(packet_path))
+        rc = self.run_cli("add", "--packet", str(packet_path))
+        self.assertEqual(rc, 0)
+        self.assertIn("layer1: Design", self.load_text(self.generated / "index.md"))
+        self.assertIn("[[Notes/Odd.md]]", self.load_text(self.generated / "index.md"))
 
     def test_index_logs_removed_notes_and_reports_unindexed(self) -> None:
         write_note(self.notebook / "Notes" / "State.md", "# State\n\nState keeps workflows coherent.")
@@ -119,6 +164,7 @@ class WikiScriptTests(unittest.TestCase):
         )
         self.run_cli("add", "--packet", str(packet_path))
         write_note(self.notebook / "Notes" / "Unindexed.md", "# Unindexed\n\nThis note has not been classified yet.")
+        write_note(self.notebook / "Notes" / "Dashboard Index.md", "# Dashboard Index\n\nSystem overview note.")
         (self.notebook / "Notes" / "State.md").unlink()
 
         rc = self.run_cli("index")
@@ -126,6 +172,10 @@ class WikiScriptTests(unittest.TestCase):
         log_text = self.load_text(self.generated / "log.md")
         self.assertIn('"action": "remove"', log_text)
         self.assertIn("Unindexed.md", self.load_text(self.generated / "index.md") or "")
+        self.assertIn("Unsorted", self.load_text(self.generated / "index.md"))
+        self.assertIn("Dashboard Index.md", self.load_text(self.generated / "index.md"))
+        self.assertIn("Unindexed.md", self.load_text(self.generated / "index.md"))
+        self.assertNotIn("Indexed Notes By Category", self.load_text(self.generated / "index.md"))
 
     def test_search_uses_generated_docs_as_fallback_context(self) -> None:
         write_note(self.notebook / "AI" / "Retrieval.md", "# Retrieval\n\nSearch systems use retrieval and ranking.")
@@ -146,6 +196,11 @@ class WikiScriptTests(unittest.TestCase):
 
         rc = self.run_cli("search", "ranking")
         self.assertEqual(rc, 0)
+        index_text = self.load_text(self.generated / "index.md")
+        self.assertIn("layer3: Retrieval", index_text)
+        category_page = self.load_text(self.generated / "categories" / "computer-science" / "knowledge-systems" / "retrieval" / "index.md")
+        self.assertIn("## Brief Intro", category_page)
+        self.assertIn("## Search Cues", category_page)
 
     def test_lint_flags_unindexed_and_missing_sources(self) -> None:
         write_note(self.notebook / "Notes" / "Delegation.md", "# Delegation\n\nDelegate work to subagents.")

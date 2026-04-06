@@ -1,56 +1,34 @@
 # Category Tree
 
-Use this file to establish the approved classification tree before indexing the full notebook.
+Use this file as the starter tree block before indexing the full notebook. Copy it into the top of `index.md`, above the `---` separator.
 
 Rules of thumb:
-- Keep exactly three hierarchy layers before concept pages.
+- Keep exactly three hierarchy layers before note leaves.
 - Aim for roughly 5-10 children at each level.
 - Prefer durable category names over narrow project-specific labels.
 - Add a new subtree only when several concepts clearly do not fit the current tree.
 
 ## Proposed Tree
 
-### Computer Science
-- AI Systems
-  - Agents
-  - Memory
-  - Evaluation
-- Knowledge Systems
-  - Retrieval
-  - Wikis
-  - Notes Infrastructure
-- Software Engineering
-  - Tooling
-  - Testing
-  - Architecture
+### layer1: Computer Science
+- [layer2: AI Systems](categories/computer-science/ai-systems/index.md)
+  - [layer3: Agents](categories/computer-science/ai-systems/agents/index.md)
+  - [layer3: Memory](categories/computer-science/ai-systems/memory/index.md)
+  - [layer3: Research](categories/computer-science/ai-systems/research/index.md)
+- [layer2: Knowledge Systems](categories/computer-science/knowledge-systems/index.md)
+  - [layer3: Retrieval](categories/computer-science/knowledge-systems/retrieval/index.md)
+  - [layer3: Wikis](categories/computer-science/knowledge-systems/wikis/index.md)
+  - [layer3: Notes Infrastructure](categories/computer-science/knowledge-systems/notes-infrastructure/index.md)
 
-### Business
-- Strategy
-  - Product Strategy
-  - Distribution
-  - Positioning
-- Organizations
-  - Team Design
-  - Management
-  - Operations
-- Markets
-  - Competition
-  - Pricing
-  - Customer Segments
-
-### Design
-- Interface Design
-  - Layout
-  - Typography
-  - Visual Systems
-- Research
-  - User Insight
-  - Interaction Patterns
-  - Information Architecture
-- Creative Direction
-  - Brand
-  - Voice
-  - Motion
+### layer1: Culture
+- [layer2: Technology](categories/culture/technology/index.md)
+  - [layer3: Product Strategy](categories/culture/technology/product-strategy/index.md)
+  - [layer3: Society](categories/culture/technology/society/index.md)
+  - [layer3: Briefings](categories/culture/technology/briefings/index.md)
+- [layer2: Research](categories/culture/research/index.md)
+  - [layer3: History](categories/culture/research/history/index.md)
+  - [layer3: Papers](categories/culture/research/papers/index.md)
+  - [layer3: Essays](categories/culture/research/essays/index.md)
 
 ## Notes
 

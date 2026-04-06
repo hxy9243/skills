@@ -4,11 +4,11 @@ Use this workflow when the task is to add one or a few source notes into the gen
 
 ## Goal
 
-Convert raw notes into normalized concept packets, then hand those packets to `scripts/wiki.py` so the backend can upsert concept pages, update ancestor summaries, and refresh manifests and search artifacts.
+Convert raw notes into normalized classification packets, then hand those packets to `scripts/wiki.py` so the backend can update `index.md`, regenerate category pages, and append to `log.md`.
 
 Use the active model from the invoking skill/session. Do not add model settings to wiki config or backend calls.
 
-Always consult the approved `category_tree.md` before choosing `category_path`.
+Always consult the approved category tree at the top of `index.md` before choosing `category_path`. Use the deterministic branch labels `layer1:`, `layer2:`, and `layer3:` when referring to parts of the tree.
 
 ## Packet Shape
 
@@ -24,12 +24,12 @@ Produce JSON objects with these fields:
 }
 ```
 
-The backend derives stable IDs and any richer internal fields from this lighter packet shape.
+The backend keeps this packet shape lightweight and deterministic.
 
 ## Workflow
 
 1. Read the source note carefully.
-2. Read the approved `category_tree.md` and find the best-fitting branch.
+2. Read the approved category tree from the top of `index.md` and find the best-fitting branch.
 3. Normalize it into one concept packet unless there is a strong reason to split it.
 4. Keep category paths broad and durable.
 5. If the note clearly does not fit, extend the tree with the smallest necessary new subtree while preserving the three-level structure.

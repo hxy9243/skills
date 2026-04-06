@@ -11,8 +11,17 @@
     "Archive/**"
   ],
   "generated_root": "/absolute/path/to/notebook/_WIKI",
+  "category_overrides": {
+    "00_Inbox/Some Note.md": [
+      "Computer Science",
+      "AI Systems",
+      "Agents"
+    ]
+  },
   "search": {
-    "lexical_limit": 8,
-    "semantic_limit": 8
+    "lexical_limit": 8
   }
 }
+
+Place this file at `_WIKI/config.json` for the notebook-specific default configuration.
+Use `category_overrides` for notebook-specific placements you want to keep stable across rebuilds.
