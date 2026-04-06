@@ -298,17 +298,17 @@ def parse_category_tree_structure(path: Path) -> list[dict[str, Any]]:
         line = raw_line.rstrip()
         stripped = line.lstrip()
         indent = len(line) - len(stripped)
-        if indent == 0 and stripped.startswith("- [layer1:"):
-            current_l1 = {"name": strip_layer_label(markdown_label(stripped[2:])), "children": []}
+        if indent == 0 and stripped.startswith("- layer1:"):
+            current_l1 = {"name": strip_layer_label(markdown_label(stripped[len("- layer1:") :])), "children": []}
             tree.append(current_l1)
             current_l2 = None
             continue
-        if indent == 2 and stripped.startswith("- [layer2:") and current_l1:
-            current_l2 = {"name": strip_layer_label(markdown_label(stripped[2:])), "children": []}
+        if indent == 2 and stripped.startswith("- layer2:") and current_l1:
+            current_l2 = {"name": strip_layer_label(markdown_label(stripped[len("- layer2:") :])), "children": []}
             current_l1["children"].append(current_l2)
             continue
-        if indent == 4 and stripped.startswith("- [layer3:") and current_l1 and current_l2:
-            current_l2["children"].append(strip_layer_label(markdown_label(stripped[2:])))
+        if indent == 4 and stripped.startswith("- layer3:") and current_l1 and current_l2:
+            current_l2["children"].append(strip_layer_label(markdown_label(stripped[len("- layer3:") :])))
     return tree
 
 
@@ -540,14 +540,14 @@ def render_category_tree(tree: list[dict[str, Any]], notes: list[dict[str, Any]]
     for l1 in effective:
         l1_name = l1["name"]
         l1_rel = normalize_path(Path("categories") / slugify(l1_name) / "index.md")
-        lines.append(f"- [{format_layer_label(1, l1_name)}]({l1_rel})")
+        lines.append(f"- layer1: [{l1_name}]({l1_rel})")
         for l2 in l1["children"]:
             l2_name = l2["name"]
             l2_rel = normalize_path(Path("categories") / slugify(l1_name) / slugify(l2_name) / "index.md")
-            lines.append(f"  - [{format_layer_label(2, l2_name)}]({l2_rel})")
+            lines.append(f"  - layer2: [{l2_name}]({l2_rel})")
             for l3 in l2["children"]:
                 l3_rel = normalize_path(Path("categories") / slugify(l1_name) / slugify(l2_name) / slugify(l3) / "index.md")
-                lines.append(f"    - [{format_layer_label(3, l3)}]({l3_rel})")
+                lines.append(f"    - layer3: [{l3}]({l3_rel})")
                 for note in sorted(notes_by_path.get((l1_name, l2_name, l3), []), key=lambda item: item["source"].lower()):
                     lines.append(f"      - [[{note['source']}]]")
     lines.append("")

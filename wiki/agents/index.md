@@ -19,14 +19,16 @@ Use the active model from the invoking skill/session for any synthesis or classi
 - Ask the user to approve the tree before continuing to whole-repo indexing.
 - Use `templates/category_tree.md.example` as the starting tree block, then paste it into the top of `index.md`.
 3. Once the category tree in `index.md` is approved, treat it as the classification source of truth.
-4. After notes have been classified into the approved tree, rebuild generated views:
+4. For each new or changed note, spawn a classification subagent to determine its best `layer1/layer2/layer3` branch against the approved tree.
+5. Parallelize that note-classification work when the batch is large, but cap concurrency at 8 subagents at a time so runs stay tractable.
+6. After notes have been classified into the approved tree, rebuild generated views:
 
 ```bash
 python wiki/scripts/wiki.py index
 ```
 
-5. Review the generated category pages for touched branches. Use subagents to refine the synthesis at each layer when you need a better intro, topics-covered list, or search/Q&A framing than the deterministic baseline.
-6. If notes still need classification, generate packets and feed them through `add --packet` before rebuilding.
+7. Review the generated category pages for touched branches. Use subagents to refine the synthesis at each layer when you need a better intro, topics-covered list, or search/Q&A framing than the deterministic baseline.
+8. If notes still need classification, generate packets and feed them through `add --packet` before rebuilding.
 
 ## Responsibilities
 
@@ -36,6 +38,7 @@ python wiki/scripts/wiki.py index
 - Keep hierarchy labels broad enough to survive future indexing.
 - Keep the approved category tree in `index.md` updated when genuinely new subtrees are needed.
 - Use the deterministic `layer1:`, `layer2:`, and `layer3:` labels when proposing or editing branch names.
+- For bulk indexing, use note-level subagents as the classification workers and keep the run bounded to 8 concurrent workers.
 
 ## Do Not
 

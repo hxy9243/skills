@@ -76,14 +76,14 @@ Rule of thumb:
 - Keep each level to roughly 5-10 children.
 - Prefer broad, durable buckets over narrow one-off branches.
 - Expand the tree only when a concept clearly does not fit an existing branch.
-- Add layer to each layer of category for better future 
+- Prefix each category row with its depth marker so the tree stays machine- and prompt-friendly.
 
 Small example:
 
 ```text
-- layer1: Computer Science
-  - layer2: AI Systems
-    - layer3: Agents
+- layer1: [Computer Science](Computer Science)
+  - layer2: [AI Systems](AI Systems)
+    - layer3: [Agents](Agents)
       - Note 1 on AI Agent
       - Note 2 on AI Agent
 ```
@@ -116,6 +116,7 @@ The Python backend maintains:
 - Keep the approved category tree at the top of `index.md` as the classification reference for `add` and first-time `index`.
 - Keep `index.md` focused on the category tree itself. Do not regenerate a second browse-by-category section below it.
 - Prefer `index` for broad refreshes and `add` for small targeted updates.
+- For notebook-wide indexing, classify new notes with subagents in parallel when feasible, but cap concurrency at 8 notes at a time.
 - Use packet mode when a subagent has already normalized note classification data:
 
 ```bash

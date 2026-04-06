@@ -120,7 +120,7 @@ class WikiScriptTests(unittest.TestCase):
         self.assertIn('"action": "add"', self.load_text(self.generated / "log.md"))
         self.assertIn("Computer Science", self.load_text(self.generated / "index.md"))
         self.assertIn("## Category Tree", self.load_text(self.generated / "index.md"))
-        self.assertIn("[layer1: Computer Science](categories/computer-science/index.md)", self.load_text(self.generated / "index.md"))
+        self.assertIn("layer1: [Computer Science](categories/computer-science/index.md)", self.load_text(self.generated / "index.md"))
         self.assertIn("[[Notes/Delegation.md]]", self.load_text(self.generated / "index.md"))
         category_page = self.generated / "categories" / "computer-science" / "ai-systems" / "agents" / "index.md"
         self.assertTrue(category_page.exists())
@@ -144,7 +144,7 @@ class WikiScriptTests(unittest.TestCase):
 
         rc = self.run_cli("add", "--packet", str(packet_path))
         self.assertEqual(rc, 0)
-        self.assertIn("layer1: Design", self.load_text(self.generated / "index.md"))
+        self.assertIn("layer1: [Design]", self.load_text(self.generated / "index.md"))
         self.assertIn("[[Notes/Odd.md]]", self.load_text(self.generated / "index.md"))
 
     def test_index_logs_removed_notes_and_reports_unindexed(self) -> None:
@@ -197,7 +197,7 @@ class WikiScriptTests(unittest.TestCase):
         rc = self.run_cli("search", "ranking")
         self.assertEqual(rc, 0)
         index_text = self.load_text(self.generated / "index.md")
-        self.assertIn("layer3: Retrieval", index_text)
+        self.assertIn("layer3: [Retrieval]", index_text)
         category_page = self.load_text(self.generated / "categories" / "computer-science" / "knowledge-systems" / "retrieval" / "index.md")
         self.assertIn("## Brief Intro", category_page)
         self.assertIn("## Search Cues", category_page)
