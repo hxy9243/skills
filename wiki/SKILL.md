@@ -76,28 +76,16 @@ Rule of thumb:
 - Keep each level to roughly 5-10 children.
 - Prefer broad, durable buckets over narrow one-off branches.
 - Expand the tree only when a concept clearly does not fit an existing branch.
+- Add layer to each layer of category for better future 
 
 Small example:
 
 ```text
-Computer Science
-  AI Systems
-    Memory
-      State.md
-      Context Windows.md
-    Agents
-      Tool Use.md
-      Workflow Delegation.md
-```
-
-More polished top-level index example:
-
-```text
-layer1: Computer Science
-  layer2: AI Systems
-    layer3: Agents
-      Note 1 on AI Agent
-      Note 2 on AI Agent
+- layer1: Computer Science
+  - layer2: AI Systems
+    - layer3: Agents
+      - Note 1 on AI Agent
+      - Note 2 on AI Agent
 ```
 
 ## First-Time Setup
