@@ -45,8 +45,8 @@ Format your output as a strict JSON object with:
 - "title": MUST match an existing node title if synthesizing into it, otherwise a new concise filename (no spaces/special chars)
 - "description": a one-line summary
 - "l1": The top-level category (e.g. Artificial Intelligence)
-- "l2": The mid-level category (e.g. Agentic Systems)
-- "l3": The granular category (e.g. Architecture & Memory)
+- "l2": The mid-level category. VERY IMPORTANT: Group into broad buckets (e.g., 'Agents & Memory', 'Engineering & Infrastructure', 'Social Impact', or 'Industry & Economics'). Do NOT invent highly specific new categories.
+- "l3": The granular category, or omit/null if L2 is broad enough.
 - "content": A markdown section summarizing the core ideas. If synthesizing into an existing concept, update its summary to include new info. Formatted with '## Core Ideas' and '## Evolution / Contradictions'.
 - "is_new": boolean (true if creating a new node, false if updating an existing node found in the index)
     
