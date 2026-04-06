@@ -1,0 +1,13 @@
+{
+  "name": "llm-wiki",
+  "version": "1.0.0",
+  "description": "LLM-Wiki manager based on Karpathy pattern",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "commander": "^10.0.0",
+    "axios": "1.13.6"
+  }
+}
