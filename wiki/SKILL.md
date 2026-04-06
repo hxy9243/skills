@@ -81,6 +81,7 @@ Rule of thumb:
 - Prefer broad, durable buckets over narrow one-off branches.
 - Prefer real topics over generic buckets like `Research`, `Papers`, `General`, or `Misc`.
 - Do not shoehorn notes into an existing branch when they point to a clearer topical subtree.
+- Treat fallback branches as explicit review queues, not as real long-term categories.
 - Expand the tree only when a concept clearly does not fit an existing branch.
 - Prefix each category row with its depth marker so the tree stays machine- and prompt-friendly.
 

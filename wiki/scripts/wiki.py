@@ -30,6 +30,8 @@ CATEGORY_RULES = [
     (["agent", "assistant", "tool", "workflow", "automation"], ["Computer Science", "AI Systems", "Agents"]),
     (["infra", "infrastructure", "cluster", "runtime", "container", "vm", "orchestration", "deploy"], ["Computer Science", "AI Systems", "Infrastructure"]),
     (["memory", "context", "recall", "buffer", "state"], ["Computer Science", "AI Systems", "Memory"]),
+    (["model", "training", "inference", "neural", "transformer", "gradient", "rlhf", "finetuning", "learning"], ["Computer Science", "Machine Learning", "Systems"]),
+    (["distributed", "database", "replication", "consensus", "scheduler", "cluster"], ["Computer Science", "Computer Systems", "Distributed Systems"]),
     (["search", "retrieval", "index", "embedding", "vector"], ["Computer Science", "Knowledge Systems", "Retrieval"]),
     (["product", "market", "strategy", "company", "startup"], ["Culture", "Technology", "Product Strategy"]),
     (["design", "typography", "layout", "color", "ui"], ["Design", "Interface Design", "Visual Systems"]),
@@ -237,7 +239,7 @@ def tokenize(text: str) -> list[str]:
 def infer_category(title: str, text: str, source_relpath: str) -> list[str]:
     scorebag = Counter(tokenize(f"{title}\n{text}\n{source_relpath}"))
     best_score = 0
-    best = ["General", "Notes", "Unsorted"]
+    best = ["Needs Review", "Reclassify", "Pending"]
     for keywords, category in CATEGORY_RULES:
         score = sum(scorebag.get(keyword.lower(), 0) for keyword in keywords)
         if score > best_score:

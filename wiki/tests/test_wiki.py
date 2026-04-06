@@ -14,7 +14,8 @@ TREE_TEXT = """## Category Tree
 - AI Systems
   - Agents
   - Memory
-  - Research
+- Machine Learning
+  - Systems
 - Knowledge Systems
   - Retrieval
   - Wikis
@@ -205,7 +206,7 @@ class WikiScriptTests(unittest.TestCase):
         log_text = self.load_text(self.generated / "log.md")
         self.assertIn('"action": "remove"', log_text)
         self.assertIn("Unindexed.md", self.load_text(self.generated / "index.md") or "")
-        self.assertIn("Unsorted", self.load_text(self.generated / "index.md"))
+        self.assertIn("Needs Review", self.load_text(self.generated / "index.md"))
         self.assertIn("Dashboard Index.md", self.load_text(self.generated / "index.md"))
         self.assertIn("Unindexed.md", self.load_text(self.generated / "index.md"))
         self.assertNotIn("Indexed Notes By Category", self.load_text(self.generated / "index.md"))

@@ -17,6 +17,7 @@ Use the active model from the invoking skill/session for any synthesis or classi
 - Keep the tree to three layers, with roughly 5-10 children per level.
 - Prefer topic-shaped branches over generic buckets like `Research`, `General`, `Papers`, or `Misc`.
 - Do not shoehorn notes into an existing branch when the note clearly deserves a better subtree.
+- If a note still does not fit, place it in a review queue branch and revisit the tree. Do not leave it in a broad catch-all permanently.
 - Put that tree at the top of `index.md`, above a `---` separator.
 - Ask the user to approve the tree before continuing to whole-repo indexing.
 - Use `templates/category_tree.md.example` as the starting tree block, then paste it into the top of `index.md`.

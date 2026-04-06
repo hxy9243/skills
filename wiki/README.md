@@ -35,6 +35,7 @@ Use [`templates/config.json.example`](./templates/config.json.example) as the st
 - Aim for roughly 5-10 children per layer.
 - Prefer durable topic branches over generic buckets like `Research`, `Papers`, `General`, or `Misc`.
 - Do not shoehorn notes into an existing branch when the note clearly points to a better topic-shaped subtree.
+- Treat fallback branches as review queues only. Reclassify them into topic branches as soon as the right subtree is clear.
 - Use `category_overrides` for exact note placements and `category_prefix_overrides` for stable folder-level rules.
 
 ## Workflow

@@ -33,4 +33,4 @@
 Place this file at `_WIKI/config.json` for the notebook-specific default configuration.
 Use `category_overrides` for notebook-specific placements you want to keep stable across rebuilds.
 Use `category_prefix_overrides` for folder-level placement rules that should apply to many notes.
-Prefer topic-based override branches over generic buckets like `Research` or `Papers`.
+Prefer topic-based override branches over generic buckets like `Research`, `Papers`, or `General`.
