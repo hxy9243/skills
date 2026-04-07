@@ -26,15 +26,16 @@ The generated wiki workspace is intentionally small.
 
 ## Tree Model
 
-The tree always uses exactly three category layers before note leaves.
+The tree uses three category layers by default, but can grow deeper when a branch gets crowded or a concept needs a finer split.
 
 Example:
 
 ```text
 - layer1: [Computer Science](categories/computer-science/index.md)
-  - layer2: [AI Systems](categories/computer-science/ai-systems/index.md)
-    - layer3: [Agents](categories/computer-science/ai-systems/agents/index.md)
-      - [[00_Inbox/AI Agent/Example.md]]
+  - layer2: [Artificial Intelligence](categories/computer-science/artificial-intelligence/index.md)
+    - layer3: [AI Agents](categories/computer-science/artificial-intelligence/ai-agents/index.md)
+      - layer4: [Optimization](categories/computer-science/artificial-intelligence/ai-agents/optimization/index.md)
+        - [[00_Inbox/AI Agent/Example.md]]
 ```
 
 Design rules:
@@ -43,28 +44,30 @@ Design rules:
 - prefer topic branches over generic buckets like `Research`, `Papers`, `General`, or `Misc`
 - do not shoehorn notes into an existing branch if the note clearly points to a better subtree
 - use fallback branches only as review queues, not as stable long-term categories
+- add a deeper layer when a branch grows past roughly 12 direct children or has obvious subclusters
+- consolidate overlapping systems branches when they serve the same browsing intent
 
 ## Core Workflow
 
 ### First-Time Setup
 
 1. Inspect a representative slice of the notebook.
-2. Propose a three-layer category tree.
+2. Propose a category tree that starts simple and deepens only where needed.
 3. Put that tree at the top of `index.md`.
 4. Get approval before whole-repo indexing.
 
 ### Ongoing Indexing
 
 1. Read the approved tree from `index.md`.
-2. For each new or changed note, classify it into `layer1/layer2/layer3`.
+2. For each new or changed note, classify it into the approved category path.
 3. For larger batches, spawn note-level classification subagents in parallel.
 4. Cap parallel classification at 8 workers.
-5. Rebuild `index.md`, `categories/`, and `log.md`.
+5. Run indexing to record removals, report modified notes via source `mtime`, and rebuild `index.md` and `categories/`.
 
 ### Search
 
 1. Search notes via `obsidian-cli search-content` when available.
-2. Fall back to `rg` when Obsidian CLI is unavailable or returns nothing.
+2. Combine that with tag-aware matching and category-path/index matches.
 3. Search generated wiki docs for category context.
 4. Use the search subagent to synthesize an answer from the retrieved material.
 
@@ -99,13 +102,14 @@ python wiki/scripts/wiki.py add --packet /tmp/wiki_packets.json
 
 ### `index`
 
-Use `index` for broad refreshes and rebuilds.
+Use `index` for broad refreshes and source-of-truth scans.
 
 Behavior:
 
 - crawl configured include roots
 - skip excluded and generated files
 - record removed notes in `log.md`
+- report notes whose source `mtime` differs from the last recorded add event
 - detect notes not yet in the active catalog
 - render the category tree in `index.md`
 - regenerate category synthesis pages under `categories/`
@@ -123,8 +127,9 @@ Use `search` to retrieve notes and generated category context.
 Behavior:
 
 - use `obsidian-cli search-content`
-- fall back to `rg`
+- combine with `rg`, tag-aware note matching, and hierarchy/index matches
 - include generated category-page matches
+- return hierarchy with each resolved note match when possible
 - return structured JSON for the search subagent to interpret
 
 Example:
@@ -140,6 +145,7 @@ Use `lint` to validate the current wiki state.
 Behavior:
 
 - report missing source notes
+- report modified notes using stored source `mtime`
 - report unindexed notes
 - report catalog entries whose category path is no longer in the approved tree
 - optionally append findings to `log.md`

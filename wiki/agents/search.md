@@ -4,7 +4,7 @@ Use this workflow when the user wants to search, browse, or answer questions fro
 
 ## Goal
 
-Interpret the query, let the backend delegate retrieval to `obsidian-cli search-content` when available or `rg` otherwise, then use `index.md` and category pages for browse context.
+Interpret the query, let the backend combine content search, tag search, and hierarchy/index search, then use `index.md` and category pages for browse context.
 
 Use the active model from the invoking skill/session for answer synthesis. Retrieval remains delegated in `scripts/wiki.py`.
 
@@ -16,9 +16,9 @@ Use the active model from the invoking skill/session for answer synthesis. Retri
 python wiki/scripts/wiki.py search "user query"
 ```
 
-2. Read note matches from `obsidian-cli` or `rg`.
+2. Read note matches from the combined backends: Obsidian content search, tag matches, and hierarchy-aware matches.
 3. Read generated matches from `index.md` and `categories/`.
-4. Use category-path context and the deterministic `layer1:`, `layer2:`, `layer3:` labels when they help orient the user.
+4. Use category-path context and the deterministic `layer1:`, `layer2:`, `layer3:`, and deeper `layerN:` labels when they help orient the user.
 5. Prefer grounded synthesis over speculative inference.
 
 ## What Good Answers Include
@@ -27,6 +27,7 @@ python wiki/scripts/wiki.py search "user query"
 - Their category paths or category pages
 - The key distinction or pattern across top matches
 - Direct mention of missing coverage when the wiki does not support the answer
+- Hierarchy on each returned note when available
 
 ## Do Not
 

@@ -1,6 +1,9 @@
 import json
+import os
 import tempfile
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 from pathlib import Path
 from os import environ
 from unittest.mock import patch
@@ -10,20 +13,19 @@ from wiki.scripts import wiki
 
 TREE_TEXT = """## Category Tree
 
-### Computer Science
-- AI Systems
-  - Agents
-  - Memory
-- Machine Learning
-  - Systems
-- Knowledge Systems
-  - Retrieval
-  - Wikis
-
-### Culture
-- Technology
-  - Society
-  - Briefings
+- layer1: [Computer Science](categories/computer-science/index.md)
+  - layer2: [AI Systems](categories/computer-science/ai-systems/index.md)
+    - layer3: [Agents](categories/computer-science/ai-systems/agents/index.md)
+    - layer3: [Memory](categories/computer-science/ai-systems/memory/index.md)
+  - layer2: [Machine Learning](categories/computer-science/machine-learning/index.md)
+    - layer3: [Systems](categories/computer-science/machine-learning/systems/index.md)
+  - layer2: [Knowledge Systems](categories/computer-science/knowledge-systems/index.md)
+    - layer3: [Retrieval](categories/computer-science/knowledge-systems/retrieval/index.md)
+    - layer3: [Wikis](categories/computer-science/knowledge-systems/wikis/index.md)
+- layer1: [Culture](categories/culture/index.md)
+  - layer2: [Technology](categories/culture/technology/index.md)
+    - layer3: [Society](categories/culture/technology/society/index.md)
+    - layer3: [Briefings](categories/culture/technology/briefings/index.md)
 """
 
 
@@ -64,6 +66,13 @@ class WikiScriptTests(unittest.TestCase):
 
     def run_cli(self, *args: str) -> int:
         return wiki.main(["--config", str(self.config_path), *args])
+
+    def run_cli_json(self, *args: str) -> dict[str, object]:
+        buffer = StringIO()
+        with redirect_stdout(buffer):
+            rc = self.run_cli(*args)
+        self.assertIn(rc, {0, 1})
+        return json.loads(buffer.getvalue())
 
     def load_text(self, path: Path) -> str:
         return path.read_text(encoding="utf-8")
@@ -159,6 +168,8 @@ class WikiScriptTests(unittest.TestCase):
         category_page = self.generated / "categories" / "computer-science" / "ai-systems" / "agents" / "index.md"
         self.assertTrue(category_page.exists())
         self.assertIn("[[Notes/Delegation.md]]", self.load_text(category_page))
+        catalog = wiki.active_catalog(wiki.load_config(str(self.config_path)))
+        self.assertIsInstance(catalog["Notes/Delegation.md"]["source_mtime_ns"], int)
 
     def test_add_can_extend_tree(self) -> None:
         write_note(self.notebook / "Notes" / "Odd.md", "# Odd\n\nA note with an unsupported category.")
@@ -211,6 +222,10 @@ class WikiScriptTests(unittest.TestCase):
         self.assertIn("Unindexed.md", self.load_text(self.generated / "index.md"))
         self.assertNotIn("Indexed Notes By Category", self.load_text(self.generated / "index.md"))
 
+    def test_reconcile_alias_still_works(self) -> None:
+        rc = self.run_cli("reconcile")
+        self.assertEqual(rc, 0)
+
     def test_search_uses_generated_docs_as_fallback_context(self) -> None:
         write_note(self.notebook / "AI" / "Retrieval.md", "# Retrieval\n\nSearch systems use retrieval and ranking.")
         packet_path = self.root / "packet.json"
@@ -260,6 +275,86 @@ class WikiScriptTests(unittest.TestCase):
         log_text = self.load_text(self.generated / "log.md")
         self.assertIn('"action": "lint"', log_text)
         self.assertIn("Loose.md", log_text)
+
+    def test_lint_flags_modified_notes_via_mtime(self) -> None:
+        note_path = self.notebook / "Notes" / "Delegation.md"
+        write_note(note_path, "# Delegation\n\nDelegate work to subagents.")
+        packet_path = self.root / "packet.json"
+        packet_path.write_text(
+            json.dumps(
+                {
+                    "title": "Delegation",
+                    "summary": "Delegate work to smaller agents.",
+                    "category_path": ["Computer Science", "AI Systems", "Agents"],
+                    "tags": ["#agents"],
+                    "source": "Notes/Delegation.md",
+                }
+            ),
+            encoding="utf-8",
+        )
+        self.run_cli("add", "--packet", str(packet_path))
+        current_ns = note_path.stat().st_mtime_ns
+        note_path.write_text("# Delegation\n\nDelegate more carefully.", encoding="utf-8")
+        os.utime(note_path, ns=(current_ns + 1_000_000_000, current_ns + 1_000_000_000))
+
+        rc = self.run_cli("lint")
+        self.assertEqual(rc, 1)
+
+    def test_search_returns_hierarchy_and_tag_matches(self) -> None:
+        write_note(
+            self.notebook / "Notes" / "DSPy.md",
+            "---\n"
+            "tags:\n"
+            "- '#dspy'\n"
+            "- '#agent'\n"
+            "---\n"
+            "# DSPy\n\nPrompt optimization for agent programs.\n",
+        )
+        packet_path = self.root / "packet.json"
+        packet_path.write_text(
+            json.dumps(
+                {
+                    "title": "DSPy",
+                    "summary": "Prompt optimization for agent programs.",
+                    "category_path": ["Computer Science", "Artificial Intelligence", "AI Agents"],
+                    "tags": ["#dspy", "#agent"],
+                    "source": "Notes/DSPy.md",
+                }
+            ),
+            encoding="utf-8",
+        )
+        self.run_cli("add", "--packet", str(packet_path))
+
+        payload = self.run_cli_json("search", "dspy agent")
+        note_matches = payload["note_matches"]
+        self.assertTrue(note_matches)
+        self.assertEqual(
+            note_matches[0]["hierarchy"],
+            ["Computer Science", "Artificial Intelligence", "AI Agents"],
+        )
+        self.assertIn("tags", note_matches[0]["match_reasons"])
+
+    def test_add_supports_deeper_category_paths(self) -> None:
+        write_note(self.notebook / "Notes" / "Optimizer.md", "# Optimizer\n\nA deeper category placement.")
+        packet_path = self.root / "packet.json"
+        packet_path.write_text(
+            json.dumps(
+                {
+                    "title": "Optimizer",
+                    "summary": "A deeper category placement.",
+                    "category_path": ["Computer Science", "Artificial Intelligence", "AI Agents", "Optimization"],
+                    "tags": [],
+                    "source": "Notes/Optimizer.md",
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        rc = self.run_cli("add", "--packet", str(packet_path))
+        self.assertEqual(rc, 0)
+        index_text = self.load_text(self.generated / "index.md")
+        self.assertIn("layer4: [Optimization]", index_text)
+        self.assertTrue((self.generated / "categories" / "computer-science" / "artificial-intelligence" / "ai-agents" / "optimization" / "index.md").exists())
 
 
 if __name__ == "__main__":

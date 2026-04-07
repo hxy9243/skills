@@ -31,18 +31,20 @@ Use [`templates/config.json.example`](./templates/config.json.example) as the st
 
 ## Category Rules
 
-- Keep the hierarchy to exactly three layers before note leaves.
+- Keep three layers as the default starting point, but add deeper layers when a branch gets crowded or conceptually dense.
 - Aim for roughly 5-10 children per layer.
 - Prefer durable topic branches over generic buckets like `Research`, `Papers`, `General`, or `Misc`.
 - Do not shoehorn notes into an existing branch when the note clearly points to a better topic-shaped subtree.
 - Treat fallback branches as review queues only. Reclassify them into topic branches as soon as the right subtree is clear.
+- Split branches once they pass roughly 12 direct children or clearly contain subclusters.
+- Consolidate overlapping systems buckets when they represent the same browsing intent.
 - Use `category_overrides` for exact note placements and `category_prefix_overrides` for stable folder-level rules.
 
 ## Workflow
 
 - `agents/index.md` owns first-run taxonomy design and bulk indexing.
 - `agents/add.md` classifies targeted notes against the approved tree in `index.md`.
-- `agents/search.md` delegates retrieval to `obsidian-cli search-content` with `rg` fallback.
-- `agents/lint.md` checks for drift, missing notes, and branches that no longer match the tree.
+- `agents/search.md` combines content search, tag search, and hierarchy/index search.
+- `agents/lint.md` checks for modified notes, missing notes, and branches that no longer match the tree.
 
 When changing this skill, verify it with a clean-slate subagent run instead of relying only on the current session context.

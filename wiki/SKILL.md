@@ -13,9 +13,9 @@ This skill formalizes a notebook into a generated wiki workspace. Keep model-dri
 - Generated wiki artifacts live in a separate wiki root.
 - The approved category tree lives at the top of `index.md` and is the classification reference.
 - Category, subcategory, and topic layers each get a generated markdown synthesis page.
-- Search delegates to `obsidian-cli search-content` when available, with `rg` fallback.
+- Search combines `obsidian-cli search-content` when available, tag-aware note matching, and generated index/category search.
 - `log.md` is the persistent record of adds, removals, and lint runs.
-- Layer labels are written deterministically as `layer1: ...`, `layer2: ...`, and `layer3: ...` so prompts and search can target a specific depth.
+- Layer labels are written deterministically as `layer1: ...`, `layer2: ...`, `layer3: ...`, and deeper when needed, so prompts and search can target a specific depth.
 
 ## Dispatch
 
@@ -74,7 +74,7 @@ Model choice is not part of the backend config. Subagents should inherit the act
 
 ## Hierarchy Shape
 
-The generated wiki always uses exactly three hierarchy layers before note leaves.
+The generated wiki should default to three hierarchy layers before note leaves, but may add deeper layers when a branch gets crowded or a concept is clearly dense enough to deserve a finer split.
 
 Rule of thumb:
 - Keep each level to roughly 5-10 children.
@@ -83,16 +83,19 @@ Rule of thumb:
 - Do not shoehorn notes into an existing branch when they point to a clearer topical subtree.
 - Treat fallback branches as explicit review queues, not as real long-term categories.
 - Expand the tree only when a concept clearly does not fit an existing branch.
+- If a branch grows past roughly 12 direct children, or multiple notes form a clear dense cluster, add another layer instead of leaving an overloaded bucket.
+- Consolidate overlapping systems buckets when they reflect the same browsing intent.
 - Prefix each category row with its depth marker so the tree stays machine- and prompt-friendly.
 
 Small example:
 
 ```text
 - layer1: [Computer Science](Computer Science)
-  - layer2: [AI Systems](AI Systems)
-    - layer3: [Agents](Agents)
-      - Note 1 on AI Agent
-      - Note 2 on AI Agent
+  - layer2: [Artificial Intelligence](Artificial Intelligence)
+    - layer3: [AI Agents](AI Agents)
+      - layer4: [Optimization](Optimization)
+        - Note 1 on DSPy
+        - Note 2 on GEPA
 ```
 
 ## First-Time Setup
@@ -119,20 +122,24 @@ The Python backend maintains:
 ## Operating Rules
 
 - Let subagents interpret notes and queries.
-- Let `scripts/wiki.py` own file IO, category-page regeneration, log updates, index rebuilding, delegated search, and lint checks.
+- Let `scripts/wiki.py` own file IO, category-page regeneration, log updates, indexing, delegated search, and lint checks.
 - Keep the approved category tree at the top of `index.md` as the classification reference for `add` and first-time `index`.
 - Keep `index.md` focused on the category tree itself. Do not regenerate a second browse-by-category section below it.
 - Prefer `index` for broad refreshes and `add` for small targeted updates.
+- `index` detects missing source notes, reports modified notes via source `mtime`, and rebuilds generated views.
 - For notebook-wide indexing, classify new notes with subagents in parallel when feasible, but cap concurrency at 8 notes at a time.
 - For broad or ambiguous note sets, have subagents propose better topical branches instead of forcing notes into a weak existing category.
 - Use packet mode when a subagent has already normalized note classification data:
 
 ```bash
 python wiki/scripts/wiki.py add --packet /tmp/wiki_packets.json
+python wiki/scripts/wiki.py index
 ```
 
-- Keep the hierarchy at exactly three layers before note leaves.
+- Keep three layers as the default floor, not a hard ceiling. Add deeper layers when a branch becomes crowded or needs a finer conceptual split.
 - Use the approved category tree from the top of `index.md` when classifying new notes. Add new subtrees only when the existing tree is clearly insufficient.
-- Use the deterministic `layer1:`, `layer2:`, and `layer3:` labels when referring to branches in prompts, searches, or follow-up edits.
+- When the notebook mixes `AI Systems` and `Machine Learning Systems`, prefer consolidating them under a shared `Artificial Intelligence` subtree when that matches how the user retrieves notes.
+- Use the deterministic `layer1:`, `layer2:`, `layer3:`, and deeper `layerN:` labels when referring to branches in prompts, searches, or follow-up edits.
+- Search responses should include hierarchy for each returned note whenever the backend can resolve it.
 - Treat source notes as references; do not rewrite them in place.
 - When changing this skill, always test it with a clean-slate subagent run rather than relying only on the current session context.
