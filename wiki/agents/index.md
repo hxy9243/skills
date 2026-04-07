@@ -15,6 +15,7 @@ Use the active model from the invoking skill/session for any synthesis or classi
 - Read a representative sample of notes.
 - Propose a category tree that can fit the full notebook.
 - Start with three layers, with roughly 5-10 children per level, then add deeper layers when a branch is crowded or conceptually dense.
+- Prefer a retrieval-first tree: group notes the way a user would expect to search or browse for them later.
 - Prefer topic-shaped branches over generic buckets like `Research`, `General`, `Papers`, or `Misc`.
 - Do not shoehorn notes into an existing branch when the note clearly deserves a better subtree.
 - If a note still does not fit, place it in a review queue branch and revisit the tree. Do not leave it in a broad catch-all permanently.
@@ -41,6 +42,8 @@ python wiki/scripts/wiki.py index
 - Surface category collisions, poor bucket names, or overloaded branches.
 - Replace broad catch-all branches when the underlying notes naturally split into clearer topical branches.
 - Split overloaded branches when they exceed roughly 12 direct children or when the notes form obvious subclusters.
+- Consolidate parallel branches when users would search them as one idea cluster.
+- Prefer concept consistency across source folders. A topic family should usually live in one subtree even if notes came from projects, inbox, and subject folders.
 - Keep hierarchy labels broad enough to survive future indexing.
 - Keep the approved category tree in `index.md` updated when genuinely new subtrees are needed.
 - Use the deterministic `layer1:`, `layer2:`, `layer3:`, and deeper `layerN:` labels when proposing or editing branch names.

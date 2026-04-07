@@ -17,6 +17,16 @@ This skill formalizes a notebook into a generated wiki workspace. Keep model-dri
 - `log.md` is the persistent record of adds, removals, and lint runs.
 - Layer labels are written deterministically as `layer1: ...`, `layer2: ...`, `layer3: ...`, and deeper when needed, so prompts and search can target a specific depth.
 
+## Retrieval-First Principles
+
+Use these principles when indexing or searching:
+
+- Taxonomy should optimize for how a user will try to find a note later, not for academic purity alone.
+- Prefer consolidating semantically overlapping branches when they lead to the same retrieval behavior.
+- For dense concept families like frameworks, optimizers, or evaluation loops, keep sibling notes clustered unless there is a strong browsing reason to split them.
+- Search should infer nearby concepts, aliases, tags, and hierarchy cues instead of depending on the exact phrase the user typed.
+- Good answers should return note path, hierarchy, and a short evidence snippet, not just a title match.
+
 ## Dispatch
 
 Choose one of these four subagent workflows before touching the script:
@@ -103,7 +113,7 @@ Small example:
 Before indexing a notebook for the first time, establish an approved category tree.
 
 1. Read through a representative slice of the notes.
-2. Propose a three-level category tree that can absorb the notebook's concepts.
+2. Propose a category tree that can absorb the notebook's concepts and match how the user will naturally browse or search them later.
 3. Put the approved category tree at the top of `index.md`, above a markdown separator `---`.
 4. Ask the user to approve or edit that top section before running a full-repo index.
 
@@ -129,6 +139,8 @@ The Python backend maintains:
 - `index` detects missing source notes, reports modified notes via source `mtime`, and rebuilds generated views.
 - For notebook-wide indexing, classify new notes with subagents in parallel when feasible, but cap concurrency at 8 notes at a time.
 - For broad or ambiguous note sets, have subagents propose better topical branches instead of forcing notes into a weak existing category.
+- For taxonomy disputes, prefer the branch that would make future search queries easier to succeed.
+- When a concept shows up across projects, papers, and inbox notes, cluster it consistently unless there is a strong reason to preserve source-folder distinctions.
 - Use packet mode when a subagent has already normalized note classification data:
 
 ```bash
@@ -141,5 +153,6 @@ python wiki/scripts/wiki.py index
 - When the notebook mixes `AI Systems` and `Machine Learning Systems`, prefer consolidating them under a shared `Artificial Intelligence` subtree when that matches how the user retrieves notes.
 - Use the deterministic `layer1:`, `layer2:`, `layer3:`, and deeper `layerN:` labels when referring to branches in prompts, searches, or follow-up edits.
 - Search responses should include hierarchy for each returned note whenever the backend can resolve it.
+- Search responses should favor semantic matches with direct evidence over literal-but-weak text matches.
 - Treat source notes as references; do not rewrite them in place.
 - When changing this skill, always test it with a clean-slate subagent run rather than relying only on the current session context.

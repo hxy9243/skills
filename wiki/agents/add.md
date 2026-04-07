@@ -8,7 +8,7 @@ Convert raw notes into normalized classification packets, then hand those packet
 
 Use the active model from the invoking skill/session. Do not add model settings to wiki config or backend calls.
 
-Always consult the approved category tree at the top of `index.md` before choosing `category_path`. Use the deterministic branch labels `layer1:`, `layer2:`, and `layer3:` when referring to parts of the tree.
+Always consult the approved category tree at the top of `index.md` before choosing `category_path`. Use the deterministic branch labels `layer1:`, `layer2:`, `layer3:`, and deeper `layerN:` labels when referring to parts of the tree.
 
 ## Packet Shape
 
@@ -31,10 +31,13 @@ The backend keeps this packet shape lightweight and deterministic.
 1. Read the source note carefully.
 2. Read the approved category tree from the top of `index.md` and find the best-fitting branch.
 3. Normalize it into one concept packet unless there is a strong reason to split it.
-4. Keep category paths broad and durable.
-5. If the note clearly does not fit, extend the tree with the smallest necessary new subtree while preserving the three-level structure.
-6. Prefer stable concept titles over catchy phrasing.
-7. Save the packet JSON if needed, then call:
+4. Choose the branch that would make this note easiest to rediscover later through natural search queries.
+5. Keep category paths broad and durable, but add a deeper level when a dense concept family is already forming.
+6. If the note clearly does not fit, extend the tree with the smallest necessary new subtree rather than forcing a weak placement.
+7. Keep concept families consistent across folders. If a DSPy note in `10_Projects` and a DSPy note in `20_Subjects` belong together for search, place them together.
+8. Prefer stable concept titles over catchy phrasing.
+9. Pull reusable tags from frontmatter when available and normalize them into short search-friendly tags.
+10. Save the packet JSON if needed, then call:
 
 ```bash
 python wiki/scripts/wiki.py add --packet /tmp/wiki_packets.json
@@ -44,6 +47,7 @@ python wiki/scripts/wiki.py add --packet /tmp/wiki_packets.json
 
 - Summary should explain what the concept is and why it matters.
 - Category path should fit the approved tree, not invent brittle micro-buckets.
+- Category path should reflect retrieval intent, not just where the note happens to live in the notebook.
 - Tags should be short and reusable.
 - Source note paths must be relative to the notebook root.
 - New subtrees should be rare and justified by repeated concept pressure, not a single quirky note.

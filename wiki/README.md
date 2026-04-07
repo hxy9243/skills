@@ -38,6 +38,7 @@ Use [`templates/config.json.example`](./templates/config.json.example) as the st
 - Treat fallback branches as review queues only. Reclassify them into topic branches as soon as the right subtree is clear.
 - Split branches once they pass roughly 12 direct children or clearly contain subclusters.
 - Consolidate overlapping systems buckets when they represent the same browsing intent.
+- Prefer retrieval-first grouping over folder-first grouping. Notes from different source folders can still belong in the same concept subtree.
 - Use `category_overrides` for exact note placements and `category_prefix_overrides` for stable folder-level rules.
 
 ## Workflow

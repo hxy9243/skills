@@ -42,6 +42,7 @@ Design rules:
 
 - aim for roughly 5-10 children per layer
 - prefer topic branches over generic buckets like `Research`, `Papers`, `General`, or `Misc`
+- prefer retrieval-first clustering over strict folder mirroring or academic taxonomy purity
 - do not shoehorn notes into an existing branch if the note clearly points to a better subtree
 - use fallback branches only as review queues, not as stable long-term categories
 - add a deeper layer when a branch grows past roughly 12 direct children or has obvious subclusters
@@ -70,6 +71,7 @@ Design rules:
 2. Combine that with tag-aware matching and category-path/index matches.
 3. Search generated wiki docs for category context.
 4. Use the search subagent to synthesize an answer from the retrieved material.
+5. Return hierarchy and short evidence with note-level hits whenever possible.
 
 ### Lint
 
