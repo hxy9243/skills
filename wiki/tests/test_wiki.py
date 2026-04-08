@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import tempfile
 import unittest
 from contextlib import redirect_stdout
@@ -8,7 +9,11 @@ from pathlib import Path
 from os import environ
 from unittest.mock import patch
 
-from wiki.scripts import wiki
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from wikicli import cli
+from wikicli import config as wiki_config
+from wikicli import core as wiki_core
 
 
 TREE_TEXT = """## Category Tree
@@ -65,7 +70,7 @@ class WikiScriptTests(unittest.TestCase):
         self.tmp.cleanup()
 
     def run_cli(self, *args: str) -> int:
-        return wiki.main(["--config", str(self.config_path), *args])
+        return cli.main(["--config", str(self.config_path), *args])
 
     def run_cli_json(self, *args: str) -> dict[str, object]:
         buffer = StringIO()
@@ -104,7 +109,7 @@ class WikiScriptTests(unittest.TestCase):
         )
 
         with patch.dict(environ, {"HOME": str(self.root)}):
-            config = wiki.load_config(None)
+            config = wiki_config.load_config(None)
 
         self.assertEqual(config.generated_root, self.generated.resolve())
         self.assertEqual(config.include_roots, [self.notebook.resolve()])
@@ -133,9 +138,9 @@ class WikiScriptTests(unittest.TestCase):
             "# BBoltDB\n\nEmbedded storage for system design notes.",
         )
 
-        packet = wiki.extract_packet_from_note(
+        packet = wiki_core.extract_packet_from_note(
             self.notebook / "20_Subjects" / "Computer Science" / "Computer Systems" / "Distributed Systems" / "BBoltDB.md",
-            wiki.load_config(str(self.config_path)),
+            wiki_config.load_config(str(self.config_path)),
         )
         self.assertEqual(
             packet["category_path"],
@@ -168,7 +173,7 @@ class WikiScriptTests(unittest.TestCase):
         category_page = self.generated / "categories" / "computer-science" / "ai-systems" / "agents" / "index.md"
         self.assertTrue(category_page.exists())
         self.assertIn("[[Notes/Delegation.md]]", self.load_text(category_page))
-        catalog = wiki.active_catalog(wiki.load_config(str(self.config_path)))
+        catalog = wiki_core.active_catalog(wiki_config.load_config(str(self.config_path)))
         self.assertIsInstance(catalog["Notes/Delegation.md"]["source_mtime_ns"], int)
 
     def test_add_can_extend_tree(self) -> None:
@@ -355,6 +360,35 @@ class WikiScriptTests(unittest.TestCase):
         index_text = self.load_text(self.generated / "index.md")
         self.assertIn("layer4: [Optimization]", index_text)
         self.assertTrue((self.generated / "categories" / "computer-science" / "artificial-intelligence" / "ai-agents" / "optimization" / "index.md").exists())
+
+    def test_synthesize_returns_structured_note_bundle(self) -> None:
+        write_note(
+            self.notebook / "Notes" / "DSPy.md",
+            "---\n"
+            "tags:\n"
+            "- '#dspy'\n"
+            "- '#agent'\n"
+            "---\n"
+            "# DSPy\n\nPrompt optimization for agent programs.\n",
+        )
+        packet_path = self.root / "packet.json"
+        packet_path.write_text(
+            json.dumps(
+                {
+                    "title": "DSPy",
+                    "summary": "Prompt optimization for agent programs.",
+                    "category_path": ["Computer Science", "Artificial Intelligence", "AI Agents"],
+                    "tags": ["#dspy", "#agent"],
+                    "source": "Notes/DSPy.md",
+                }
+            ),
+            encoding="utf-8",
+        )
+        self.run_cli("add", "--packet", str(packet_path))
+
+        payload = self.run_cli_json("synthesize", "--tag", "#dspy")
+        self.assertEqual(payload["status"], "experimental")
+        self.assertEqual(payload["notes"][0]["source"], "Notes/DSPy.md")
 
 
 if __name__ == "__main__":

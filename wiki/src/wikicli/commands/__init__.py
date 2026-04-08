@@ -1,0 +1,2 @@
+"""wikicli command modules."""
+

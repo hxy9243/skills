@@ -98,8 +98,8 @@ Behavior:
 Example:
 
 ```bash
-python wiki/scripts/wiki.py add /absolute/path/to/note.md
-python wiki/scripts/wiki.py add --packet /tmp/wiki_packets.json
+uv run wiki add /absolute/path/to/note.md
+uv run wiki add --packet /tmp/wiki_packets.json
 ```
 
 ### `index`
@@ -119,7 +119,7 @@ Behavior:
 Example:
 
 ```bash
-python wiki/scripts/wiki.py index
+uv run wiki index
 ```
 
 ### `search`
@@ -137,7 +137,7 @@ Behavior:
 Example:
 
 ```bash
-python wiki/scripts/wiki.py search "agent memory"
+uv run wiki search "agent memory"
 ```
 
 ### `lint`
@@ -155,8 +155,8 @@ Behavior:
 Example:
 
 ```bash
-python wiki/scripts/wiki.py lint
-python wiki/scripts/wiki.py lint --log
+uv run wiki lint
+uv run wiki lint --log
 ```
 
 ## Config Model

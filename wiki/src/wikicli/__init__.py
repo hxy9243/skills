@@ -1,0 +1,2 @@
+"""wikicli package."""
+

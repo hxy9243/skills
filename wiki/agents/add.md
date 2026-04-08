@@ -40,7 +40,7 @@ The backend keeps this packet shape lightweight and deterministic.
 10. Save the packet JSON if needed, then call:
 
 ```bash
-python wiki/scripts/wiki.py add --packet /tmp/wiki_packets.json
+uv run wiki add --packet /tmp/wiki_packets.json
 ```
 
 ## Quality Bar

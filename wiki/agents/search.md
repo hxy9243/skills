@@ -13,7 +13,7 @@ Use the active model from the invoking skill/session for answer synthesis. Retri
 1. Run search first:
 
 ```bash
-python wiki/scripts/wiki.py search "user query"
+uv run wiki search "user query"
 ```
 
 2. Read note matches from the combined backends: Obsidian content search, tag matches, and hierarchy-aware matches.

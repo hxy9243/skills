@@ -12,10 +12,10 @@
 ## Commands
 
 ```bash
-python wiki/scripts/wiki.py add ...
-python wiki/scripts/wiki.py index
-python wiki/scripts/wiki.py search "query"
-python wiki/scripts/wiki.py lint
+uv run wiki add ...
+uv run wiki index
+uv run wiki search "query"
+uv run wiki lint
 ```
 
 ## Config Resolution

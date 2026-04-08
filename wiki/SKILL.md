@@ -144,8 +144,8 @@ The Python backend maintains:
 - Use packet mode when a subagent has already normalized note classification data:
 
 ```bash
-python wiki/scripts/wiki.py add --packet /tmp/wiki_packets.json
-python wiki/scripts/wiki.py index
+uv run wiki add --packet /tmp/wiki_packets.json
+uv run wiki index
 ```
 
 - Keep three layers as the default floor, not a hard ceiling. Add deeper layers when a branch becomes crowded or needs a finer conceptual split.
