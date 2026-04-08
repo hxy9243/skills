@@ -361,6 +361,28 @@ class WikiScriptTests(unittest.TestCase):
         self.assertIn("layer4: [Optimization]", index_text)
         self.assertTrue((self.generated / "categories" / "computer-science" / "artificial-intelligence" / "ai-agents" / "optimization" / "index.md").exists())
 
+    def test_add_writes_category_frontmatter_property(self) -> None:
+        note_path = self.notebook / "Notes" / "Delegation.md"
+        write_note(note_path, "# Delegation\n\nDelegate work to subagents when tasks are well scoped.")
+        packet_path = self.root / "packet.json"
+        packet_path.write_text(
+            json.dumps(
+                {
+                    "title": "Delegation",
+                    "summary": "Delegate work to smaller agents for bounded tasks.",
+                    "category_path": ["Computer Science", "AI Systems", "Agents"],
+                    "tags": ["#agents", "#delegation"],
+                    "source": "Notes/Delegation.md",
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        rc = self.run_cli("add", "--packet", str(packet_path))
+        self.assertEqual(rc, 0)
+        text = self.load_text(note_path)
+        self.assertIn('category: "Computer Science > AI Systems > Agents"', text)
+
     def test_synthesize_returns_structured_note_bundle(self) -> None:
         write_note(
             self.notebook / "Notes" / "DSPy.md",

@@ -105,6 +105,70 @@ def strip_frontmatter(text: str) -> str:
     return parse_frontmatter(text)[1]
 
 
+def category_value(category_path: Sequence[str]) -> str:
+    return " > ".join(safe_title(part) for part in category_path)
+
+
+def upsert_frontmatter_property(text: str, key: str, value: str) -> str:
+    rendered = f'{key}: {json.dumps(value, ensure_ascii=False)}'
+    if not text.startswith("---\n"):
+        body = text.lstrip("\n")
+        return f"---\n{rendered}\n---\n{body}"
+
+    parts = text.split("\n---\n", 1)
+    if len(parts) != 2:
+        body = text.lstrip("\n")
+        return f"---\n{rendered}\n---\n{body}"
+
+    raw_frontmatter, body = parts
+    lines = raw_frontmatter.splitlines()[1:]
+    output: list[str] = []
+    target = key.lower()
+    replaced = False
+    skip_continuation = False
+
+    for line in lines:
+        stripped = line.strip()
+        if skip_continuation:
+            if line.startswith("  - ") or line.startswith("- "):
+                continue
+            skip_continuation = False
+
+        if not stripped:
+            output.append(line)
+            continue
+
+        current_key, sep, current_value = line.partition(":")
+        if sep and current_key.strip().lower() == target:
+            if not replaced:
+                output.append(rendered)
+                replaced = True
+            if not current_value.strip():
+                skip_continuation = True
+            continue
+
+        output.append(line)
+
+    if not replaced:
+        if output and output[-1].strip():
+            output.append(rendered)
+        else:
+            while output and not output[-1].strip():
+                output.pop()
+            output.append(rendered)
+
+    return "---\n" + "\n".join(output) + "\n---\n" + body
+
+
+def apply_category_property(path: Path, category_path: Sequence[str]) -> bool:
+    original = path.read_text(encoding="utf-8")
+    updated = upsert_frontmatter_property(original, "category", category_value(category_path))
+    if updated == original:
+        return False
+    path.write_text(updated, encoding="utf-8")
+    return True
+
+
 def title_from_text(text: str, path: Path) -> str:
     body = strip_frontmatter(text)
     for line in body.splitlines():

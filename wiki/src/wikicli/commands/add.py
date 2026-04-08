@@ -4,7 +4,16 @@ import json
 from pathlib import Path
 
 from wikicli.config import ensure_layout, load_config, read_json
-from wikicli.core import active_catalog, append_log_event, normalize_packet, normalize_path, utc_now, gather_source_files, extract_packet_from_note
+from wikicli.core import (
+    active_catalog,
+    append_log_event,
+    apply_category_property,
+    extract_packet_from_note,
+    gather_source_files,
+    normalize_packet,
+    normalize_path,
+    utc_now,
+)
 from wikicli.tree import rebuild_generated_views
 
 
@@ -36,6 +45,7 @@ def run(args) -> int:
         source_path = (config.notebook_root / normalized["source"]).resolve()
         if not source_path.exists():
             raise SystemExit(f"missing source note: {normalized['source']}")
+        apply_category_property(source_path, normalized["category_path"])
         event = {"timestamp": utc_now(), "action": "add", "source_mtime_ns": source_path.stat().st_mtime_ns, **normalized}
         append_log_event(config, event)
         added.append(normalized)
