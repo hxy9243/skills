@@ -19,6 +19,67 @@ uv run wiki synthesize --category "Computer Science > Artificial Intelligence > 
 uv run wiki lint
 ```
 
+## Small Example
+
+Example category tree in `index.md`:
+
+```text
+- layer1: [Computer Science](categories/computer-science/index.md)
+  - layer2: [Artificial Intelligence](categories/computer-science/artificial-intelligence/index.md)
+    - layer3: [LLM](categories/computer-science/artificial-intelligence/llm/index.md)
+      - [[20_Subjects/Computer Science/Papers/Chain-of-Thought Prompting Elicits Reasoning in Large Language Models.md]]
+      - [[20_Subjects/Computer Science/Papers/Least-to-Most Prompting Enables Complex Reasoning in Large Language Models.md]]
+```
+
+Example search:
+
+```bash
+uv run wiki search "chain of thought"
+```
+
+Example result:
+
+```json
+{
+  "hierarchy_matches": [
+    {
+      "path": "20_Subjects/Computer Science/Papers/Chain-of-Thought Prompting Elicits Reasoning in Large Language Models.md",
+      "category_path": [
+        "Computer Science",
+        "Artificial Intelligence",
+        "LLM"
+      ],
+      "evidence": "reasoning in large language models"
+    }
+  ]
+}
+```
+
+Example synthesize:
+
+```bash
+uv run wiki synthesize --category "Computer Science > Artificial Intelligence > LLM" --limit 2
+```
+
+Example result bundle:
+
+```json
+{
+  "status": "experimental",
+  "message": "Use this note bundle as input to the synthesize workflow.",
+  "notes": [
+    {
+      "title": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models",
+      "category_path": ["Computer Science", "Artificial Intelligence", "LLM"]
+    },
+    {
+      "title": "Least-to-Most Prompting Enables Complex Reasoning in Large Language Models",
+      "category_path": ["Computer Science", "Artificial Intelligence", "LLM"]
+    }
+  ]
+}
+```
+
 ## Config Resolution
 
 The backend resolves config in this order:
