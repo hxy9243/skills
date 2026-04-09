@@ -4,6 +4,7 @@ A collection of AI agent skills for productivity and knowledge management.
 
 ## Available Skills
 
+-   **[Wiki](./wiki/)**: A notebook-to-wiki skill for indexing notes into a category-driven knowledge base with delegated search, topic synthesis, and linting.
 -   **[Zettel Brainstormer](./zettel-brainstormer/)**: An AI-powered drafting tool that turns Zettelkasten notes into comprehensive writing drafts using a multi-stage LLM pipeline.
 -   **[Zettel Link](./zettel-link/)**: A suite of tools to maintain note embeddings for semantic search and discovering connections between notes.
 -   **[Startup Researcher](./startup-researcher/)**: An AI-powered research assistant that generates comprehensive market intelligence reports for startups.

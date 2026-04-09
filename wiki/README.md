@@ -1,6 +1,6 @@
 # wiki
 
-`wiki` turns an Obsidian-style note collection into a lightweight generated wiki rooted in category pages.
+`wiki` turns an Obsidian-style note collection into a lightweight generated wiki rooted in category pages, with search and topic-synthesis workflows on top of the indexed notes.
 
 ## What It Generates
 
@@ -15,6 +15,7 @@
 uv run wiki add ...
 uv run wiki index
 uv run wiki search "query"
+uv run wiki synthesize --category "Computer Science > Artificial Intelligence > AI Agents"
 uv run wiki lint
 ```
 
@@ -46,6 +47,17 @@ Use [`templates/config.json.example`](./templates/config.json.example) as the st
 - `agents/index.md` owns first-run taxonomy design and bulk indexing.
 - `agents/add.md` classifies targeted notes against the approved tree in `index.md`.
 - `agents/search.md` combines content search, tag search, and hierarchy/index search.
+- `agents/synthesize.md` searches, cross-references, extracts core topics, and produces a synthesized presentation with references at the end.
 - `agents/lint.md` checks for modified notes, missing notes, and branches that no longer match the tree.
+
+## Synthesis Workflow
+
+Use synthesis when the user wants a topic brief built from multiple notes rather than just search hits.
+
+- Search first to gather the strongest note set.
+- Cross-reference the notes to identify recurring ideas, distinctions, and contradictions.
+- Extract the core topics into a compact outline.
+- Produce a synthesized presentation grounded in note evidence.
+- Always include references at the end for every materially used note.
 
 When changing this skill, verify it with a clean-slate subagent run instead of relying only on the current session context.
