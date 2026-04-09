@@ -5,7 +5,7 @@ description: Build and maintain a formal notebook wiki with category-organized i
 
 # Wiki
 
-This skill formalizes a notebook into a generated wiki workspace. Keep model-driven interpretation in the subagents and keep deterministic processing in `scripts/wiki.py`.
+This skill formalizes a notebook into a generated wiki workspace. Keep model-driven interpretation in the subagents and keep deterministic processing in the `wikicli` python package.
 
 ## What This Skill Owns
 
@@ -70,6 +70,12 @@ Supported config fields:
   "category_prefix_overrides": {
     "20_Subjects/Computer Science/Computer Systems/Distributed Systems": ["Computer Science", "Computer Systems", "Distributed Systems"]
   },
+  "category_rules": [
+    {
+      "keywords": ["agent", "assistant", "tool"],
+      "category": ["Computer Science", "Artificial Intelligence", "AI Systems", "Agents"]
+    }
+  ],
   "search": {
     "lexical_limit": 8
   }
@@ -132,7 +138,7 @@ The Python backend maintains:
 ## Operating Rules
 
 - Let subagents interpret notes and queries.
-- Let `scripts/wiki.py` own file IO, category-page regeneration, log updates, indexing, delegated search, and lint checks.
+- Let `src/wikicli` own file IO, category-page regeneration, log updates, indexing, delegated search, and lint checks.
 - Keep the approved category tree at the top of `index.md` as the classification reference for `add` and first-time `index`.
 - Keep `index.md` focused on the category tree itself. Do not regenerate a second browse-by-category section below it.
 - Prefer `index` for broad refreshes and `add` for small targeted updates.
@@ -144,8 +150,8 @@ The Python backend maintains:
 - Use packet mode when a subagent has already normalized note classification data:
 
 ```bash
-python wiki/scripts/wiki.py add --packet /tmp/wiki_packets.json
-python wiki/scripts/wiki.py index
+uv run wiki add --packet /tmp/wiki_packets.json
+uv run wiki index
 ```
 
 - Keep three layers as the default floor, not a hard ceiling. Add deeper layers when a branch becomes crowded or needs a finer conceptual split.

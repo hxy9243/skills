@@ -11,20 +11,6 @@ from typing import Any, Sequence
 from wikicli.config import DEFAULT_EXCLUDES, WikiConfig, ensure_layout, read_json
 
 
-CATEGORY_RULES = [
-    (
-        ["dspy", "gepa", "mipro", "teleprompt", "prompt-optimization", "prompt", "coding-agent", "ai-agent", "agent-framework", "skills"],
-        ["Computer Science", "Artificial Intelligence", "AI Agents"],
-    ),
-    (["agent", "assistant", "tool", "workflow", "automation"], ["Computer Science", "AI Systems", "Agents"]),
-    (["infra", "infrastructure", "cluster", "runtime", "container", "vm", "orchestration", "deploy"], ["Computer Science", "AI Systems", "Infrastructure"]),
-    (["memory", "context", "recall", "buffer", "state"], ["Computer Science", "AI Systems", "Memory"]),
-    (["model", "training", "inference", "neural", "transformer", "gradient", "rlhf", "finetuning", "learning"], ["Computer Science", "Machine Learning", "Systems"]),
-    (["distributed", "database", "replication", "consensus", "scheduler", "cluster"], ["Computer Science", "Computer Systems", "Distributed Systems"]),
-    (["search", "retrieval", "index", "embedding", "vector"], ["Computer Science", "Knowledge Systems", "Retrieval"]),
-    (["product", "market", "strategy", "company", "startup"], ["Culture", "Technology", "Product Strategy"]),
-    (["design", "typography", "layout", "color", "ui"], ["Design", "Interface Design", "Visual Systems"]),
-]
 SYSTEM_NOTE_NAMES = {"dashboard", "dashboard-index", "index", "readme", "summary", "log"}
 LAYER_LABEL_RE = re.compile(r"^layer\d+\s*:\s*", re.IGNORECASE)
 LAYER_BULLET_RE = re.compile(r"^-\s*layer(?P<depth>\d+)\s*:\s*(?P<label>.+)$", re.IGNORECASE)
@@ -226,16 +212,16 @@ def note_tags_from_metadata(metadata: dict[str, Any]) -> list[str]:
     return sorted(set(tags))
 
 
-def infer_category(title: str, text: str, source_relpath: str, tags: Sequence[str] | None = None) -> list[str]:
+def infer_category(config: WikiConfig, title: str, text: str, source_relpath: str, tags: Sequence[str] | None = None) -> list[str]:
     tag_text = " ".join(tags or [])
     scorebag = Counter(tokenize(f"{title}\n{text}\n{source_relpath}\n{tag_text}"))
     best_score = 0
     best = ["Needs Review", "Reclassify", "Pending"]
-    for keywords, category in CATEGORY_RULES:
-        score = sum(scorebag.get(keyword.lower(), 0) for keyword in keywords)
+    for rule in config.category_rules:
+        score = sum(scorebag.get(keyword.lower(), 0) for keyword in rule["keywords"])
         if score > best_score:
             best_score = score
-            best = category
+            best = rule["category"]
     return best
 
 
@@ -245,7 +231,7 @@ def configured_category(config: WikiConfig, source_relpath: str) -> list[str] | 
     override = (raw.get("category_overrides") or {}).get(source_relpath)
     if override:
         category = [safe_title(part) for part in override]
-        if len(category) >= 3:
+        if len(category) >= 2:
             return category
     prefix_overrides = raw.get("category_prefix_overrides") or {}
     best_prefix = None
@@ -257,7 +243,7 @@ def configured_category(config: WikiConfig, source_relpath: str) -> list[str] | 
     if best_prefix is None:
         return None
     category = [safe_title(part) for part in prefix_overrides[best_prefix]]
-    return category if len(category) >= 3 else None
+    return category if len(category) >= 2 else None
 
 
 def gather_source_files(config: WikiConfig) -> list[Path]:
@@ -286,8 +272,8 @@ def normalize_packet(packet: dict[str, Any]) -> dict[str, Any]:
     title = safe_title(packet.get("title") or Path(source).stem)
     summary = summarize_text(packet.get("summary") or title)
     category = [safe_title(part) for part in (packet.get("category_path") or [])]
-    if len(category) < 3:
-        raise ValueError("packet category_path must have at least 3 levels")
+    if len(category) < 2:
+        raise ValueError("packet category_path must have at least 2 levels")
     tags = sorted({str(tag).strip() for tag in packet.get("tags", []) if str(tag).strip()})
     return {"title": title, "summary": summary, "category_path": category, "tags": tags, "source": source}
 
@@ -305,7 +291,7 @@ def extract_packet_from_note(path: Path, config: WikiConfig) -> dict[str, Any]:
     return {
         "title": title,
         "summary": summary,
-        "category_path": category_override or infer_category(title, cleaned, rel, tags),
+        "category_path": category_override or infer_category(config, title, cleaned, rel, tags),
         "tags": tags,
         "source": rel,
     }

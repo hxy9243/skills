@@ -25,6 +25,20 @@
       "Distributed Systems"
     ]
   },
+  "category_rules": [
+    {
+      "keywords": ["dspy", "gepa", "mipro", "teleprompt", "prompt-optimization", "prompt", "coding-agent", "ai-agent", "agent-framework", "skills"],
+      "category": ["Computer Science", "Artificial Intelligence", "AI Agents"]
+    },
+    {
+      "keywords": ["agent", "assistant", "tool", "workflow", "automation"],
+      "category": ["Computer Science", "Artificial Intelligence", "AI Systems", "Agents"]
+    },
+    {
+      "keywords": ["distributed", "database", "replication", "consensus", "scheduler", "cluster"],
+      "category": ["Computer Science", "Computer Systems", "Distributed Systems"]
+    }
+  ],
   "search": {
     "lexical_limit": 8
   }

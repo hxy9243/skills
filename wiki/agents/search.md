@@ -6,7 +6,7 @@ Use this workflow when the user wants to search, browse, or answer questions fro
 
 Interpret the query, expand it into the most likely nearby concepts, let the backend combine content search, tag search, and hierarchy/index search, then use `index.md` and category pages for browse context.
 
-Use the active model from the invoking skill/session for answer synthesis. Retrieval remains delegated in `scripts/wiki.py`.
+Use the active model from the invoking skill/session for answer synthesis. Retrieval remains delegated in the `wikicli` python package.
 
 ## Workflow
 

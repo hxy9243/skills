@@ -4,7 +4,7 @@ Use this workflow for first-time taxonomy setup, notebook-wide indexing, rebuild
 
 ## Goal
 
-Handle first-time taxonomy setup and whole-notebook classification planning, then let `scripts/wiki.py` index source notes against the log and rebuild the tree-focused `index.md`, `categories/`, and `log.md`.
+Handle first-time taxonomy setup and whole-notebook classification planning, then let the `wikicli` python package index source notes against the log and rebuild the tree-focused `index.md`, `categories/`, and `log.md`.
 
 Use the active model from the invoking skill/session for any synthesis or classification work. Do not try to configure a model in the backend.
 

@@ -4,7 +4,7 @@ Use this workflow when the task is to add one or a few source notes into the gen
 
 ## Goal
 
-Convert raw notes into normalized classification packets, then hand those packets to `scripts/wiki.py` so the backend can update `index.md`, regenerate category pages, and append to `log.md`.
+Convert raw notes into normalized classification packets, then hand those packets to the `wikicli` python package so the backend can update `index.md`, regenerate category pages, and append to `log.md`.
 
 Use the active model from the invoking skill/session. Do not add model settings to wiki config or backend calls.
 

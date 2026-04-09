@@ -6,7 +6,7 @@ Use this workflow when the user wants validation, cleanup guidance, or confidenc
 
 Run deterministic checks first, then turn the result into a short remediation plan.
 
-Use the active model from the invoking skill/session if you summarize findings, but keep all validation logic in `scripts/wiki.py`.
+Use the active model from the invoking skill/session if you summarize findings, but keep all validation logic in the `wikicli` python package.
 
 ## Workflow
 

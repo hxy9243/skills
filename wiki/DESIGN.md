@@ -9,7 +9,7 @@ The design goal is to keep the system simple:
 - source notes remain the source of truth
 - generated wiki files live under a separate wiki root such as `_WIKI/`
 - model-driven categorization and synthesis stay in the skill prompts
-- deterministic file handling, rendering, search delegation, and linting stay in `scripts/wiki.py`
+- deterministic file handling, rendering, search delegation, and linting stay in the `wikicli` python package
 
 ## Generated Files
 
