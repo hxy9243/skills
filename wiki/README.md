@@ -1,6 +1,10 @@
 # wiki
 
-`wiki` turns an Obsidian-style note collection into a lightweight generated wiki rooted in category pages, with search and topic-synthesis workflows on top of the indexed notes.
+The `wiki` skill turns an Obsidian-style note collection into a lightweight generated wiki rooted in category pages, with search and topic-synthesis workflows on top of the indexed notes.
+
+## How To Use It
+
+In normal use, start with `index` to establish or refresh the wiki structure, then use `add` for targeted note classification. Reach for `search` when the user wants discovery or direct answers from the note set, use `synthesize` when they want a topic brief assembled across multiple notes, and use `lint` to validate that the generated wiki is still in sync with the underlying notebook.
 
 ## What It Generates
 
@@ -19,65 +23,54 @@ uv run wiki synthesize --category "Computer Science > Artificial Intelligence > 
 uv run wiki lint
 ```
 
-## Small Example
+## Skill Use Example
 
-Example category tree in `index.md`:
+### Example category tree in `index.md`
 
 ```text
-- layer1: [Computer Science](categories/computer-science/index.md)
-  - layer2: [Artificial Intelligence](categories/computer-science/artificial-intelligence/index.md)
-    - layer3: [LLM](categories/computer-science/artificial-intelligence/llm/index.md)
+- layer1: [[Computer Science]]
+  - layer2: [[Artificial Intelligence]]
+    - layer3: [[LLM]]
       - [[20_Subjects/Computer Science/Papers/Chain-of-Thought Prompting Elicits Reasoning in Large Language Models.md]]
       - [[20_Subjects/Computer Science/Papers/Least-to-Most Prompting Enables Complex Reasoning in Large Language Models.md]]
 ```
 
-Example search:
+## Search
 
-```bash
-uv run wiki search "chain of thought"
+input
+
+> Search my notes for chain-of-thought prompting.
+
+output
+
+```
+Assistant: I found the strongest hit in
+[[20_Subjects/Computer Science/Papers/Chain-of-Thought Prompting Elicits Reasoning in Large Language Models.md]]
+under [[Computer Science]] > [[Artificial Intelligence]] > [[LLM]].
+
+It matches because the note explicitly covers reasoning in large language models and sits in the same concept branch as related prompting papers.
 ```
 
-Example result:
+## Synthesis
 
-```json
-{
-  "hierarchy_matches": [
-    {
-      "path": "20_Subjects/Computer Science/Papers/Chain-of-Thought Prompting Elicits Reasoning in Large Language Models.md",
-      "category_path": [
-        "Computer Science",
-        "Artificial Intelligence",
-        "LLM"
-      ],
-      "evidence": "reasoning in large language models"
-    }
-  ]
-}
-```
+input
 
-Example synthesize:
+> Synthesize what my notes say about reasoning prompts in LLMs.
 
-```bash
-uv run wiki synthesize --category "Computer Science > Artificial Intelligence > LLM" --limit 2
-```
+output
 
-Example result bundle:
+```text
+Assistant: Your notes treat reasoning prompts as a family of techniques for improving multi-step problem solving in LLMs.
 
-```json
-{
-  "status": "experimental",
-  "message": "Use this note bundle as input to the synthesize workflow.",
-  "notes": [
-    {
-      "title": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models",
-      "category_path": ["Computer Science", "Artificial Intelligence", "LLM"]
-    },
-    {
-      "title": "Least-to-Most Prompting Enables Complex Reasoning in Large Language Models",
-      "category_path": ["Computer Science", "Artificial Intelligence", "LLM"]
-    }
-  ]
-}
+The core cluster here is:
+- [[20_Subjects/Computer Science/Papers/Chain-of-Thought Prompting Elicits Reasoning in Large Language Models.md]]
+- [[20_Subjects/Computer Science/Papers/Least-to-Most Prompting Enables Complex Reasoning in Large Language Models.md]]
+
+Together they suggest a progression from eliciting intermediate reasoning to structuring harder problems into smaller ordered steps.
+
+References:
+- [[20_Subjects/Computer Science/Papers/Chain-of-Thought Prompting Elicits Reasoning in Large Language Models.md]]
+- [[20_Subjects/Computer Science/Papers/Least-to-Most Prompting Enables Complex Reasoning in Large Language Models.md]]
 ```
 
 ## Config Resolution
