@@ -1,6 +1,6 @@
 ---
 name: wiki
-description: Build and maintain a formal notebook wiki with category-organized indexes, hierarchy summaries, delegated search, and linting. Use this whenever the user wants to turn notes into a browsable knowledge base, organize an Obsidian notebook into categories, regenerate a wiki index, search across synthesized categories, or validate wiki integrity.
+description: Build and maintain a formal notebook wiki with category-organized indexes, hierarchy summaries, delegated search, synthesis, and linting. Use this whenever the user wants to turn notes into a browsable knowledge base, organize an Obsidian notebook into categories, regenerate a wiki index, search across synthesized categories, create a synthesized topic brief from notes, or validate wiki integrity.
 ---
 
 # Wiki
@@ -29,7 +29,7 @@ Use these principles when indexing or searching:
 
 ## Dispatch
 
-Choose one of these four subagent workflows before touching the script:
+Choose one of these five subagent workflows before touching the script:
 
 1. `agents/add.md`
 Use for targeted note ingestion or when the user wants to add a few notes into the wiki.
@@ -40,7 +40,10 @@ Use for notebook-wide or folder-wide indexing, incremental refreshes, and rebuil
 3. `agents/search.md`
 Use when the user wants answers or browsing help from the generated wiki.
 
-4. `agents/lint.md`
+4. `agents/synthesize.md`
+Use when the user wants a synthesized presentation of a topic assembled from matching notes.
+
+5. `agents/lint.md`
 Use when the user wants validation, cleanup guidance, or integrity checks.
 
 ## Config Contract
