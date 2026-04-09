@@ -14,6 +14,7 @@ from wikicli.config import DEFAULT_EXCLUDES, WikiConfig, ensure_layout, read_jso
 SYSTEM_NOTE_NAMES = {"dashboard", "dashboard-index", "index", "readme", "summary", "log"}
 LAYER_LABEL_RE = re.compile(r"^layer\d+\s*:\s*", re.IGNORECASE)
 LAYER_BULLET_RE = re.compile(r"^-\s*layer(?P<depth>\d+)\s*:\s*(?P<label>.+)$", re.IGNORECASE)
+NOTE_LINK_RE = re.compile(r"^\s*-\s*\[\[([^\]]+)\]\]\s*$")
 STOPWORDS = {
     "a", "an", "and", "are", "as", "at", "be", "by", "for", "from", "how",
     "in", "is", "it", "of", "on", "or", "that", "the", "this", "to", "use", "with",
@@ -93,6 +94,21 @@ def strip_frontmatter(text: str) -> str:
 
 def category_value(category_path: Sequence[str]) -> str:
     return " > ".join(safe_title(part) for part in category_path)
+
+
+def parse_category_path(value: Any) -> list[str] | None:
+    if isinstance(value, str):
+        parts = [safe_title(part) for part in value.split(">") if part.strip()]
+        return parts if len(parts) >= 2 else None
+    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
+        parts = [safe_title(str(part)) for part in value if str(part).strip()]
+        return parts if len(parts) >= 2 else None
+    return None
+
+
+def frontmatter_category_path(text: str) -> list[str] | None:
+    metadata, _ = parse_frontmatter(text)
+    return parse_category_path(metadata.get("category"))
 
 
 def upsert_frontmatter_property(text: str, key: str, value: str) -> str:
@@ -212,7 +228,63 @@ def note_tags_from_metadata(metadata: dict[str, Any]) -> list[str]:
     return sorted(set(tags))
 
 
-def infer_category(config: WikiConfig, title: str, text: str, source_relpath: str, tags: Sequence[str] | None = None) -> list[str]:
+def extract_tree_section(path: Path) -> str | None:
+    if not path.exists():
+        return None
+    text = path.read_text(encoding="utf-8")
+    if "## Category Tree" not in text or "\n---\n" not in text:
+        return None
+    after_header = text.split("## Category Tree", 1)[1]
+    tree_block, _, _ = after_header.partition("\n---\n")
+    return tree_block.strip()
+
+
+def parse_allowed_category_paths(path: Path) -> set[tuple[str, ...]]:
+    text = extract_tree_section(path)
+    if not text:
+        return set()
+
+    allowed: set[tuple[str, ...]] = set()
+    stack: list[str] = []
+    for raw_line in text.splitlines():
+        match = LAYER_BULLET_RE.match(raw_line.lstrip())
+        if not match:
+            continue
+        depth = max(1, int(match.group("depth")))
+        name = strip_layer_label(markdown_label(match.group("label")))
+        while len(stack) >= depth:
+            stack.pop()
+        stack.append(name)
+        if depth >= 2:
+            allowed.add(tuple(stack))
+    return allowed
+
+
+def parse_index_note_assignments(path: Path) -> dict[str, list[str]]:
+    text = extract_tree_section(path)
+    if not text:
+        return {}
+
+    assignments: dict[str, list[str]] = {}
+    stack: list[str] = []
+    for raw_line in text.splitlines():
+        stripped = raw_line.rstrip()
+        match = LAYER_BULLET_RE.match(stripped.lstrip())
+        if match:
+            depth = max(1, int(match.group("depth")))
+            name = strip_layer_label(markdown_label(match.group("label")))
+            while len(stack) >= depth:
+                stack.pop()
+            stack.append(name)
+            continue
+
+        note_match = NOTE_LINK_RE.match(stripped)
+        if note_match and len(stack) >= 2:
+            assignments[normalize_path(Path(note_match.group(1)))] = list(stack)
+    return assignments
+
+
+def infer_category_from_rules(config: WikiConfig, title: str, text: str, source_relpath: str, tags: Sequence[str] | None = None) -> list[str]:
     tag_text = " ".join(tags or [])
     scorebag = Counter(tokenize(f"{title}\n{text}\n{source_relpath}\n{tag_text}"))
     best_score = 0
@@ -223,6 +295,49 @@ def infer_category(config: WikiConfig, title: str, text: str, source_relpath: st
             best_score = score
             best = rule["category"]
     return best
+
+
+def score_category_path(path_parts: Sequence[str], title: str, text: str, source_relpath: str, tags: Sequence[str] | None = None) -> tuple[int, int, int]:
+    title_bag = Counter(tokenize(title))
+    text_bag = Counter(tokenize(text))
+    source_bag = Counter(tokenize(source_relpath))
+    tag_bag = Counter(tokenize(" ".join(tags or [])))
+    haystack = " ".join([title.lower(), text.lower(), source_relpath.lower(), " ".join(tag.lower() for tag in (tags or []))])
+
+    score = 0
+    matched = 0
+    for part in path_parts:
+        part_tokens = set(tokenize(part))
+        if not part_tokens:
+            continue
+        token_score = 0
+        for token in part_tokens:
+            token_score += title_bag.get(token, 0) * 8
+            token_score += tag_bag.get(token, 0) * 6
+            token_score += source_bag.get(token, 0) * 5
+            token_score += text_bag.get(token, 0) * 2
+        phrase = part.lower()
+        if phrase and phrase in haystack:
+            token_score += 12
+        if token_score > 0:
+            matched += 1
+        score += token_score
+    return score, matched, -len(path_parts)
+
+
+def infer_category(config: WikiConfig, title: str, text: str, source_relpath: str, tags: Sequence[str] | None = None) -> list[str]:
+    allowed_paths = sorted(parse_allowed_category_paths(config.category_tree_path))
+    if allowed_paths:
+        ranked = sorted(
+            ((score_category_path(path, title, text, source_relpath, tags), list(path)) for path in allowed_paths),
+            key=lambda item: item[0],
+            reverse=True,
+        )
+        best_score, best_path = ranked[0]
+        if best_score[0] > 0 or best_score[1] > 0:
+            return best_path
+
+    return infer_category_from_rules(config, title, text, source_relpath, tags)
 
 
 def configured_category(config: WikiConfig, source_relpath: str) -> list[str] | None:
@@ -288,10 +403,11 @@ def extract_packet_from_note(path: Path, config: WikiConfig) -> dict[str, Any]:
     summary = summarize_text(sentences[0] if sentences else cleaned or title)
     rel = normalize_path(path.relative_to(config.notebook_root))
     category_override = configured_category(config, rel)
+    frontmatter_category = frontmatter_category_path(text)
     return {
         "title": title,
         "summary": summary,
-        "category_path": category_override or infer_category(config, title, cleaned, rel, tags),
+        "category_path": frontmatter_category or category_override or infer_category(config, title, cleaned, rel, tags),
         "tags": tags,
         "source": rel,
     }
