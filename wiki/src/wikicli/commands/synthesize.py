@@ -3,8 +3,10 @@ from __future__ import annotations
 import json
 
 from wikicli.config import load_config
-from wikicli.core import active_catalog, gather_source_files, normalize_path
-from wikicli.tree import combined_notes, suggest_unindexed_packets
+from wikicli.fs import gather_source_files, normalize_path
+from wikicli.log import active_catalog
+from wikicli.markdown import clean_note_text
+from wikicli.render import combined_notes, suggest_unindexed_packets
 
 
 def register_parser(subparsers) -> None:
@@ -12,6 +14,7 @@ def register_parser(subparsers) -> None:
     parser.add_argument("--category", help="Filter notes by an exact category path segment joined with ' > '.")
     parser.add_argument("--tag", action="append", default=[], help="Filter notes by tag. Repeatable.")
     parser.add_argument("--limit", type=int, default=10, help="Maximum notes to include.")
+    parser.add_argument("--include-body", action="store_true", help="Include the full markdown body of the notes in the output.")
     parser.set_defaults(func=run)
 
 
@@ -28,9 +31,17 @@ def run(args) -> int:
         requested = set(args.tag)
         selected = [note for note in selected if requested & set(note.get("tags", []))]
 
+    selected = selected[: args.limit]
+
+    if args.include_body:
+        for note in selected:
+            source_path = config.notebook_root / note["source"]
+            if source_path.exists():
+                note["body"] = clean_note_text(source_path.read_text(encoding="utf-8"))
+
     print(json.dumps({
         "status": "experimental",
         "message": "Use this note bundle as input to the synthesize workflow.",
-        "notes": selected[: args.limit],
+        "notes": selected,
     }, indent=2))
     return 0

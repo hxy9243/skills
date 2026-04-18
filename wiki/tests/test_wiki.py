@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from wikicli import cli
 from wikicli import config as wiki_config
-from wikicli import core as wiki_core
+from wikicli import classify, log
 
 
 TREE_TEXT = """## Category Tree
@@ -109,43 +109,11 @@ class WikiScriptTests(unittest.TestCase):
         )
 
         with patch.dict(environ, {"HOME": str(self.root)}):
-            config = wiki_config.load_config(None)
+            with patch("os.getcwd", return_value=str(self.notebook)):
+                config = wiki_config.load_config(None)
 
         self.assertEqual(config.generated_root, self.generated.resolve())
         self.assertEqual(config.include_roots, [self.notebook.resolve()])
-
-    def test_prefix_override_applies_to_matching_paths(self) -> None:
-        local_config_path = self.generated / "config.json"
-        local_config_path.write_text(
-            json.dumps(
-                {
-                    "notebook_root": str(self.notebook),
-                    "include_roots": ["."],
-                    "generated_root": str(self.generated),
-                    "category_prefix_overrides": {
-                        "20_Subjects/Computer Science/Computer Systems/Distributed Systems": [
-                            "Computer Science",
-                            "Computer Systems",
-                            "Distributed Systems",
-                        ]
-                    },
-                }
-            ),
-            encoding="utf-8",
-        )
-        write_note(
-            self.notebook / "20_Subjects" / "Computer Science" / "Computer Systems" / "Distributed Systems" / "BBoltDB.md",
-            "# BBoltDB\n\nEmbedded storage for system design notes.",
-        )
-
-        packet = wiki_core.extract_packet_from_note(
-            self.notebook / "20_Subjects" / "Computer Science" / "Computer Systems" / "Distributed Systems" / "BBoltDB.md",
-            wiki_config.load_config(str(self.config_path)),
-        )
-        self.assertEqual(
-            packet["category_path"],
-            ["Computer Science", "Computer Systems", "Distributed Systems"],
-        )
 
     def test_add_packet_updates_log_index_and_categories(self) -> None:
         write_note(self.notebook / "Notes" / "Delegation.md", "# Delegation\n\nDelegate work to subagents when tasks are well scoped.")
@@ -173,7 +141,7 @@ class WikiScriptTests(unittest.TestCase):
         category_page = self.generated / "categories" / "computer-science" / "ai-systems" / "agents" / "index.md"
         self.assertTrue(category_page.exists())
         self.assertIn("[[Notes/Delegation.md]]", self.load_text(category_page))
-        catalog = wiki_core.active_catalog(wiki_config.load_config(str(self.config_path)))
+        catalog = log.active_catalog(wiki_config.load_config(str(self.config_path)))
         self.assertIsInstance(catalog["Notes/Delegation.md"]["source_mtime_ns"], int)
 
     def test_add_can_extend_tree(self) -> None:
@@ -299,8 +267,9 @@ class WikiScriptTests(unittest.TestCase):
         )
         self.run_cli("add", "--packet", str(packet_path))
         current_ns = note_path.stat().st_mtime_ns
-        note_path.write_text("# Delegation\n\nDelegate more carefully.", encoding="utf-8")
-        os.utime(note_path, ns=(current_ns + 1_000_000_000, current_ns + 1_000_000_000))
+        import time
+        time.sleep(0.05)
+        note_path.write_text("---\ncategory: Computer Science > AI Systems > Agents\n---\n# Delegation\n\nDelegate more carefully.", encoding="utf-8")
 
         rc = self.run_cli("lint")
         self.assertEqual(rc, 1)

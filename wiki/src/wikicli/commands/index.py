@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import json
 
-from wikicli.config import ensure_layout, load_config
-from wikicli.core import active_catalog, append_log_event, gather_source_files, normalize_path, source_mtime_ns, utc_now
-from wikicli.tree import rebuild_generated_views
+from wikicli.config import load_config
+from wikicli.fs import ensure_layout, gather_source_files, normalize_path, source_mtime_ns
+from wikicli.log import active_catalog, append_log_event, utc_now
+from wikicli.render import rebuild_generated_views
 
 
 def register_parser(subparsers) -> None:

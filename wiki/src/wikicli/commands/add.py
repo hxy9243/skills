@@ -3,18 +3,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from wikicli.config import ensure_layout, load_config, read_json
-from wikicli.core import (
-    active_catalog,
-    append_log_event,
-    apply_category_property,
-    extract_packet_from_note,
-    gather_source_files,
-    normalize_packet,
-    normalize_path,
-    utc_now,
-)
-from wikicli.tree import rebuild_generated_views
+from wikicli.classify import extract_packet_from_note, normalize_packet
+from wikicli.config import load_config, read_json
+from wikicli.fs import ensure_layout, gather_source_files, normalize_path
+from wikicli.log import active_catalog, append_log_event, utc_now
+from wikicli.markdown import apply_category_property
+from wikicli.render import rebuild_generated_views
 
 
 def register_parser(subparsers) -> None:
@@ -32,7 +26,13 @@ def run(args) -> int:
 
     packets: list[dict[str, object]] = []
     if args.packet:
-        payload = read_json(Path(args.packet).expanduser().resolve(), None)
+        try:
+            if args.packet.strip().startswith("{") or args.packet.strip().startswith("["):
+                payload = json.loads(args.packet)
+            else:
+                payload = read_json(Path(args.packet).expanduser().resolve(), None)
+        except json.JSONDecodeError as e:
+            raise SystemExit(f"invalid packet JSON: {e}")
         if payload is None:
             raise SystemExit(f"packet file not found: {args.packet}")
         packets.extend(payload if isinstance(payload, list) else [payload])

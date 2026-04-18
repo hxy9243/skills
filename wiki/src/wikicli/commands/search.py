@@ -6,8 +6,10 @@ import subprocess
 from pathlib import Path
 
 from wikicli.config import load_config
-from wikicli.core import STOPWORDS, active_catalog, gather_source_files, normalize_path, tokenize
-from wikicli.tree import combined_notes, suggest_unindexed_packets
+from wikicli.fs import gather_source_files, normalize_path
+from wikicli.log import active_catalog
+from wikicli.render import combined_notes, suggest_unindexed_packets
+from wikicli.text import STOPWORDS, tokenize
 
 
 def register_parser(subparsers) -> None:

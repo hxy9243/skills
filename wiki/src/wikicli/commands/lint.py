@@ -2,20 +2,11 @@ from __future__ import annotations
 
 import json
 
-from wikicli.config import ensure_layout, load_config
-from wikicli.core import (
-    active_catalog,
-    append_log_event,
-    apply_category_property,
-    category_value,
-    frontmatter_category_path,
-    gather_source_files,
-    normalize_path,
-    parse_index_note_assignments,
-    source_mtime_ns,
-    utc_now,
-)
-from wikicli.tree import parse_category_tree
+from wikicli.config import load_config
+from wikicli.fs import ensure_layout, gather_source_files, normalize_path, source_mtime_ns
+from wikicli.log import active_catalog, append_log_event, utc_now
+from wikicli.markdown import apply_category_property, category_value, frontmatter_category_path
+from wikicli.tree import parse_category_tree, parse_index_note_assignments
 
 
 def register_parser(subparsers) -> None:
