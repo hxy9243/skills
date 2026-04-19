@@ -36,7 +36,7 @@ Choose one of these six subagent workflows before touching the script:
 Use when the task is to establish the wiki for the first time by proposing an initial category tree.
 
 1. `agents/add.md`
-Use for targeted note ingestion or when the user wants to add a few notes into the wiki.
+Use for targeted note ingestion or when the user wants to add a few notes into the wiki. The agent will also maintain existing concept pages by integrating new information and noting contradictions.
 
 2. `agents/index.md`
 Use for notebook-wide or folder-wide indexing, incremental refreshes, and rebuilds.
