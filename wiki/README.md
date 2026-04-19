@@ -23,6 +23,14 @@ uv run wiki synthesize --category "Computer Science > Artificial Intelligence > 
 uv run wiki lint
 ```
 
+## Testing
+
+To run the full suite of unit and integration tests for the Python backend:
+
+```bash
+uv run python -m unittest discover tests/
+```
+
 ## Skill Use Example
 
 ### Example category tree in `index.md`
@@ -86,6 +94,8 @@ Use [`templates/config.json.example`](./templates/config.json.example) as the st
 
 ## Category Rules
 
+If the user has specific classification preferences, they should be documented in `RULES.md` in the wiki root. Subagents should consult `RULES.md` alongside the approved category tree when classifying notes.
+
 - Keep three layers as the default starting point, but add deeper layers when a branch gets crowded or conceptually dense.
 - Aim for roughly 5-10 children per layer.
 - Prefer durable topic branches over generic buckets like `Research`, `Papers`, `General`, or `Misc`.
@@ -94,7 +104,6 @@ Use [`templates/config.json.example`](./templates/config.json.example) as the st
 - Split branches once they pass roughly 12 direct children or clearly contain subclusters.
 - Consolidate overlapping systems buckets when they represent the same browsing intent.
 - Prefer retrieval-first grouping over folder-first grouping. Notes from different source folders can still belong in the same concept subtree.
-- Use `category_overrides` for exact note placements and `category_prefix_overrides` for stable folder-level rules.
 
 ## Workflow
 

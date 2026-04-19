@@ -1,17 +1,18 @@
 ---
 name: wiki
-description: Build and maintain a formal notebook wiki with category-organized indexes, hierarchy summaries, delegated search, synthesis, and linting. Use this whenever the user wants to turn notes into a browsable knowledge base, organize an Obsidian notebook into categories, regenerate a wiki index, search across synthesized categories, create a synthesized topic brief from notes, or validate wiki integrity.
+description: Build and maintain organized knowledge from raw source notes into a formal wiki with category-organized indexes, hierarchy summaries, delegated search, synthesis, and linting. Use this whenever the user wants to turn notes into a browsable knowledge base, organize an Obsidian notebook into categories, regenerate a wiki index, search across synthesized categories, create a synthesized topic summary, or validate wiki integrity.
 ---
 
 # Wiki
 
-This skill formalizes a notebook into a generated wiki workspace. Keep model-driven interpretation in the subagents and keep deterministic processing in the `wikicli` python package.
+This skill formalizes a notebook into a generated wiki workspace for easier indexing, organization, and retrieval.
 
 ## What This Skill Owns
 
 - Source notes stay in the notebook.
 - Generated wiki artifacts live in a separate wiki root.
 - The approved category tree lives at the top of `index.md` and is the classification reference.
+- User preferences live in the `RULES.md` file to guide or override categorization decisions.
 - Category, subcategory, and topic layers each get a generated markdown synthesis page.
 - Search combines `obsidian-cli search-content` when available, tag-aware note matching, and generated index/category search.
 - `log.md` is the persistent record of adds, removals, and lint runs.
@@ -29,7 +30,10 @@ Use these principles when indexing or searching:
 
 ## Dispatch
 
-Choose one of these five subagent workflows before touching the script:
+Choose one of these six subagent workflows before touching the script:
+
+1. `agents/setup.md`
+Use when the task is to establish the wiki for the first time by proposing an initial category tree.
 
 1. `agents/add.md`
 Use for targeted note ingestion or when the user wants to add a few notes into the wiki.
@@ -67,18 +71,6 @@ Supported config fields:
   "include_roots": [".", "Projects"],
   "exclude_globs": ["_WIKI/**", ".obsidian/**", "Templates/**"],
   "generated_root": "/absolute/path/to/notebook/_WIKI",
-  "category_overrides": {
-    "00_Inbox/Some Note.md": ["Computer Science", "AI Systems", "Agents"]
-  },
-  "category_prefix_overrides": {
-    "20_Subjects/Computer Science/Computer Systems/Distributed Systems": ["Computer Science", "Computer Systems", "Distributed Systems"]
-  },
-  "category_rules": [
-    {
-      "keywords": ["agent", "assistant", "tool"],
-      "category": ["Computer Science", "Artificial Intelligence", "AI Systems", "Agents"]
-    }
-  ],
   "search": {
     "lexical_limit": 8
   }
@@ -86,8 +78,6 @@ Supported config fields:
 ```
 
 `include_roots` are resolved relative to `notebook_root` unless absolute.
-Use `category_overrides` for notebook-specific placements that should survive future rebuilds.
-Use `category_prefix_overrides` for stable folder-level placements where many notes should share the same branch.
 
 Model choice is not part of the backend config. Subagents should inherit the active model from the invoking skill/session.
 
@@ -126,9 +116,11 @@ Before indexing a notebook for the first time, establish an approved category tr
 3. Put the approved category tree at the top of `index.md`, above a markdown separator `---`.
 4. Ask the user to approve or edit that top section before running a full-repo index.
 
-Use [`templates/category_tree.md.example`](/home/kevin/Workspace/skills/wiki/templates/category_tree.md.example) as the starting tree block, then paste it into the top of `index.md`.
+Use [`templates/category_tree.md.example`](/templates/category_tree.md.example) as an example, create a new category tree and place it at the top of `index.md`.
 
 Do not index the whole notebook until the user has accepted a category tree.
+
+Save exceptions and rules into the `RULES.md` in the wiki root.
 
 ## Generated Artifacts
 
@@ -141,7 +133,7 @@ The Python backend maintains:
 ## Operating Rules
 
 - Let subagents interpret notes and queries.
-- Let `src/wikicli` own file IO, category-page regeneration, log updates, indexing, delegated search, and lint checks.
+- Let `src/wikicli` own deterministic operations like file IO, category-page regeneration, log updates, indexing, delegated search, and lint checks.
 - Keep the approved category tree at the top of `index.md` as the classification reference for `add` and first-time `index`.
 - Keep `index.md` focused on the category tree itself. Do not regenerate a second browse-by-category section below it.
 - Prefer `index` for broad refreshes and `add` for small targeted updates.

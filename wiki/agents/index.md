@@ -44,6 +44,8 @@ uv run wiki index
 - Split overloaded branches when they exceed roughly 12 direct children or when the notes form obvious subclusters.
 - Consolidate parallel branches when users would search them as one idea cluster.
 - Prefer concept consistency across source folders. A topic family should usually live in one subtree even if notes came from projects, inbox, and subject folders.
+- Run `uv run wiki lint` to discover all unindexed notes.
+- If there are unindexed notes, read the approved category tree at the top of `index.md` and any custom rules in `RULES.md` to guide classification.
 - Keep hierarchy labels broad enough to survive future indexing.
 - Keep the approved category tree in `index.md` updated when genuinely new subtrees are needed.
 - Use the deterministic `layer1:`, `layer2:`, `layer3:`, and deeper `layerN:` labels when proposing or editing branch names.

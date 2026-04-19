@@ -1,0 +1,9 @@
+# Categorization Rules
+
+This file documents persistent rules and preferences for how notes should be classified by the subagents. These rules guide decisions when the category tree is ambiguous or when you want to enforce a specific placement.
+
+## Examples
+
+- **AI Agents**: Any note talking about LLM agents, tool use, or function calling should go to `Computer Science > Artificial Intelligence > AI Systems > Agents`.
+- **Databases**: Place notes about SQL, NoSQL, or distributed storage under `Computer Science > Computer Systems > Databases`.
+- **Daily Notes**: Daily journal entries or meeting notes should NOT be indexed in the main topic tree. Keep them in a separate `Journal` branch.
