@@ -104,3 +104,9 @@ Good synthesis responses usually include:
 - Do not flatten disagreements or tradeoffs into fake consensus.
 - Do not present external facts as though they came from the notebook.
 - Do not rewrite source notes in place.
+
+# Result Output
+
+By default, if it's a synthesis for a given category in the tree, write the result into the `path/to/category/index.md` file, under the section `## Synthesis` or `## Summary`.
+
+If the topic is not covered in the category tree, you can propose and write a new `path/to/category/index.md` file, and add it into the tree structure.
