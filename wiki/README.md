@@ -104,6 +104,8 @@ References:
 - [[20_Subjects/Computer Science/Papers/Least-to-Most Prompting Enables Complex Reasoning in Large Language Models.md]]
 ```
 
+**Compound Knowledge**: You can ask the agent to "save this synthesis" to permanently file it back into your notebook as a new source note, allowing your explorations to compound over time.
+
 ## Config Resolution
 
 The backend resolves config in this order:

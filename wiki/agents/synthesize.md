@@ -110,3 +110,13 @@ Good synthesis responses usually include:
 By default, if it's a synthesis for a given category in the tree, write the result into the `path/to/category/index.md` file, under the section `## Synthesis` or `## Summary`.
 
 If the topic is not covered in the category tree, you can propose and write a new `path/to/category/index.md` file, and add it into the tree structure.
+
+## Compound Knowledge
+
+If the synthesis represents a highly valuable new concept, deep analysis, or comparison, or if the user explicitly asks to save the synthesis, you should offer to file it back into the wiki as a new source note. This allows explorations to compound over time.
+
+To save a synthesis:
+1. Create a new markdown file in the user's notebook (e.g., alongside related source notes or in a `Syntheses/` folder).
+2. Include rich YAML frontmatter (tags, related note links).
+3. Write the synthesized content into the file.
+4. Run `uv run wiki add <path-to-new-note>` to index it back into the wiki.

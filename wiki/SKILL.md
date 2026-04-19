@@ -45,7 +45,7 @@ Use for notebook-wide or folder-wide indexing, incremental refreshes, and rebuil
 Use when the user wants answers or browsing help from the generated wiki.
 
 4. `agents/synthesize.md`
-Use when the user wants a synthesized presentation of a topic assembled from matching notes.
+Use when the user wants a synthesized presentation of a topic assembled from matching notes. The agent can save valuable syntheses back into the user's notebook as new source notes to compound knowledge over time.
 
 5. `agents/lint.md`
 Use when the user wants validation, cleanup guidance, or integrity checks.
@@ -106,29 +106,6 @@ Small example:
         - Note 1 on DSPy
         - Note 2 on GEPA
 ```
-
-## First-Time Setup
-
-Before indexing a notebook for the first time, establish an approved category tree.
-
-1. Read through a representative slice of the notes.
-2. Propose a category tree that can absorb the notebook's concepts and match how the user will naturally browse or search them later.
-3. Put the approved category tree at the top of `index.md`, above a markdown separator `---`.
-4. Ask the user to approve or edit that top section before running a full-repo index.
-
-Use [`templates/category_tree.md.example`](/templates/category_tree.md.example) as an example, create a new category tree and place it at the top of `index.md`.
-
-Do not index the whole notebook until the user has accepted a category tree.
-
-Save exceptions and rules into the `RULES.md` in the wiki root.
-
-## Generated Artifacts
-
-The Python backend maintains:
-- `config.json`: notebook-local wiki config stored under the generated wiki root
-- `index.md`: top-level category tree across the whole wiki, with all discovered non-system notes placed under their current branch and operational sections below a separator
-- `log.md`: append-only record of adds, removals, and lint runs
-- `categories/`: generated synthesis pages for each category node, with a brief intro, topics covered, references, and search cues
 
 ## Operating Rules
 
