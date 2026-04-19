@@ -47,7 +47,7 @@ uv run wiki add --packet '{"title": "Note title", "summary": "One paragraph summ
 
 ## Quality Bar
 
-- Summary should explain what the concept is and why it matters.
+- **Contextual Framing (5W1H)**: The summary must strictly answer: Who is involved? What is the core concept? When/Where does it apply? Why does it matter? How is it implemented or used? This captures human intent and prevents generic summaries.
 - Category path should fit the approved tree, not invent brittle micro-buckets.
 - Category path should reflect retrieval intent, not just where the note happens to live in the notebook.
 - Tags should be short and reusable.

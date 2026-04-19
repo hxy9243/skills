@@ -54,7 +54,7 @@ uv run wiki search "user topic"
      - open questions or gaps
 
 6. Create the synthesized presentation.
-   - Start with a short framing paragraph that defines the topic as the notes use it.
+   - **Contextual Framing (5W1H)**: Start with a short framing paragraph that defines the topic using the 5W1H framework (Who, What, When, Where, Why, How) to capture human intent and prevent generic summaries.
    - Then present the major themes in a deliberate order.
    - Prefer synthesis over note-by-note recitation.
    - Keep each claim tied to note evidence.
