@@ -2,9 +2,31 @@
 
 The `wiki` skill turns an Obsidian-style note collection into a lightweight generated wiki rooted in category pages, with search and topic-synthesis workflows on top of the indexed notes.
 
-## How To Use It
+## Install
 
-In normal use, start with `index` to establish or refresh the wiki structure, then use `add` for targeted note classification. Reach for `search` when the user wants discovery or direct answers from the note set, use `synthesize` when they want a topic brief assembled across multiple notes, and use `lint` to validate that the generated wiki is still in sync with the underlying notebook.
+```bash
+npx skills install wiki
+```
+
+## Quick Start
+
+You can interact with the wiki natively through the agent using natural language.
+
+1. **First-time setup**: Ask the agent to "set up the wiki" or "index the notebook for the first time" to generate your initial category tree.
+   - *Example*: "@wiki set up the wiki for my current notebook"
+   - *Example*: "@wiki read through my notes and propose a category tree"
+2. **Add notes**: Say "add my recent notes to the wiki" to classify and ingest new notes into the established categories.
+   - *Example*: "@wiki add all notes in the `00_Inbox` folder to the wiki"
+   - *Example*: "@wiki index `Notes/Delegation.md` into the wiki"
+3. **Search notes**: Ask "search my notes for X" to get direct, evidence-backed answers with hierarchy context.
+   - *Example*: "@wiki search my notes for chain-of-thought prompting"
+   - *Example*: "@wiki what do my notes say about distributed consensus algorithms?"
+4. **Synthesize**: Ask "synthesize a topic brief on Y" to cross-reference multiple notes into a cohesive summary.
+   - *Example*: "@wiki synthesize what my notes say about reasoning prompts in LLMs"
+   - *Example*: "@wiki create a topic brief for the 'AI Agents' category"
+5. **Automation (Dream & Cron Jobs)**: You can configure the agent's background `dream` or `cron` workflows to automatically add new notes, synthesize weekly roundups, and run `lint` to maintain the wiki without manual intervention.
+   - *Example Dream Task*: "Look for unindexed notes in the workspace and classify them into the wiki."
+   - *Example Cron Task*: "Run `@wiki lint` every night to ensure the wiki integrity is preserved."
 
 ## What It Generates
 
@@ -12,6 +34,7 @@ In normal use, start with `index` to establish or refresh the wiki structure, th
 - `log.md`: append-only add/remove/lint history
 - `categories/`: one generated synthesis page per category node
 - `config.json`: notebook-local configuration, typically stored under `_WIKI/`
+- `RULES.md`: category rules, notes, exceptions and overrides from user.
 
 ## Commands
 
