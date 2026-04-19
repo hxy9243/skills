@@ -109,6 +109,7 @@ Small example:
 
 ## Operating Rules
 
+- Always run `uv` commands from the wiki skill directory to ensure dependencies are loaded correctly.
 - Let subagents interpret notes and queries.
 - Let `src/wikicli` own deterministic operations like file IO, category-page regeneration, log updates, indexing, delegated search, and lint checks.
 - Keep the approved category tree at the top of `index.md` as the classification reference for `add` and first-time `index`.
@@ -122,6 +123,7 @@ Small example:
 - Use packet mode when a subagent has already normalized note classification data:
 
 ```bash
+# ensure you're in the wiki skill directory
 uv run wiki add --packet /tmp/wiki_packets.json
 uv run wiki index
 ```

@@ -21,14 +21,14 @@ from wikicli.tree import parse_allowed_category_paths
 def score_category_path(path_parts: Sequence[str], title: str, text: str, source_relpath: str, tags: Sequence[str] | None = None) -> tuple[int, int, int]:
     """
     Calculate a relevance score for a given category path against a note.
-    
+
     Args:
         path_parts (Sequence[str]): The category path to evaluate.
         title (str): The note title.
         text (str): The note body text.
         source_relpath (str): The relative path of the source note.
         tags (Sequence[str] | None): A list of tags for the note.
-        
+
     Returns:
         tuple[int, int, int]: A scoring tuple (total_score, matched_parts, inverted_depth).
     """
@@ -59,17 +59,17 @@ def score_category_path(path_parts: Sequence[str], title: str, text: str, source
     return score, matched, -len(path_parts)
 
 
-def infer_category(config: WikiConfig, title: str, text: str, source_relpath: str, tags: Sequence[str] | None = None) -> list[str]:
+def infer_category(config: WikiConfig, title: str, text: str, source_relpath: str, tags: Sequence[str] | None = None) -> str:
     """
     Infer the best category by evaluating allowed tree paths or falling back to rules.
-    
+
     Args:
         config (WikiConfig): The active wiki configuration.
         title (str): The note title.
         text (str): The note body text.
         source_relpath (str): The relative path of the source note.
         tags (Sequence[str] | None): A list of tags for the note.
-        
+
     Returns:
         list[str]: The best-matching category path.
     """
@@ -84,22 +84,22 @@ def infer_category(config: WikiConfig, title: str, text: str, source_relpath: st
         if best_score[0] > 0 or best_score[1] > 0:
             return best_path
 
-    return ["Needs Review", "Reclassify", "Pending"]
+    return "Needs Review"
 
 
 
 def normalize_packet(packet: dict[str, Any]) -> dict[str, Any]:
     """
     Normalize and validate an incoming category packet dictionary.
-    
+
     Ensures required fields exist, formats titles/categories safely, and bounds the packet.
-    
+
     Args:
         packet (dict[str, Any]): The raw packet dictionary.
-        
+
     Returns:
         dict[str, Any]: The normalized packet.
-        
+
     Raises:
         ValueError: If 'source' is missing or 'category_path' is too shallow.
     """
@@ -108,21 +108,21 @@ def normalize_packet(packet: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("packet is missing source")
     title = safe_title(packet.get("title") or Path(source).stem)
     summary = summarize_text(packet.get("summary") or title)
-    category = [safe_title(part) for part in (packet.get("category_path") or [])]
+    category = [safe_title(part) for part in (packet.get("category") or [])]
     if len(category) < 2:
-        raise ValueError("packet category_path must have at least 2 levels")
+        raise ValueError("packet category must have at least 2 levels")
     tags = sorted({str(tag).strip() for tag in packet.get("tags", []) if str(tag).strip()})
-    return {"title": title, "summary": summary, "category_path": category, "tags": tags, "source": source}
+    return {"title": title, "summary": summary, "category": category, "tags": tags, "source": source}
 
 
 def extract_packet_from_note(path: Path, config: WikiConfig) -> dict[str, Any]:
     """
     Extract a fully formed metadata packet from a note by parsing and inferencing.
-    
+
     Args:
         path (Path): The absolute path to the note.
         config (WikiConfig): The active wiki configuration.
-        
+
     Returns:
         dict[str, Any]: A packet dictionary with title, summary, category_path, tags, and source.
     """
@@ -138,7 +138,7 @@ def extract_packet_from_note(path: Path, config: WikiConfig) -> dict[str, Any]:
     return {
         "title": title,
         "summary": summary,
-        "category_path": frontmatter_category or infer_category(config, title, cleaned, rel, tags),
+        "category": frontmatter_category or infer_category(config, title, cleaned, rel, tags),
         "tags": tags,
         "source": rel,
     }

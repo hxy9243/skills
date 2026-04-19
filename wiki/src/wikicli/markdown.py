@@ -182,22 +182,9 @@ def clean_note_text(text: str) -> str:
     return "\n".join(lines).strip()
 
 
-def category_value(category_path: Sequence[str]) -> str:
+def parse_category(value: Any) -> str | None:
     """
-    Format a sequence of category layers into a single string.
-    
-    Args:
-        category_path (Sequence[str]): A list of category layers.
-        
-    Returns:
-        str: The joined category string (e.g., 'Layer 1 > Layer 2').
-    """
-    return " > ".join(safe_title(part) for part in category_path)
-
-
-def parse_category_path(value: Any) -> list[str] | None:
-    """
-    Parse a category property value into a list of layers.
+    Parse a category property value into a normalized string.
     
     Supports both strings delimited by '>' and lists of strings.
     
@@ -205,18 +192,18 @@ def parse_category_path(value: Any) -> list[str] | None:
         value (Any): The raw category value from frontmatter or config.
         
     Returns:
-        list[str] | None: A list of layer strings, or None if invalid.
+        str | None: A normalized category string, or None if invalid.
     """
     if isinstance(value, str):
         parts = [safe_title(part) for part in value.split(">") if part.strip()]
-        return parts if len(parts) >= 2 else None
+        return " > ".join(parts) if len(parts) >= 2 else None
     if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
         parts = [safe_title(str(part)) for part in value if str(part).strip()]
-        return parts if len(parts) >= 2 else None
+        return " > ".join(parts) if len(parts) >= 2 else None
     return None
 
 
-def frontmatter_category_path(text: str) -> list[str] | None:
+def frontmatter_category(text: str) -> str | None:
     """
     Extract and parse the 'category' property from a note's frontmatter.
     
@@ -224,25 +211,25 @@ def frontmatter_category_path(text: str) -> list[str] | None:
         text (str): The full markdown text.
         
     Returns:
-        list[str] | None: The parsed category path, or None if not found.
+        str | None: The parsed category string, or None if not found.
     """
     metadata, _ = parse_frontmatter(text)
-    return parse_category_path(metadata.get("category"))
+    return parse_category(metadata.get("category"))
 
 
-def apply_category_property(path: Path, category_path: Sequence[str]) -> bool:
+def apply_category_property(path: Path, category: str) -> bool:
     """
     Update the 'category' frontmatter property of a note file on disk.
     
     Args:
         path (Path): The file path to the note.
-        category_path (Sequence[str]): The category path to apply.
+        category (str): The category string to apply.
         
     Returns:
         bool: True if the file was modified, False if it already had the correct category.
     """
     original = path.read_text(encoding="utf-8")
-    updated = upsert_frontmatter_property(original, "category", category_value(category_path))
+    updated = upsert_frontmatter_property(original, "category", category)
     if updated == original:
         return False
     path.write_text(updated, encoding="utf-8")
