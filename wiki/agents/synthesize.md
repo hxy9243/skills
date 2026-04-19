@@ -117,6 +117,6 @@ If the synthesis represents a highly valuable new concept, deep analysis, or com
 
 To save a synthesis:
 1. Create a new markdown file in the user's notebook (e.g., alongside related source notes or in a `Syntheses/` folder).
-2. Include rich YAML frontmatter (tags, related note links).
+2. **Rich Frontmatter**: Include rich YAML frontmatter to fully leverage Obsidian tools like Dataview and Graph View. You must include `date`, `tags`, `source_count` (number of notes synthesized), and `entity_links` (direct wikilinks to the core notes used).
 3. Write the synthesized content into the file.
 4. Run `uv run wiki add <path-to-new-note>` to index it back into the wiki.

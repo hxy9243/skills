@@ -39,7 +39,8 @@ The backend keeps this packet shape lightweight and deterministic.
 8. Keep concept families consistent across folders. If an AI note in `10_Projects` and an AI note in `20_Subjects` belong together for search, place them together.
 9. Prefer stable concept titles over catchy phrasing.
 10. Pull reusable tags from frontmatter when available and normalize them into short search-friendly tags.
-11. Call the add command with the packet as an inline JSON string:
+11. **Rich Frontmatter**: Before calling the add command, ensure the source note has rich YAML frontmatter to fully leverage Obsidian tools like Dataview and Graph View. Use your file editing tools to add or update `tags`, `date` (if missing), and any relevant `entity_links` to other notes. If you updated a concept page in step 4, also ensure its `source_count` or `related_notes` is updated.
+12. Call the add command with the packet as an inline JSON string:
 
 ```bash
 uv run wiki add --packet '{"title": "Note title", "summary": "One paragraph summary", "category": "Layer 1 > Layer 2 > Layer 3", "tags": ["#tag-a"], "search_terms": ["search term 1", "search term 2"], "source": "relative/path/to/note.md"}'
