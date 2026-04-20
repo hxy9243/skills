@@ -17,7 +17,7 @@ uv run wiki search "user query"
 ```
 
 2. Read note matches from the combined backends: Obsidian content search, tag matches, and hierarchy-aware matches.
-3. Expand the query mentally to aliases, nearby terms, and likely related concepts before judging the results. Example: `DSPy` can imply `MIPRO`, `GEPA`, prompt optimization, compiler-style LM programs, and agent frameworks.
+3. Expand the query mentally to aliases, nearby terms, and likely related concepts before judging the results.
 4. Read generated matches from `index.md` and `categories/`.
 5. Use category-path context and the deterministic `layer1:`, `layer2:`, `layer3:`, and deeper `layerN:` labels when they help orient the user.
 6. Prefer grounded synthesis over speculative inference.

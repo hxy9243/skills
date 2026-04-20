@@ -12,7 +12,7 @@ Keep retrieval in the backend and keep interpretation in the subagent.
 
 Use this workflow when the user asks for any of the following:
 
-- a synthesis of a topic
+- a synthesis of a topic or category
 - an outline plus synthesis
 - a topic brief from notes
 - a cross-note summary
@@ -59,6 +59,7 @@ uv run wiki search "user topic"
    - Prefer synthesis over note-by-note recitation.
    - Keep each claim tied to note evidence.
    - Include note paths and short snippets when they materially support the synthesis.
+   - Reference the note for your claims, as a part of your narrative.
 
 7. Call out gaps.
    - If the notebook coverage is thin, fragmented, or mostly references external material, say so directly.
@@ -107,9 +108,11 @@ Good synthesis responses usually include:
 
 # Result Output
 
-By default, if it's a synthesis for a given category in the tree, write the result into the `path/to/category/index.md` file, under the section `## Synthesis` or `## Summary`.
+By default, if it's a synthesis for a given category in the tree, write the result into the `path/to/category/index.md` file, under the section `## Synthesis`, `## Summary`, or `## Topics Covered`.
 
 If the topic is not covered in the category tree, you can propose and write a new `path/to/category/index.md` file, and add it into the tree structure.
+
+If the result is not necessarily matching a category (e.g. a synthesis across different categories) you can save the results into a new note in the appropriate category.
 
 ## Compound Knowledge
 
@@ -118,5 +121,6 @@ If the synthesis represents a highly valuable new concept, deep analysis, or com
 To save a synthesis:
 1. Create a new markdown file in the user's notebook (e.g., alongside related source notes or in a `Syntheses/` folder).
 2. **Rich Frontmatter**: Include rich YAML frontmatter to fully leverage Obsidian tools like Dataview and Graph View. You must include `date`, `tags`, `source_count` (number of notes synthesized), and `entity_links` (direct wikilinks to the core notes used).
-3. Write the synthesized content into the file.
-4. Build a single add packet for the new note, then run `uv run wiki add --packet '<json-packet>'` to index it back into the wiki.
+3. When necessary, use rich representations to better present your ideas, like a mermaid flowchart, table, or lists.
+4. Write the synthesized content into the file.
+5. Build a single add packet for the new note, then run `uv run wiki add --packet '<json-packet>'` to index it back into the wiki.
