@@ -17,7 +17,7 @@ def register_parser(subparsers) -> None:
     parser.set_defaults(func=run)
 
 
-def run(args) -> int:
+def run(args) -> None:
     config = load_config(args.config)
     ensure_layout(config)
     if not config.category_tree_path.exists():
@@ -47,4 +47,3 @@ def run(args) -> int:
         "unindexed_notes": unindexed,
         "category_pages": artifacts["category_pages"],
     }, indent=2))
-    return 0

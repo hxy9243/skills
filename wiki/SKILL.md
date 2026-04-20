@@ -30,7 +30,7 @@ Use these principles when indexing or searching:
 
 ## Dispatch
 
-Choose one of these six subagent workflows before touching the script:
+Based on user intent, choose one of the following agent to dispatch the workflow.
 
 1. `agents/setup.md`
 Use when the task is to establish the wiki for the first time by proposing an initial category tree.
@@ -86,13 +86,13 @@ Model choice is not part of the backend config. Subagents should inherit the act
 The generated wiki should default to three hierarchy layers before note leaves, but may add deeper layers when a branch gets crowded or a concept is clearly dense enough to deserve a finer split.
 
 Rule of thumb:
-- Keep each level to roughly 5-10 children.
+- Keep each level to roughly 5-20 children.
 - Prefer broad, durable buckets over narrow one-off branches.
 - Prefer real topics over generic buckets like `Research`, `Papers`, `General`, or `Misc`.
 - Do not shoehorn notes into an existing branch when they point to a clearer topical subtree.
 - Treat fallback branches as explicit review queues, not as real long-term categories.
 - Expand the tree only when a concept clearly does not fit an existing branch.
-- If a branch grows past roughly 12 direct children, or multiple notes form a clear dense cluster, add another layer instead of leaving an overloaded bucket.
+- If a branch grows past roughly 20 direct children, or multiple notes form a clear dense cluster, add another layer instead of leaving an overloaded bucket.
 - Consolidate overlapping systems buckets when they reflect the same browsing intent.
 - Prefix each category row with its depth marker so the tree stays machine- and prompt-friendly.
 
@@ -109,7 +109,7 @@ Small example:
 
 ## Operating Rules
 
-- Always run `uv` commands from the wiki skill directory to ensure dependencies are loaded correctly.
+- Always run `uv` commands from the wiki skill directory, or use `--directory <wiki skill path>` to ensure dependencies are loaded correctly.
 - Let subagents interpret notes and queries.
 - Let `src/wikicli` own deterministic operations like file IO, category-page regeneration, log updates, indexing, delegated search, and lint checks.
 - Keep the approved category tree at the top of `index.md` as the classification reference for `add` and first-time `index`.
@@ -120,11 +120,11 @@ Small example:
 - For broad or ambiguous note sets, have subagents propose better topical branches instead of forcing notes into a weak existing category.
 - For taxonomy disputes, prefer the branch that would make future search queries easier to succeed.
 - When a concept shows up across projects, papers, and inbox notes, cluster it consistently unless there is a strong reason to preserve source-folder distinctions.
-- Use packet mode when a subagent has already normalized note classification data:
+- Use `add` only when a subagent has already normalized a single note into one packet:
 
 ```bash
-# ensure you're in the wiki skill directory
-uv run wiki add --packet /tmp/wiki_packets.json
+# ensure you're in the wiki skill directory, or use uv run --directory <path to wiki skill> wiki ...
+uv run wiki add --packet '{"title":"Note title","summary":"One paragraph summary","category":"Layer 1 > Layer 2 > Layer 3","tags":["#tag-a"],"source":"relative/path/to/note.md"}'
 uv run wiki index
 ```
 

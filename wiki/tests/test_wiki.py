@@ -123,7 +123,7 @@ class WikiScriptTests(unittest.TestCase):
                 {
                     "title": "Delegation",
                     "summary": "Delegate work to smaller agents for bounded tasks.",
-                    "category_path": ["Computer Science", "AI Systems", "Agents"],
+                    "category": "Computer Science > AI Systems > Agents",
                     "tags": ["#agents", "#delegation"],
                     "source": "Notes/Delegation.md",
                 }
@@ -131,7 +131,7 @@ class WikiScriptTests(unittest.TestCase):
             encoding="utf-8",
         )
 
-        rc = self.run_cli("add", "--packet", str(packet_path))
+        rc = self.run_cli("add", "--packet", packet_path.read_text(encoding="utf-8"))
         self.assertEqual(rc, 0)
         self.assertIn('"action": "add"', self.load_text(self.generated / "log.md"))
         self.assertIn("Computer Science", self.load_text(self.generated / "index.md"))
@@ -152,7 +152,7 @@ class WikiScriptTests(unittest.TestCase):
                 {
                     "title": "Odd",
                     "summary": "Unsupported branch.",
-                    "category_path": ["Design", "Craft", "Typography"],
+                    "category": "Design > Craft > Typography",
                     "tags": [],
                     "source": "Notes/Odd.md",
                 }
@@ -160,10 +160,30 @@ class WikiScriptTests(unittest.TestCase):
             encoding="utf-8",
         )
 
-        rc = self.run_cli("add", "--packet", str(packet_path))
+        rc = self.run_cli("add", "--packet", packet_path.read_text(encoding="utf-8"))
         self.assertEqual(rc, 0)
         self.assertIn("layer1: [Design]", self.load_text(self.generated / "index.md"))
         self.assertIn("[[Notes/Odd.md]]", self.load_text(self.generated / "index.md"))
+
+    def test_add_rejects_packet_lists(self) -> None:
+        write_note(self.notebook / "Notes" / "Delegation.md", "# Delegation\n\nDelegate work to subagents when tasks are well scoped.")
+        with self.assertRaises(SystemExit) as ctx:
+            self.run_cli(
+                "add",
+                "--packet",
+                json.dumps(
+                    [
+                        {
+                            "title": "Delegation",
+                            "summary": "Delegate work to smaller agents for bounded tasks.",
+                            "category": "Computer Science > AI Systems > Agents",
+                            "tags": ["#agents", "#delegation"],
+                            "source": "Notes/Delegation.md",
+                        }
+                    ]
+                ),
+            )
+        self.assertEqual(str(ctx.exception), "packet payload must be a single object, not a list")
 
     def test_index_logs_removed_notes_and_reports_unindexed(self) -> None:
         write_note(self.notebook / "Notes" / "State.md", "# State\n\nState keeps workflows coherent.")
@@ -173,14 +193,14 @@ class WikiScriptTests(unittest.TestCase):
                 {
                     "title": "State",
                     "summary": "State keeps workflows coherent.",
-                    "category_path": ["Computer Science", "AI Systems", "Memory"],
+                    "category": "Computer Science > AI Systems > Memory",
                     "tags": ["#memory"],
                     "source": "Notes/State.md",
                 }
             ),
             encoding="utf-8",
         )
-        self.run_cli("add", "--packet", str(packet_path))
+        self.run_cli("add", "--packet", packet_path.read_text(encoding="utf-8"))
         write_note(self.notebook / "Notes" / "Unindexed.md", "# Unindexed\n\nThis note has not been classified yet.")
         write_note(self.notebook / "Notes" / "Dashboard Index.md", "# Dashboard Index\n\nSystem overview note.")
         (self.notebook / "Notes" / "State.md").unlink()
@@ -207,14 +227,14 @@ class WikiScriptTests(unittest.TestCase):
                 {
                     "title": "Retrieval",
                     "summary": "Search systems use retrieval and ranking.",
-                    "category_path": ["Computer Science", "Knowledge Systems", "Retrieval"],
+                    "category": "Computer Science > Knowledge Systems > Retrieval",
                     "tags": ["#search"],
                     "source": "AI/Retrieval.md",
                 }
             ),
             encoding="utf-8",
         )
-        self.run_cli("add", "--packet", str(packet_path))
+        self.run_cli("add", "--packet", packet_path.read_text(encoding="utf-8"))
 
         rc = self.run_cli("search", "ranking")
         self.assertEqual(rc, 0)
@@ -232,14 +252,14 @@ class WikiScriptTests(unittest.TestCase):
                 {
                     "title": "Delegation",
                     "summary": "Delegate work to smaller agents.",
-                    "category_path": ["Computer Science", "AI Systems", "Agents"],
+                    "category": "Computer Science > AI Systems > Agents",
                     "tags": ["#agents"],
                     "source": "Notes/Delegation.md",
                 }
             ),
             encoding="utf-8",
         )
-        self.run_cli("add", "--packet", str(packet_path))
+        self.run_cli("add", "--packet", packet_path.read_text(encoding="utf-8"))
         write_note(self.notebook / "Notes" / "Loose.md", "# Loose\n\nNo category yet.")
         (self.notebook / "Notes" / "Delegation.md").unlink()
 
@@ -258,14 +278,14 @@ class WikiScriptTests(unittest.TestCase):
                 {
                     "title": "Delegation",
                     "summary": "Delegate work to smaller agents.",
-                    "category_path": ["Computer Science", "AI Systems", "Agents"],
+                    "category": "Computer Science > AI Systems > Agents",
                     "tags": ["#agents"],
                     "source": "Notes/Delegation.md",
                 }
             ),
             encoding="utf-8",
         )
-        self.run_cli("add", "--packet", str(packet_path))
+        self.run_cli("add", "--packet", packet_path.read_text(encoding="utf-8"))
         current_ns = note_path.stat().st_mtime_ns
         import time
         time.sleep(0.05)
@@ -290,14 +310,14 @@ class WikiScriptTests(unittest.TestCase):
                 {
                     "title": "DSPy",
                     "summary": "Prompt optimization for agent programs.",
-                    "category_path": ["Computer Science", "Artificial Intelligence", "AI Agents"],
+                    "category": "Computer Science > Artificial Intelligence > AI Agents",
                     "tags": ["#dspy", "#agent"],
                     "source": "Notes/DSPy.md",
                 }
             ),
             encoding="utf-8",
         )
-        self.run_cli("add", "--packet", str(packet_path))
+        self.run_cli("add", "--packet", packet_path.read_text(encoding="utf-8"))
 
         payload = self.run_cli_json("search", "dspy agent")
         note_matches = payload["note_matches"]
@@ -316,7 +336,7 @@ class WikiScriptTests(unittest.TestCase):
                 {
                     "title": "Optimizer",
                     "summary": "A deeper category placement.",
-                    "category_path": ["Computer Science", "Artificial Intelligence", "AI Agents", "Optimization"],
+                    "category": "Computer Science > Artificial Intelligence > AI Agents > Optimization",
                     "tags": [],
                     "source": "Notes/Optimizer.md",
                 }
@@ -324,7 +344,7 @@ class WikiScriptTests(unittest.TestCase):
             encoding="utf-8",
         )
 
-        rc = self.run_cli("add", "--packet", str(packet_path))
+        rc = self.run_cli("add", "--packet", packet_path.read_text(encoding="utf-8"))
         self.assertEqual(rc, 0)
         index_text = self.load_text(self.generated / "index.md")
         self.assertIn("layer4: [Optimization]", index_text)
@@ -339,7 +359,7 @@ class WikiScriptTests(unittest.TestCase):
                 {
                     "title": "Delegation",
                     "summary": "Delegate work to smaller agents for bounded tasks.",
-                    "category_path": ["Computer Science", "AI Systems", "Agents"],
+                    "category": "Computer Science > AI Systems > Agents",
                     "tags": ["#agents", "#delegation"],
                     "source": "Notes/Delegation.md",
                 }
@@ -347,7 +367,7 @@ class WikiScriptTests(unittest.TestCase):
             encoding="utf-8",
         )
 
-        rc = self.run_cli("add", "--packet", str(packet_path))
+        rc = self.run_cli("add", "--packet", packet_path.read_text(encoding="utf-8"))
         self.assertEqual(rc, 0)
         text = self.load_text(note_path)
         self.assertIn('category: "Computer Science > AI Systems > Agents"', text)
@@ -368,14 +388,14 @@ class WikiScriptTests(unittest.TestCase):
                 {
                     "title": "DSPy",
                     "summary": "Prompt optimization for agent programs.",
-                    "category_path": ["Computer Science", "Artificial Intelligence", "AI Agents"],
+                    "category": "Computer Science > Artificial Intelligence > AI Agents",
                     "tags": ["#dspy", "#agent"],
                     "source": "Notes/DSPy.md",
                 }
             ),
             encoding="utf-8",
         )
-        self.run_cli("add", "--packet", str(packet_path))
+        self.run_cli("add", "--packet", packet_path.read_text(encoding="utf-8"))
 
         payload = self.run_cli_json("synthesize", "--tag", "#dspy")
         self.assertEqual(payload["status"], "experimental")

@@ -86,7 +86,7 @@ Design rules:
 
 Use `add` for a small number of notes.
 
-It accepts either direct note paths or pre-built packet JSON from a subagent.
+It accepts exactly one pre-built packet JSON object from a subagent per invocation.
 
 Behavior:
 
@@ -98,8 +98,7 @@ Behavior:
 Example:
 
 ```bash
-uv run wiki add /absolute/path/to/note.md
-uv run wiki add --packet /tmp/wiki_packets.json
+uv run wiki add --packet '{"title":"Note title","summary":"One paragraph summary","category":"Layer 1 > Layer 2 > Layer 3","tags":["#tag-a"],"source":"relative/path/to/note.md"}'
 ```
 
 ### `index`

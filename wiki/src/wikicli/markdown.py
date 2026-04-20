@@ -182,7 +182,7 @@ def clean_note_text(text: str) -> str:
     return "\n".join(lines).strip()
 
 
-def parse_category(value: Any) -> str | None:
+def parse_category(value: Any, min_depth: int = 2) -> str | None:
     """
     Parse a category property value into a normalized string.
     
@@ -196,11 +196,44 @@ def parse_category(value: Any) -> str | None:
     """
     if isinstance(value, str):
         parts = [safe_title(part) for part in value.split(">") if part.strip()]
-        return " > ".join(parts) if len(parts) >= 2 else None
+        return " > ".join(parts) if len(parts) >= min_depth else None
     if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
         parts = [safe_title(str(part)) for part in value if str(part).strip()]
-        return " > ".join(parts) if len(parts) >= 2 else None
+        return " > ".join(parts) if len(parts) >= min_depth else None
     return None
+
+
+def category_value(category: str | Sequence[str] | None, min_depth: int = 2) -> str | None:
+    """
+    Normalize a category path to the stored frontmatter string format.
+
+    Args:
+        category (str | Sequence[str] | None): The raw category value.
+
+    Returns:
+        str | None: The normalized category string, or None if invalid.
+    """
+    return parse_category(category, min_depth=min_depth)
+
+
+def split_category(category: str | Sequence[str] | None, min_depth: int = 2) -> list[str]:
+    """
+    Normalize a category value and split it into path segments.
+
+    Args:
+        category (str | Sequence[str] | None): The raw category value.
+        min_depth (int): The minimum number of path segments required.
+
+    Returns:
+        list[str]: The normalized category path segments.
+
+    Raises:
+        ValueError: If the category is missing or too shallow.
+    """
+    normalized = category_value(category, min_depth=min_depth)
+    if not normalized:
+        raise ValueError(f"category must have at least {min_depth} levels")
+    return [safe_title(part) for part in normalized.split(">") if part.strip()]
 
 
 def frontmatter_category(text: str) -> str | None:
@@ -217,19 +250,22 @@ def frontmatter_category(text: str) -> str | None:
     return parse_category(metadata.get("category"))
 
 
-def apply_category_property(path: Path, category: str) -> bool:
+def apply_category_property(path: Path, category: str | Sequence[str]) -> bool:
     """
     Update the 'category' frontmatter property of a note file on disk.
     
     Args:
         path (Path): The file path to the note.
-        category (str): The category string to apply.
+        category (str | Sequence[str]): The category string or category path to apply.
         
     Returns:
         bool: True if the file was modified, False if it already had the correct category.
     """
     original = path.read_text(encoding="utf-8")
-    updated = upsert_frontmatter_property(original, "category", category)
+    normalized = category_value(category)
+    if not normalized:
+        raise ValueError("category must have at least 2 levels")
+    updated = upsert_frontmatter_property(original, "category", normalized)
     if updated == original:
         return False
     path.write_text(updated, encoding="utf-8")

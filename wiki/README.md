@@ -15,9 +15,8 @@ You can interact with the wiki natively through the agent using natural language
 1. **First-time setup**: Ask the agent to "set up the wiki" or "index the notebook for the first time" to generate your initial category tree.
    - *Example*: "@wiki set up the wiki for my current notebook"
    - *Example*: "@wiki read through my notes and propose a category tree"
-2. **Add notes**: Say "add my recent notes to the wiki" to classify and ingest new notes into the established categories.
-   - *Example*: "@wiki add all notes in the `00_Inbox` folder to the wiki"
-   - *Example*: "@wiki index `Notes/Delegation.md` into the wiki"
+2. **Add a note**: Say "add this note to the wiki" to classify and ingest one note into the established categories.
+   - *Example*: "@wiki add `Notes/Delegation.md` to the wiki"
 3. **Search notes**: Ask "search my notes for X" to get direct, evidence-backed answers with hierarchy context.
    - *Example*: "@wiki search my notes for chain-of-thought prompting"
    - *Example*: "@wiki what do my notes say about distributed consensus algorithms?"
@@ -39,7 +38,7 @@ You can interact with the wiki natively through the agent using natural language
 ## Commands
 
 ```bash
-uv run wiki add ...
+uv run wiki add --packet '{"title":"Delegation","summary":"Delegate work to smaller agents for bounded tasks.","category":"Computer Science > AI Systems > Agents","tags":["#agents"],"source":"Notes/Delegation.md"}'
 uv run wiki index
 uv run wiki search "query"
 uv run wiki synthesize --category "Computer Science > Artificial Intelligence > AI Agents"

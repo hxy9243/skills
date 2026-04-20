@@ -7,6 +7,7 @@ from typing import Any
 
 from wikicli.config import WikiConfig
 from wikicli.fs import ensure_layout
+from wikicli.markdown import category_value
 from wikicli.text import slugify
 
 
@@ -79,11 +80,15 @@ def active_catalog(config: WikiConfig) -> dict[str, dict[str, Any]]:
         if not source:
             continue
         if event.get("action") == "add":
+            category = category_value(event.get("category") or event.get("category_path"), min_depth=1)
+            if not category:
+                continue
             catalog[source] = {
                 "title": event["title"],
                 "summary": event["summary"],
-                "category_path": event["category_path"],
+                "category": category,
                 "tags": event.get("tags", []),
+                "search_terms": event.get("search_terms", []),
                 "source": source,
                 "source_mtime_ns": event.get("source_mtime_ns"),
                 "updated_at": event["timestamp"],

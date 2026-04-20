@@ -8,6 +8,7 @@ from pathlib import Path
 from wikicli.config import load_config
 from wikicli.fs import gather_source_files, normalize_path
 from wikicli.log import active_catalog
+from wikicli.markdown import split_category
 from wikicli.render import combined_notes, suggest_unindexed_packets
 from wikicli.text import STOPWORDS, tokenize
 
@@ -102,7 +103,7 @@ def hierarchy_search(notes, query: str):
         return []
     matches = []
     for note in notes:
-        hierarchy_tokens = set(tokenize(" ".join(note.get("category_path", []))))
+        hierarchy_tokens = set(tokenize(note.get("category", "")))
         overlap = sorted(terms & hierarchy_tokens)
         if overlap:
             matches.append({"source": note["source"], "snippet": f"Matched hierarchy terms: {', '.join(overlap)}", "match_reason": "hierarchy"})
@@ -119,7 +120,7 @@ def enrich_note_matches(raw_matches, note_lookup):
         enriched = merged.setdefault(source, {
             "source": source,
             "title": note.get("title", Path(source).stem),
-            "hierarchy": note.get("category_path", []),
+            "hierarchy": split_category(note.get("category"), min_depth=1) if note.get("category") else [],
             "tags": note.get("tags", []),
             "match_reasons": [],
             "snippets": [],
@@ -136,7 +137,7 @@ def enrich_note_matches(raw_matches, note_lookup):
     return list(merged.values())
 
 
-def run(args) -> int:
+def run(args) -> int | None:
     config = load_config(args.config)
     catalog = active_catalog(config)
     current_files = {normalize_path(path.relative_to(config.notebook_root)) for path in gather_source_files(config)}
@@ -166,4 +167,5 @@ def run(args) -> int:
         "hierarchy_matches": hierarchy_search(notes, args.query)[: args.limit],
         "generated_matches": generated_matches[: args.limit],
     }, indent=2))
-    return 0 if obsidian_matches or structured_note_matches or generated_matches else 1
+    if not (obsidian_matches or structured_note_matches or generated_matches):
+        return 1

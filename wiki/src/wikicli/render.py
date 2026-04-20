@@ -7,8 +7,9 @@ from typing import Any, Sequence
 
 from wikicli.classify import extract_packet_from_note
 from wikicli.config import WikiConfig
-from wikicli.fs import ensure_layout, normalize_path
+from wikicli.fs import ensure_layout, gather_source_files, normalize_path
 from wikicli.log import active_catalog, is_system_note
+from wikicli.markdown import split_category
 from wikicli.text import (
     STOPWORDS,
     format_layer_label,
@@ -23,11 +24,11 @@ from wikicli.tree import flatten_tree_paths, parse_category_tree_structure, tree
 def category_page_path(config: WikiConfig, path_parts: Sequence[str]) -> Path:
     """
     Determine the file path for a category index page.
-    
+
     Args:
         config (WikiConfig): The active wiki configuration.
         path_parts (Sequence[str]): The category layers.
-        
+
     Returns:
         Path: The absolute path to the category's index.md file.
     """
@@ -40,12 +41,12 @@ def category_page_path(config: WikiConfig, path_parts: Sequence[str]) -> Path:
 def branch_intro(path_parts: Sequence[str], notes: list[dict[str, Any]], child_names: list[str]) -> str:
     """
     Generate a dynamic introduction paragraph for a category page.
-    
+
     Args:
         path_parts (Sequence[str]): The category layers.
         notes (list[dict[str, Any]]): A list of notes in this category.
         child_names (list[str]): A list of subcategory names.
-        
+
     Returns:
         str: A synthesized introductory text block.
     """
@@ -64,10 +65,10 @@ def branch_intro(path_parts: Sequence[str], notes: list[dict[str, Any]], child_n
 def layer_metadata(path_parts: Sequence[str]) -> list[str]:
     """
     Format the category lineage as a list of layer strings.
-    
+
     Args:
         path_parts (Sequence[str]): The category layers.
-        
+
     Returns:
         list[str]: A list of formatted bullet point strings.
     """
@@ -77,11 +78,11 @@ def layer_metadata(path_parts: Sequence[str]) -> list[str]:
 def relative_category_link(path_parts: Sequence[str], target_parts: Sequence[str]) -> str:
     """
     Compute a relative path link from one category page to another.
-    
+
     Args:
         path_parts (Sequence[str]): The source category path.
         target_parts (Sequence[str]): The destination category path.
-        
+
     Returns:
         str: A relative URL suitable for a markdown link.
     """
@@ -95,12 +96,12 @@ def relative_category_link(path_parts: Sequence[str], target_parts: Sequence[str
 def branch_keywords(path_parts: Sequence[str], notes: list[dict[str, Any]], child_names: list[str]) -> list[str]:
     """
     Extract the most common keywords for a category branch.
-    
+
     Args:
         path_parts (Sequence[str]): The category layers.
         notes (list[dict[str, Any]]): Notes within the category.
         child_names (list[str]): Subcategories.
-        
+
     Returns:
         list[str]: A list of top keywords for search cues.
     """
@@ -121,12 +122,12 @@ def branch_keywords(path_parts: Sequence[str], notes: list[dict[str, Any]], chil
 def render_category_page(path_parts: Sequence[str], child_names: list[str], notes: list[dict[str, Any]]) -> str:
     """
     Generate the markdown content for a category index page.
-    
+
     Args:
         path_parts (Sequence[str]): The category layers.
         child_names (list[str]): Subcategories.
         notes (list[dict[str, Any]]): Notes within the category.
-        
+
     Returns:
         str: The full markdown document string.
     """
@@ -165,11 +166,11 @@ def render_category_page(path_parts: Sequence[str], child_names: list[str], note
 def suggest_unindexed_packets(config: WikiConfig, sources: list[str]) -> list[dict[str, Any]]:
     """
     Generate inferred packets for a list of unindexed source notes.
-    
+
     Args:
         config (WikiConfig): The active wiki configuration.
         sources (list[str]): A list of relative paths for unindexed notes.
-        
+
     Returns:
         list[dict[str, Any]]: A list of generated note metadata packets.
     """
@@ -187,11 +188,11 @@ def suggest_unindexed_packets(config: WikiConfig, sources: list[str]) -> list[di
 def combined_notes(catalog: dict[str, dict[str, Any]], suggested: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
     Merge the active catalog with suggested unindexed packets.
-    
+
     Args:
         catalog (dict[str, dict[str, Any]]): The confirmed, indexed notes.
         suggested (list[dict[str, Any]]): The inferred packets.
-        
+
     Returns:
         list[dict[str, Any]]: A combined and sorted list of all notes.
     """
@@ -204,20 +205,20 @@ def combined_notes(catalog: dict[str, dict[str, Any]], suggested: list[dict[str,
 def render_category_tree(tree: list[dict[str, Any]], notes: list[dict[str, Any]]) -> str:
     """
     Render the combined category tree and note mappings as markdown.
-    
+
     Args:
         tree (list[dict[str, Any]]): The pre-existing category tree.
         notes (list[dict[str, Any]]): All valid notes mapped to their paths.
-        
+
     Returns:
         str: The rendered '## Category Tree' markdown block.
     """
     notes_by_path: dict[tuple[str, ...], list[dict[str, Any]]] = defaultdict(list)
     declared_paths = flatten_tree_paths(tree)
-    note_paths = {tuple(note["category_path"]) for note in notes}
+    note_paths = {tuple(split_category(note["category"], min_depth=1)) for note in notes}
     effective = tree_from_paths(declared_paths | note_paths)
     for note in notes:
-        notes_by_path[tuple(note["category_path"])].append(note)
+        notes_by_path[tuple(split_category(note["category"], min_depth=1))].append(note)
 
     lines = [
         "## Category Tree",
@@ -246,20 +247,27 @@ def render_category_tree(tree: list[dict[str, Any]], notes: list[dict[str, Any]]
 def rebuild_generated_views(config: WikiConfig, unindexed: list[str] | None = None) -> dict[str, Any]:
     """
     Reconstruct the entire wiki generated folder layout.
-    
+
     This rewrites the main index.md, all nested category pages, and removes
     orphaned category pages.
-    
+
     Args:
         config (WikiConfig): The active wiki configuration.
-        unindexed (list[str] | None): Relative paths to notes not yet indexed.
-        
+        unindexed (list[str] | None): Relative paths to notes not yet indexed. If omitted,
+            the set is derived from the current notebook scan and active catalog.
+
     Returns:
         dict[str, Any]: A dictionary of summary metrics regarding the rebuild.
     """
     ensure_layout(config)
     catalog = active_catalog(config)
-    unindexed = sorted(unindexed or [])
+
+    if unindexed is None:
+        current_files = {normalize_path(path.relative_to(config.notebook_root)) for path in gather_source_files(config)}
+        unindexed = sorted(current_files - set(catalog))
+    else:
+        unindexed = sorted(unindexed)
+
     suggested = suggest_unindexed_packets(config, unindexed)
     skipped_system = [source for source in unindexed if is_system_note(source)]
     tree = parse_category_tree_structure(config.category_tree_path)
@@ -267,7 +275,7 @@ def rebuild_generated_views(config: WikiConfig, unindexed: list[str] | None = No
     groups: dict[tuple[str, ...], list[dict[str, Any]]] = defaultdict(list)
     children: dict[tuple[str, ...], set[str]] = defaultdict(set)
     for note in all_notes:
-        path = tuple(note["category_path"])
+        path = tuple(split_category(note["category"], min_depth=1))
         for depth in range(1, len(path) + 1):
             groups[path[:depth]].append(note)
         for depth in range(1, len(path)):

@@ -5,7 +5,7 @@ import json
 from wikicli.config import load_config
 from wikicli.fs import ensure_layout, gather_source_files, normalize_path, source_mtime_ns
 from wikicli.log import active_catalog, append_log_event, utc_now
-from wikicli.markdown import apply_category_property, category_value, frontmatter_category_path
+from wikicli.markdown import apply_category_property, category_value, frontmatter_category, split_category
 from wikicli.tree import parse_category_tree, parse_index_note_assignments
 
 
@@ -15,7 +15,7 @@ def register_parser(subparsers) -> None:
     parser.set_defaults(func=run)
 
 
-def run(args) -> int:
+def run(args) -> int | None:
     config = load_config(args.config)
     ensure_layout(config)
     issues: list[str] = []
@@ -53,11 +53,11 @@ def run(args) -> int:
             add_issue(f"missing source note: {source}")
             continue
         source_path = (config.notebook_root / source).resolve()
-        expected_category = index_assignments.get(source, record["category_path"])
-        current_frontmatter = frontmatter_category_path(source_path.read_text(encoding="utf-8"))
+        expected_category = category_value(index_assignments.get(source, record["category"]))
+        current_frontmatter = frontmatter_category(source_path.read_text(encoding="utf-8"))
         changed = False
 
-        if expected_category != record["category_path"]:
+        if expected_category != record["category"]:
             changed = True
             add_fix(f"catalog category synced from index: {source} -> {category_value(expected_category)}")
 
@@ -75,19 +75,19 @@ def run(args) -> int:
                     "action": "add",
                     "title": record["title"],
                     "summary": record["summary"],
-                    "category_path": expected_category,
+                    "category": expected_category,
                     "tags": record.get("tags", []),
                     "source": source,
                     "source_mtime_ns": current_mtime,
                 },
             )
-            record = {**record, "category_path": expected_category, "source_mtime_ns": current_mtime}
+            record = {**record, "category": expected_category, "source_mtime_ns": current_mtime}
 
         stored_mtime = record.get("source_mtime_ns")
         if stored_mtime is not None and current_mtime != stored_mtime:
             add_issue(f"modified note: {source}")
-        if allowed and tuple(expected_category) not in allowed:
-            add_issue(f"category not in tree: {source} -> {' -> '.join(expected_category)}")
+        if allowed and tuple(split_category(expected_category)) not in allowed:
+            add_issue(f"category not in tree: {source} -> {expected_category}")
 
     for source in sorted(current_files - set(catalog)):
         add_issue(f"unindexed note: {source}")
@@ -96,4 +96,5 @@ def run(args) -> int:
         append_log_event(config, {"timestamp": utc_now(), "action": "lint", "issues": issues, "fixes": fixes})
 
     print(json.dumps({"issues": issues, "fixes": fixes, "indexed_notes": len(catalog)}, indent=2))
-    return 1 if issues else 0
+    if issues:
+        return 1

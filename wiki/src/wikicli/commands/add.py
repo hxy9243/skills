@@ -1,56 +1,68 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
-from wikicli.classify import extract_packet_from_note, normalize_packet
-from wikicli.config import load_config, read_json
-from wikicli.fs import ensure_layout, gather_source_files, normalize_path
-from wikicli.log import active_catalog, append_log_event, utc_now
+from wikicli.classify import normalize_packet
+from wikicli.config import load_config
+from wikicli.fs import ensure_layout
+from wikicli.log import append_log_event, utc_now
 from wikicli.markdown import apply_category_property
 from wikicli.render import rebuild_generated_views
 
 
 def register_parser(subparsers) -> None:
-    parser = subparsers.add_parser("add", help="Add note classifications to the wiki log and rebuild views.")
-    parser.add_argument("files", nargs="*", help="Source markdown note paths.")
-    parser.add_argument("--packet", help="Path to a JSON packet or packet list.")
+    parser = subparsers.add_parser(
+        "add", help="Add note classifications to the wiki log and rebuild views."
+    )
+    parser.add_argument(
+        "--packet",
+        required=True,
+        help="A single packet JSON object.",
+    )
     parser.set_defaults(func=run)
 
 
-def run(args) -> int:
+def run(args) -> None:
     config = load_config(args.config)
     ensure_layout(config)
     if not config.category_tree_path.exists():
         raise SystemExit(f"missing category tree: {config.category_tree_path}")
 
-    packets: list[dict[str, object]] = []
-    if args.packet:
-        try:
-            if args.packet.strip().startswith("{") or args.packet.strip().startswith("["):
-                payload = json.loads(args.packet)
-            else:
-                payload = read_json(Path(args.packet).expanduser().resolve(), None)
-        except json.JSONDecodeError as e:
-            raise SystemExit(f"invalid packet JSON: {e}")
-        if payload is None:
-            raise SystemExit(f"packet file not found: {args.packet}")
-        packets.extend(payload if isinstance(payload, list) else [payload])
-    for file_arg in args.files:
-        packets.append(extract_packet_from_note(Path(file_arg).expanduser().resolve(), config))
+    try:
+        payload = json.loads(args.packet)
+    except json.JSONDecodeError as e:
+        raise SystemExit(f"invalid packet JSON: {e}") from e
 
-    added = []
-    for packet in packets:
-        normalized = normalize_packet(packet)
-        source_path = (config.notebook_root / normalized["source"]).resolve()
-        if not source_path.exists():
-            raise SystemExit(f"missing source note: {normalized['source']}")
-        apply_category_property(source_path, normalized["category_path"])
-        event = {"timestamp": utc_now(), "action": "add", "source_mtime_ns": source_path.stat().st_mtime_ns, **normalized}
-        append_log_event(config, event)
-        added.append(normalized)
+    if isinstance(payload, list):
+        raise SystemExit("packet payload must be a single object, not a list")
+    if not isinstance(payload, dict):
+        raise SystemExit("packet payload must be a JSON object")
 
-    current_files = {normalize_path(path.relative_to(config.notebook_root)) for path in gather_source_files(config)}
-    artifacts = rebuild_generated_views(config, sorted(current_files - set(active_catalog(config))))
-    print(json.dumps({"added": added, "indexed_notes": len(artifacts["catalog"]), "category_pages": artifacts["category_pages"]}, indent=2))
-    return 0
+    normalized = normalize_packet(payload)
+
+    source_path = (config.notebook_root / normalized["source"]).resolve()
+    if not source_path.exists():
+        raise SystemExit(f"missing source note: {normalized['source']}")
+    apply_category_property(source_path, normalized["category"])
+    artifacts = rebuild_generated_views(config)
+
+    append_log_event(
+        config,
+        {
+            "timestamp": utc_now(),
+            "action": "add",
+            "source_mtime_ns": source_path.stat().st_mtime_ns,
+            **normalized,
+        },
+    )
+
+    print(
+        json.dumps(
+            {
+                "added": normalized,
+                "indexed_notes": len(artifacts["catalog"]),
+                "category_pages": artifacts["category_pages"],
+            },
+            indent=2,
+        )
+    )

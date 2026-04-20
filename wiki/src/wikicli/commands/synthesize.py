@@ -18,7 +18,7 @@ def register_parser(subparsers) -> None:
     parser.set_defaults(func=run)
 
 
-def run(args) -> int:
+def run(args) -> None:
     config = load_config(args.config)
     catalog = active_catalog(config)
     current_files = {normalize_path(path.relative_to(config.notebook_root)) for path in gather_source_files(config)}
@@ -26,7 +26,7 @@ def run(args) -> int:
 
     selected = notes
     if args.category:
-        selected = [note for note in selected if " > ".join(note.get("category_path", [])) == args.category]
+        selected = [note for note in selected if note.get("category") == args.category]
     if args.tag:
         requested = set(args.tag)
         selected = [note for note in selected if requested & set(note.get("tags", []))]
@@ -44,4 +44,3 @@ def run(args) -> int:
         "message": "Use this note bundle as input to the synthesize workflow.",
         "notes": selected,
     }, indent=2))
-    return 0

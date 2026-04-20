@@ -37,16 +37,29 @@ class TestClassifyUtilities(unittest.TestCase):
             normalize_packet({"title": "No Source"})
 
         with self.assertRaises(ValueError):
-            normalize_packet({"source": "Note.md", "category_path": ["Too Short"]})
+            normalize_packet({"source": "Note.md", "category": "Too Short"})
 
         packet = normalize_packet(
             {
                 "source": "Note.md",
-                "category_path": ["Valid", "Category"],
+                "category": "Valid > Category",
                 "tags": [" #tag1 ", "tag2"],
+                "search_terms": ["alpha", " Alpha ", "beta"],
             }
         )
         self.assertEqual(packet["source"], "Note.md")
         self.assertEqual(packet["title"], "Note")
-        self.assertEqual(packet["category_path"], ["Valid", "Category"])
+        self.assertEqual(packet["category"], "Valid > Category")
         self.assertEqual(packet["tags"], ["#tag1", "tag2"])
+        self.assertEqual(packet["search_terms"], ["alpha", "beta"])
+
+    def test_normalize_packet_accepts_legacy_category_string(self) -> None:
+        packet = normalize_packet(
+            {
+                "source": "Note.md",
+                "category": "Valid > Category",
+                "tags": ["tag1"],
+            }
+        )
+        self.assertEqual(packet["category"], "Valid > Category")
+        self.assertEqual(packet["search_terms"], [])

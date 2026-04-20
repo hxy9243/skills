@@ -1,6 +1,6 @@
 # Wiki Add
 
-Use this workflow when the task is to add one or a few source notes into the generated wiki.
+Use this workflow when the task is to add a single source note into the generated wiki.
 
 ## Goal
 
@@ -12,7 +12,7 @@ Always consult the approved category tree at the top of `index.md` before choosi
 
 ## Packet Shape
 
-Produce JSON objects with these fields:
+Produce exactly one JSON object with these fields:
 
 ```json
 {
@@ -20,12 +20,11 @@ Produce JSON objects with these fields:
   "summary": "One paragraph summary",
   "category": "Layer 1 > Layer 2 > Layer 3",
   "tags": ["#tag-a", "#tag-b"],
-  "search_terms": ["search term 1", "search term 2"],
   "source": "relative/path/to/note.md"
 }
 ```
 
-The backend keeps this packet shape lightweight and deterministic.
+The backend keeps this packet shape lightweight and deterministic. `wiki add` accepts one packet at a time.
 
 ## Workflow
 
@@ -43,7 +42,7 @@ The backend keeps this packet shape lightweight and deterministic.
 12. Call the add command with the packet as an inline JSON string:
 
 ```bash
-uv run wiki add --packet '{"title": "Note title", "summary": "One paragraph summary", "category": "Layer 1 > Layer 2 > Layer 3", "tags": ["#tag-a"], "search_terms": ["search term 1", "search term 2"], "source": "relative/path/to/note.md"}'
+uv run wiki add --packet '{"title": "Note title", "summary": "One paragraph summary", "category": "Layer 1 > Layer 2 > Layer 3", "tags": ["#tag-a"], "source": "relative/path/to/note.md"}'
 ```
 
 ## Quality Bar
@@ -52,6 +51,5 @@ uv run wiki add --packet '{"title": "Note title", "summary": "One paragraph summ
 - Category path should fit the approved tree, not invent brittle micro-buckets.
 - Category path should reflect retrieval intent, not just where the note happens to live in the notebook.
 - Tags should be short and reusable.
-- Search terms should be short and reusable, optimizing for deterministic search.
 - Source note paths must be relative to the notebook root.
 - New subtrees should be rare and justified by repeated concept pressure, not a single quirky note.
