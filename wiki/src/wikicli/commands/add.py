@@ -44,7 +44,6 @@ def run(args) -> None:
     if not source_path.exists():
         raise SystemExit(f"missing source note: {normalized['source']}")
     apply_category_property(source_path, normalized["category"])
-    artifacts = rebuild_generated_views(config)
 
     append_log_event(
         config,
@@ -55,6 +54,7 @@ def run(args) -> None:
             **normalized,
         },
     )
+    artifacts = rebuild_generated_views(config)
 
     print(
         json.dumps(

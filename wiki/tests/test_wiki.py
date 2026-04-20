@@ -205,14 +205,13 @@ class WikiScriptTests(unittest.TestCase):
         write_note(self.notebook / "Notes" / "Dashboard Index.md", "# Dashboard Index\n\nSystem overview note.")
         (self.notebook / "Notes" / "State.md").unlink()
 
-        rc = self.run_cli("index")
-        self.assertEqual(rc, 0)
+        payload = self.run_cli_json("index")
         log_text = self.load_text(self.generated / "log.md")
         self.assertIn('"action": "remove"', log_text)
-        self.assertIn("Unindexed.md", self.load_text(self.generated / "index.md") or "")
-        self.assertIn("Needs Review", self.load_text(self.generated / "index.md"))
-        self.assertIn("Dashboard Index.md", self.load_text(self.generated / "index.md"))
-        self.assertIn("Unindexed.md", self.load_text(self.generated / "index.md"))
+        self.assertIn("Notes/Unindexed.md", payload["unindexed_notes"])
+        self.assertIn("Notes/Dashboard Index.md", payload["unindexed_notes"])
+        self.assertNotIn("Unindexed.md", self.load_text(self.generated / "index.md"))
+        self.assertNotIn("Needs Review", self.load_text(self.generated / "index.md"))
         self.assertNotIn("Indexed Notes By Category", self.load_text(self.generated / "index.md"))
 
     def test_reconcile_alias_still_works(self) -> None:

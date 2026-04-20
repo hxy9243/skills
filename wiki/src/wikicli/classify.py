@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections import Counter
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -8,108 +7,10 @@ from wikicli.config import WikiConfig
 from wikicli.fs import normalize_path
 from wikicli.markdown import (
     category_value,
-    clean_note_text,
-    frontmatter_category,
     note_tags_from_metadata,
     parse_frontmatter,
-    title_from_text,
 )
-from wikicli.text import safe_title, split_sentences, summarize_text, tokenize
-from wikicli.tree import parse_allowed_category_paths
-
-
-def score_category_path(
-    path_parts: Sequence[str],
-    title: str,
-    text: str,
-    source_relpath: str,
-    tags: Sequence[str] | None = None,
-) -> tuple[int, int, int]:
-    """
-    Calculate a relevance score for a given category path against a note.
-
-    Args:
-        path_parts (Sequence[str]): The category path to evaluate.
-        title (str): The note title.
-        text (str): The note body text.
-        source_relpath (str): The relative path of the source note.
-        tags (Sequence[str] | None): A list of tags for the note.
-
-    Returns:
-        tuple[int, int, int]: A scoring tuple (total_score, matched_parts, inverted_depth).
-    """
-    title_bag = Counter(tokenize(title))
-    text_bag = Counter(tokenize(text))
-    source_bag = Counter(tokenize(source_relpath))
-    tag_bag = Counter(tokenize(" ".join(tags or [])))
-    haystack = " ".join(
-        [
-            title.lower(),
-            text.lower(),
-            source_relpath.lower(),
-            " ".join(tag.lower() for tag in (tags or [])),
-        ]
-    )
-
-    score = 0
-    matched = 0
-    for part in path_parts:
-        part_tokens = set(tokenize(part))
-        if not part_tokens:
-            continue
-        token_score = 0
-        for token in part_tokens:
-            token_score += title_bag.get(token, 0) * 8
-            token_score += tag_bag.get(token, 0) * 6
-            token_score += source_bag.get(token, 0) * 5
-            token_score += text_bag.get(token, 0) * 2
-        phrase = part.lower()
-        if phrase and phrase in haystack:
-            token_score += 12
-        if token_score > 0:
-            matched += 1
-        score += token_score
-    return score, matched, -len(path_parts)
-
-
-def infer_category(
-    config: WikiConfig,
-    title: str,
-    text: str,
-    source_relpath: str,
-    tags: Sequence[str] | None = None,
-) -> str:
-    """
-    Infer the best category by evaluating allowed tree paths or falling back to rules.
-
-    Args:
-        config (WikiConfig): The active wiki configuration.
-        title (str): The note title.
-        text (str): The note body text.
-        source_relpath (str): The relative path of the source note.
-        tags (Sequence[str] | None): A list of tags for the note.
-
-    Returns:
-        str: The best-matching category path.
-    """
-    allowed_paths = sorted(parse_allowed_category_paths(config.category_tree_path))
-    if allowed_paths:
-        ranked = sorted(
-            (
-                (
-                    score_category_path(path, title, text, source_relpath, tags),
-                    list(path),
-                )
-                for path in allowed_paths
-            ),
-            key=lambda item: item[0],
-            reverse=True,
-        )
-        best_score, best_path = ranked[0]
-        if best_score[0] > 0 or best_score[1] > 0:
-            return " > ".join(best_path)
-
-    return "Needs Review"
+from wikicli.text import safe_title, summarize_text
 
 
 def normalize_category(value: Any, min_depth: int = 2) -> str:
@@ -159,21 +60,42 @@ def normalize_search_terms(value: Any) -> list[str]:
     return normalized
 
 
-def infer_search_terms(title: str, category: str, tags: Sequence[str]) -> list[str]:
+def require_string(packet: dict[str, Any], field: str) -> str:
     """
-    Infer default search terms for a note when none are explicitly provided.
+    Return a required packet string field after whitespace normalization.
 
     Args:
-        title (str): The note title.
-        category (str): The normalized category string.
-        tags (Sequence[str]): The normalized note tags.
+        packet (dict[str, Any]): The raw packet dictionary.
+        field (str): The required field name.
 
     Returns:
-        list[str]: A de-duplicated list of inferred search terms.
+        str: The stripped string value.
+
+    Raises:
+        ValueError: If the field is absent, non-string, or blank.
     """
-    leaf = category.rsplit(">", 1)[-1].strip()
-    raw_terms = [title, leaf, *(tag.lstrip("#") for tag in tags)]
-    return normalize_search_terms(raw_terms)
+    value = packet.get(field)
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"packet is missing {field}")
+    return value.strip()
+
+
+def normalize_tags(value: Any) -> list[str]:
+    """
+    Normalize an explicit packet tag list.
+
+    Args:
+        value (Any): The raw ``tags`` field.
+
+    Returns:
+        list[str]: A sorted list of de-duplicated tags.
+
+    Raises:
+        ValueError: If ``tags`` is absent or not a list-like value.
+    """
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
+        raise ValueError("packet is missing tags")
+    return sorted({str(tag).strip() for tag in value if str(tag).strip()})
 
 
 def normalize_packet(packet: dict[str, Any]) -> dict[str, Any]:
@@ -189,19 +111,13 @@ def normalize_packet(packet: dict[str, Any]) -> dict[str, Any]:
         dict[str, Any]: The normalized packet.
 
     Raises:
-        ValueError: If 'source' is missing or 'category' is too shallow.
+        ValueError: If any required semantic field is missing or invalid.
     """
-    source = str(packet.get("source") or "").strip()
-    if not source:
-        raise ValueError("packet is missing source")
-    title = safe_title(packet.get("title") or Path(source).stem)
-    summary = summarize_text(packet.get("summary") or title)
-    category = normalize_category(
-        packet.get("category") or packet.get("category_path") or []
-    )
-    tags = sorted(
-        {str(tag).strip() for tag in packet.get("tags", []) if str(tag).strip()}
-    )
+    source = require_string(packet, "source")
+    title = safe_title(require_string(packet, "title"))
+    summary = summarize_text(require_string(packet, "summary"))
+    category = normalize_category(packet.get("category"))
+    tags = normalize_tags(packet.get("tags"))
     search_terms = normalize_search_terms(packet.get("search_terms", []))
     return {
         "title": title,
@@ -215,31 +131,27 @@ def normalize_packet(packet: dict[str, Any]) -> dict[str, Any]:
 
 def extract_packet_from_note(path: Path, config: WikiConfig) -> dict[str, Any]:
     """
-    Extract a fully formed metadata packet from a note by parsing and inferencing.
+    Extract a packet only from explicit note frontmatter metadata.
+
+    This function intentionally does not infer title, summary, category, or tags from
+    note body text, file path, or the approved category tree.
 
     Args:
         path (Path): The absolute path to the note.
         config (WikiConfig): The active wiki configuration.
 
     Returns:
-        dict[str, Any]: A packet dictionary with title, summary, category, tags, and source.
+        dict[str, Any]: A normalized packet dictionary.
     """
     text = path.read_text(encoding="utf-8")
     metadata, _ = parse_frontmatter(text)
-    tags = note_tags_from_metadata(metadata)
-    cleaned = clean_note_text(text)
-    title = title_from_text(text, path)
-    sentences = split_sentences(cleaned)
-    summary = summarize_text(sentences[0] if sentences else cleaned or title)
     rel = normalize_path(path.relative_to(config.notebook_root))
-    current_category = frontmatter_category(text)
-    inferred_category = infer_category(config, title, cleaned, rel, tags)
-    category = normalize_category(current_category or inferred_category, min_depth=1)
-    return {
-        "title": title,
-        "summary": summary,
-        "category": category,
-        "tags": tags,
-        "search_terms": infer_search_terms(title, category, tags),
+    packet = {
         "source": rel,
+        "title": metadata.get("title"),
+        "summary": metadata.get("summary"),
+        "category": metadata.get("category"),
+        "tags": note_tags_from_metadata(metadata) if "tags" in metadata else None,
+        "search_terms": metadata.get("search_terms", []),
     }
+    return normalize_packet(packet)

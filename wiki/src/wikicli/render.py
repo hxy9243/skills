@@ -181,7 +181,10 @@ def suggest_unindexed_packets(config: WikiConfig, sources: list[str]) -> list[di
         source_path = config.notebook_root / source
         if not source_path.exists():
             continue
-        packets.append(extract_packet_from_note(source_path, config))
+        try:
+            packets.append(extract_packet_from_note(source_path, config))
+        except ValueError:
+            continue
     return packets
 
 
