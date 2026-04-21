@@ -56,11 +56,11 @@ DEFAULT_CONFIG = {
     "env": {
         "OPENAI_API_KEY": {
             "description": "API key for OpenAI embedding models",
-            "optional": true
+            "optional": True
         },
         "GEMINI_API_KEY": {
             "description": "API key for Google Gemini embedding models",
-            "optional": true
+            "optional": True
         }
     },
     "skip_dirs": [
