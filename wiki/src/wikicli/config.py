@@ -16,6 +16,21 @@ class WikiConfig:
     exclude_globs: tuple[str, ...] = ()
     search: dict[str, Any] | None = None
 
+    @property
+    def index_path(self) -> Path:
+        """Path to the generated wiki index."""
+        return self.generated_root / "index.md"
+
+    @property
+    def log_path(self) -> Path:
+        """Path to the append-only wiki event log."""
+        return self.generated_root / "log.md"
+
+    @property
+    def categories_dir(self) -> Path:
+        """Path to generated category pages."""
+        return self.generated_root / "categories"
+
 
 def load_config(config_path: str | Path | None) -> WikiConfig:
     """Load config JSON or derive a minimal workspace from the current directory."""

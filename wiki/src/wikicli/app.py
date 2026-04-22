@@ -60,43 +60,68 @@ class WikiCli:
     def add_packet(
         self, raw_packet: str, *, allow_undeclared: bool = False
     ) -> CommandResult:
-        """Validate one agent packet and return the add command result envelope.
+        """Validate and apply one agent packet.
 
         Example input: JSON with title, summary, category, tags, and source.
-        Skeleton output: the normalized packet plus empty changed-files metadata.
+        Output includes normalized packet metadata and files changed by rendering.
         """
         from .packet import parse_packet
+        from .wiki import add_packet, approved_leaf_paths, ensure_layout
 
+        ensure_layout(self.config)
         packet, issues = parse_packet(raw_packet)
         if issues:
             return CommandResult(False, "add", issues=tuple(issues), exit_code=1)
 
         assert packet is not None
+        from .notebook import resolve_source
+
+        source_path = resolve_source(self.config, packet.source)
+        if not source_path.exists():
+            return CommandResult(
+                False,
+                "add",
+                issues=(
+                    Issue(
+                        "source_missing",
+                        f"source note does not exist: {packet.source}",
+                        source=packet.source,
+                    ),
+                ),
+                exit_code=1,
+            )
+        leafs = approved_leaf_paths(self.config)
+        if packet.category not in leafs and not allow_undeclared:
+            return CommandResult(
+                False,
+                "add",
+                issues=(
+                    Issue(
+                        "category_not_approved",
+                        f"category is not an approved leaf: {packet.category.display()}",
+                    ),
+                ),
+                exit_code=1,
+            )
+        data = add_packet(self.config, packet)
+        data["allow_undeclared"] = allow_undeclared
         return CommandResult(
             True,
             "add",
-            data={
-                "packet": packet.to_json(),
-                "changed_files": [],
-                "indexed_count": 0,
-                "allow_undeclared": allow_undeclared,
-                "phase": "skeleton",
-            },
+            data=data,
         )
 
     def index(self) -> CommandResult:
         """Reconcile notebook state and generated wiki files."""
-        return CommandResult(
-            True,
-            "index",
-            data={"changed_files": [], "indexed_count": 0, "phase": "skeleton"},
-        )
+        from .wiki import index_workspace
+
+        return CommandResult(True, "index", data=index_workspace(self.config))
 
     def search(self, query: str, *, limit: int) -> CommandResult:
         """Return ranked search candidates for a user query."""
         from .search import search
 
-        results = search(query, limit=limit)
+        results = search(self.config, query, limit=limit)
         return CommandResult(
             bool(results),
             "search",
@@ -112,6 +137,27 @@ class WikiCli:
         include_body: bool = False,
     ) -> CommandResult:
         """Return a deterministic note bundle for agent-written synthesis."""
+        from .wiki import active_catalog
+
+        entries = [entry.to_json() for entry in active_catalog(self.config).values()]
+        if category:
+            entries = [entry for entry in entries if entry["category"] == category]
+        if tags:
+            requested = set(tags)
+            entries = [
+                entry for entry in entries if requested & set(entry.get("tags", []))
+            ]
+        entries = entries[:limit]
+        if include_body:
+            from .notebook import clean_body_text, load_note
+
+            for entry in entries:
+                try:
+                    entry["body"] = clean_body_text(
+                        load_note(self.config, str(entry["source"])).body
+                    )
+                except OSError:
+                    entry["body"] = ""
         return CommandResult(
             True,
             "synthesize",
@@ -120,8 +166,7 @@ class WikiCli:
                 "tags": list(tags),
                 "limit": limit,
                 "include_body": include_body,
-                "notes": [],
-                "phase": "skeleton",
+                "notes": entries,
             },
         )
 
@@ -140,7 +185,12 @@ class WikiCli:
 
     def tree(self) -> CommandResult:
         """Return the approved category tree in command-result form."""
-        return CommandResult(True, "tree", data={"categories": [], "phase": "skeleton"})
+        from .category import tree_to_json
+        from .wiki import read_tree
+
+        return CommandResult(
+            True, "tree", data={"categories": tree_to_json(read_tree(self.config))}
+        )
 
     def status(self) -> CommandResult:
         """Return resolved workspace paths and lightweight health metadata."""
@@ -151,12 +201,30 @@ class WikiCli:
                 "notebook_root": str(self.config.notebook_root),
                 "generated_root": str(self.config.generated_root),
                 "include_roots": [str(path) for path in self.config.include_roots],
-                "phase": "skeleton",
             },
         )
 
     def show(self, source: str) -> CommandResult:
         """Return one catalog/source entry by normalized source path."""
+        from .notebook import normalize_source
+        from .wiki import get_entry
+
+        normalized = normalize_source(source)
+        entry = get_entry(self.config, normalized)
+        if entry is None:
+            return CommandResult(
+                False,
+                "show",
+                data={"source": normalized, "note": None},
+                issues=(
+                    Issue(
+                        "not_found",
+                        f"source is not indexed: {normalized}",
+                        source=normalized,
+                    ),
+                ),
+                exit_code=1,
+            )
         return CommandResult(
-            True, "show", data={"source": source, "note": None, "phase": "skeleton"}
+            True, "show", data={"source": normalized, "note": entry.to_json()}
         )
