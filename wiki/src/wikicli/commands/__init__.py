@@ -1,2 +1,1 @@
-"""wikicli command modules."""
-
+"""Argparse command adapters for wikicli."""

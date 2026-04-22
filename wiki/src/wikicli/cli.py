@@ -1,25 +1,49 @@
 from __future__ import annotations
 
 import argparse
-from typing import Sequence
+import json
+import sys
+from collections.abc import Sequence
+from typing import Any
 
-from wikicli.commands import add, index, lint, search, synthesize
+from .app import CommandResult, Issue, WikiCli
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Lightweight wiki indexer.")
-    parser.add_argument("--config", help="Path to wiki config JSON.")
+    parser = argparse.ArgumentParser(prog="wiki")
+    parser.add_argument("--config", help="Path to wiki config JSON")
     subparsers = parser.add_subparsers(dest="command", required=True)
-    add.register_parser(subparsers)
-    index.register_parser(subparsers)
-    search.register_parser(subparsers)
-    lint.register_parser(subparsers)
-    synthesize.register_parser(subparsers)
+
+    from .commands import add, index, lint, search, show, status, synthesize, tree
+
+    for module in (add, index, search, synthesize, lint, tree, show, status):
+        module.register(subparsers)
+
+    reconcile = subparsers.add_parser("reconcile", help="Alias for index")
+    reconcile.set_defaults(handler=lambda app, args: app.index())
     return parser
+
+
+def print_result(result: CommandResult) -> None:
+    print(json.dumps(result.to_json(), sort_keys=True, separators=(",", ":")))
+
+
+def _config_error(message: str) -> CommandResult:
+    return CommandResult(False, "config", issues=(Issue("config_error", message),), exit_code=2)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    result = args.func(args)
-    return 0 if result is None else result
+    try:
+        app = WikiCli.from_config_path(args.config)
+        result: CommandResult = args.handler(app, args)
+    except (OSError, ValueError) as exc:
+        result = _config_error(str(exc))
+
+    print_result(result)
+    return result.exit_code
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))
