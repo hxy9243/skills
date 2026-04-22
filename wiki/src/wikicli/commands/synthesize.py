@@ -6,7 +6,9 @@ from wikicli.app import WikiCli
 
 
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
-    parser = subparsers.add_parser("synthesize", help="Return a deterministic synthesis bundle")
+    parser = subparsers.add_parser(
+        "synthesize", help="Return a deterministic synthesis bundle"
+    )
     parser.add_argument("--category")
     parser.add_argument("--tag", action="append", default=[])
     parser.add_argument("--limit", type=int, default=10)

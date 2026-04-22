@@ -59,7 +59,14 @@ class CliContractTests(unittest.TestCase):
                 "ok": False,
                 "command": "lint",
                 "data": {"checked": True},
-                "issues": [{"code": "missing", "message": "missing thing", "severity": "error", "path": "/tmp/x"}],
+                "issues": [
+                    {
+                        "code": "missing",
+                        "message": "missing thing",
+                        "severity": "error",
+                        "path": "/tmp/x",
+                    }
+                ],
                 "fixes": [],
             },
         )
@@ -70,7 +77,9 @@ class CliContractTests(unittest.TestCase):
         self.assertEqual(rc, 0)
         self.assertEqual(payload["ok"], True)
         self.assertEqual(payload["command"], "status")
-        self.assertEqual(payload["data"]["generated_root"], str(self.generated.resolve()))
+        self.assertEqual(
+            payload["data"]["generated_root"], str(self.generated.resolve())
+        )
 
     def test_add_rejects_packet_lists_as_json_issue(self) -> None:
         rc, payload = self.run_cli_json("add", "--packet", "[]")

@@ -8,7 +8,11 @@ from wikicli.app import WikiCli
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     parser = subparsers.add_parser("add", help="Add one classified packet to the wiki")
     parser.add_argument("--packet", required=True, help="Packet JSON object")
-    parser.add_argument("--allow-undeclared", action="store_true", help="Allow categories outside the approved tree")
+    parser.add_argument(
+        "--allow-undeclared",
+        action="store_true",
+        help="Allow categories outside the approved tree",
+    )
     parser.set_defaults(handler=run)
 
 

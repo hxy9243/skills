@@ -10,6 +10,7 @@ from .app import CommandResult, Issue, WikiCli
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Build the complete CLI parser and attach command handlers."""
     parser = argparse.ArgumentParser(prog="wiki")
     parser.add_argument("--config", help="Path to wiki config JSON")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -25,14 +26,19 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def print_result(result: CommandResult) -> None:
+    """Print compact, deterministic JSON for machine consumers."""
     print(json.dumps(result.to_json(), sort_keys=True, separators=(",", ":")))
 
 
 def _config_error(message: str) -> CommandResult:
-    return CommandResult(False, "config", issues=(Issue("config_error", message),), exit_code=2)
+    """Convert config loading failures into the normal command result envelope."""
+    return CommandResult(
+        False, "config", issues=(Issue("config_error", message),), exit_code=2
+    )
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    """Parse args, run one command, print JSON, and return the process exit code."""
     parser = build_parser()
     args = parser.parse_args(argv)
     try:

@@ -9,6 +9,8 @@ from .config import WikiConfig, load_config
 
 @dataclass(frozen=True)
 class Issue:
+    """Structured problem report returned in command JSON instead of stderr text."""
+
     code: str
     message: str
     severity: str = "error"
@@ -17,11 +19,14 @@ class Issue:
     line: int | None = None
 
     def to_json(self) -> dict[str, Any]:
+        """Serialize for stable CLI JSON, omitting unset optional fields."""
         return {key: value for key, value in asdict(self).items() if value is not None}
 
 
 @dataclass(frozen=True)
 class CommandResult:
+    """Uniform app-layer result that the CLI prints and exits from."""
+
     ok: bool
     command: str
     data: dict[str, Any] = field(default_factory=dict)
@@ -30,6 +35,7 @@ class CommandResult:
     exit_code: int = 0
 
     def to_json(self) -> dict[str, Any]:
+        """Return the public command envelope shared by all CLI commands."""
         return {
             "ok": self.ok,
             "command": self.command,
@@ -40,14 +46,25 @@ class CommandResult:
 
 
 class WikiCli:
+    """Programmatic command surface used by argparse adapters and future agents."""
+
     def __init__(self, config: WikiConfig):
+        """Create an app facade over one resolved wiki workspace config."""
         self.config = config
 
     @classmethod
     def from_config_path(cls, config_path: str | Path | None) -> "WikiCli":
+        """Load config once at the CLI boundary, then run commands against it."""
         return cls(load_config(config_path))
 
-    def add_packet(self, raw_packet: str, *, allow_undeclared: bool = False) -> CommandResult:
+    def add_packet(
+        self, raw_packet: str, *, allow_undeclared: bool = False
+    ) -> CommandResult:
+        """Validate one agent packet and return the add command result envelope.
+
+        Example input: JSON with title, summary, category, tags, and source.
+        Skeleton output: the normalized packet plus empty changed-files metadata.
+        """
         from .packet import parse_packet
 
         packet, issues = parse_packet(raw_packet)
@@ -68,13 +85,24 @@ class WikiCli:
         )
 
     def index(self) -> CommandResult:
-        return CommandResult(True, "index", data={"changed_files": [], "indexed_count": 0, "phase": "skeleton"})
+        """Reconcile notebook state and generated wiki files."""
+        return CommandResult(
+            True,
+            "index",
+            data={"changed_files": [], "indexed_count": 0, "phase": "skeleton"},
+        )
 
     def search(self, query: str, *, limit: int) -> CommandResult:
+        """Return ranked search candidates for a user query."""
         from .search import search
 
         results = search(query, limit=limit)
-        return CommandResult(bool(results), "search", data={"query": query, "results": results}, exit_code=0 if results else 1)
+        return CommandResult(
+            bool(results),
+            "search",
+            data={"query": query, "results": results},
+            exit_code=0 if results else 1,
+        )
 
     def synthesize_bundle(
         self,
@@ -83,6 +111,7 @@ class WikiCli:
         limit: int = 10,
         include_body: bool = False,
     ) -> CommandResult:
+        """Return a deterministic note bundle for agent-written synthesis."""
         return CommandResult(
             True,
             "synthesize",
@@ -97,6 +126,7 @@ class WikiCli:
         )
 
     def lint(self) -> CommandResult:
+        """Run read-only workspace integrity checks."""
         from .lint import lint_workspace
 
         issues = tuple(lint_workspace(self.config))
@@ -109,9 +139,11 @@ class WikiCli:
         )
 
     def tree(self) -> CommandResult:
+        """Return the approved category tree in command-result form."""
         return CommandResult(True, "tree", data={"categories": [], "phase": "skeleton"})
 
     def status(self) -> CommandResult:
+        """Return resolved workspace paths and lightweight health metadata."""
         return CommandResult(
             True,
             "status",
@@ -124,4 +156,7 @@ class WikiCli:
         )
 
     def show(self, source: str) -> CommandResult:
-        return CommandResult(True, "show", data={"source": source, "note": None, "phase": "skeleton"})
+        """Return one catalog/source entry by normalized source path."""
+        return CommandResult(
+            True, "show", data={"source": source, "note": None, "phase": "skeleton"}
+        )
