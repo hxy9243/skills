@@ -6,10 +6,8 @@ from pathlib import Path
 
 from wikicli.config import WikiConfig
 from wikicli.notebook import (
+    Note,
     NoteMetadata,
-    discover_notes,
-    load_note,
-    normalize_source,
 )
 
 
@@ -43,11 +41,11 @@ class NoteMetadataTests(unittest.TestCase):
             self.assertIn('category: "A > B > C"', path.read_text(encoding="utf-8"))
 
     def test_normalize_source_rejects_absolute_and_parent_paths(self) -> None:
-        self.assertEqual(normalize_source("Notes/A.md"), "Notes/A.md")
+        self.assertEqual(Note.normalize_source("Notes/A.md"), "Notes/A.md")
         with self.assertRaises(ValueError):
-            normalize_source("/tmp/A.md")
+            Note.normalize_source("/tmp/A.md")
         with self.assertRaises(ValueError):
-            normalize_source("../A.md")
+            Note.normalize_source("../A.md")
 
     def test_discover_notes_excludes_generated_and_configured_paths(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -67,7 +65,7 @@ class NoteMetadataTests(unittest.TestCase):
                 exclude_globs=("Templates/**",),
             )
 
-            notes = discover_notes(config)
+            notes = Note.discover(config)
 
             self.assertEqual([note.source for note in notes], ["Notes/A.md"])
 
@@ -81,7 +79,7 @@ class NoteMetadataTests(unittest.TestCase):
             )
             config = WikiConfig(notebook, generated, (notebook,))
 
-            note = load_note(config, "A.md")
+            note = Note.load(config, "A.md")
 
             self.assertEqual(note.title, "Heading Title")
             self.assertEqual(note.tags, ())

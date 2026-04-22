@@ -6,7 +6,7 @@ from typing import Any
 
 from .app import Issue
 from .category import CategoryPath
-from .notebook import normalize_source
+from .notebook import Note
 
 
 @dataclass(frozen=True)
@@ -76,7 +76,7 @@ def parse_packet(raw_packet: str) -> tuple[Packet | None, list[Issue]]:
         issues.append(Issue("packet_category_invalid", str(exc)))
 
     try:
-        source = normalize_source(source_raw) if source_raw else ""
+        source = Note.normalize_source(source_raw) if source_raw else ""
     except ValueError as exc:
         source = ""
         issues.append(Issue("packet_source_invalid", str(exc), source=source_raw))

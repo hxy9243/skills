@@ -5,7 +5,7 @@ from collections.abc import Iterable
 from .app import Issue
 from .config import WikiConfig
 from .category import CategoryPath
-from .notebook import discover_notes
+from .notebook import Note
 from .wiki import active_catalog, approved_leaf_paths, malformed_log_lines
 
 
@@ -38,7 +38,7 @@ def lint_workspace(config: WikiConfig) -> Iterable[Issue]:
             line=item.get("line"),
         )
 
-    notes = {note.source: note for note in discover_notes(config)}
+    notes = {note.source: note for note in Note.discover(config)}
     catalog = active_catalog(config)
     leafs = approved_leaf_paths(config)
     for source, entry in catalog.items():

@@ -74,9 +74,9 @@ class WikiCli:
             return CommandResult(False, "add", issues=tuple(issues), exit_code=1)
 
         assert packet is not None
-        from .notebook import resolve_source
+        from .notebook import Note
 
-        source_path = resolve_source(self.config, packet.source)
+        source_path = Note.resolve_source(self.config, packet.source)
         if not source_path.exists():
             return CommandResult(
                 False,
@@ -149,12 +149,12 @@ class WikiCli:
             ]
         entries = entries[:limit]
         if include_body:
-            from .notebook import clean_body_text, load_note
+            from .notebook import Note
 
             for entry in entries:
                 try:
-                    entry["body"] = clean_body_text(
-                        load_note(self.config, str(entry["source"])).body
+                    entry["body"] = Note.clean_body_text(
+                        Note.load(self.config, str(entry["source"])).body
                     )
                 except OSError:
                     entry["body"] = ""
@@ -206,10 +206,10 @@ class WikiCli:
 
     def show(self, source: str) -> CommandResult:
         """Return one catalog/source entry by normalized source path."""
-        from .notebook import normalize_source
+        from .notebook import Note
         from .wiki import get_entry
 
-        normalized = normalize_source(source)
+        normalized = Note.normalize_source(source)
         entry = get_entry(self.config, normalized)
         if entry is None:
             return CommandResult(

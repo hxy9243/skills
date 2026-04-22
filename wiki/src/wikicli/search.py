@@ -4,7 +4,7 @@ from dataclasses import asdict, dataclass
 from typing import Any
 
 from .config import WikiConfig
-from .notebook import clean_body_text, load_note, snippet_around, tokenize
+from .notebook import Note
 from .wiki import active_catalog
 
 
@@ -35,7 +35,7 @@ def search(config: WikiConfig, query: str, *, limit: int) -> list[dict[str, Any]
     Matches catalog title, summary, tags, hierarchy, search terms, and source
     body text, then sorts by score and source path for stable output.
     """
-    terms = tokenize(query)
+    terms = Note.tokenize(query)
     if not terms or limit <= 0:
         return []
     results: list[SearchResult] = []
@@ -57,18 +57,18 @@ def search(config: WikiConfig, query: str, *, limit: int) -> list[dict[str, Any]
             score += _weight(reason) * len(overlap)
             reasons.append(reason)
             if reason in {"title", "summary", "hierarchy"}:
-                snippets.append(snippet_around(text, overlap))
+                snippets.append(Note.snippet_around(text, overlap))
         try:
-            note = load_note(config, entry.source)
+            note = Note.load(config, entry.source)
         except OSError:
             note = None
         if note is not None:
-            body_text = clean_body_text(note.body)
+            body_text = Note.clean_body_text(note.body)
             overlap = _overlap(terms, body_text)
             if overlap:
                 score += len(overlap)
                 reasons.append("content")
-                snippets.append(snippet_around(body_text, overlap))
+                snippets.append(Note.snippet_around(body_text, overlap))
         if score <= 0:
             continue
         results.append(
@@ -87,7 +87,7 @@ def search(config: WikiConfig, query: str, *, limit: int) -> list[dict[str, Any]
 
 
 def _overlap(terms: tuple[str, ...], text: str) -> tuple[str, ...]:
-    tokens = set(tokenize(text))
+    tokens = set(Note.tokenize(text))
     return tuple(term for term in terms if term in tokens)
 
 

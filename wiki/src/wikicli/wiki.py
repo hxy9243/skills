@@ -16,12 +16,7 @@ from .category import (
     parse_category_tree,
 )
 from .config import WikiConfig
-from .notebook import (
-    Note,
-    discover_notes,
-    normalize_source,
-    resolve_source,
-)
+from .notebook import Note
 from .packet import Packet
 
 
@@ -124,7 +119,7 @@ def active_catalog(config: WikiConfig) -> dict[str, CatalogEntry]:
         if not isinstance(source, str):
             continue
         try:
-            source = normalize_source(source)
+            source = Note.normalize_source(source)
         except ValueError:
             continue
         action = event.get("action")
@@ -160,12 +155,10 @@ def active_catalog(config: WikiConfig) -> dict[str, CatalogEntry]:
 
 def add_packet(config: WikiConfig, packet: Packet) -> dict[str, Any]:
     """Apply an accepted packet: update frontmatter, append log, render views."""
-    from .notebook import NoteMetadata
-
     ensure_layout(config)
-    source_path = resolve_source(config, packet.source)
+    source_path = Note.resolve_source(config, packet.source)
     changed_files: list[str] = []
-    if NoteMetadata.write_category(source_path, packet.category.display()):
+    if Note.write_category(source_path, packet.category.display()):
         changed_files.append(packet.source)
     append_event(
         config,
@@ -197,7 +190,7 @@ def index_workspace(config: WikiConfig) -> dict[str, Any]:
     """Scan notebook state, record missing catalog entries, and regenerate views."""
     ensure_layout(config)
     catalog = active_catalog(config)
-    notes = {note.source: note for note in discover_notes(config)}
+    notes = {note.source: note for note in Note.discover(config)}
     removed: list[str] = []
     for source in sorted(set(catalog) - set(notes), key=str.casefold):
         append_event(
@@ -279,7 +272,7 @@ def rebuild_generated(
     note_map = (
         {note.source: note for note in notes}
         if notes is not None
-        else {note.source: note for note in discover_notes(config)}
+        else {note.source: note for note in Note.discover(config)}
     )
     unindexed = sorted(set(note_map) - set(catalog), key=str.casefold)
     skipped_system = [source for source in unindexed if is_system_note(source)]
@@ -373,7 +366,7 @@ def catalog_notes(config: WikiConfig) -> list[dict[str, Any]]:
 
 def get_entry(config: WikiConfig, source: str) -> CatalogEntry | None:
     """Return one active catalog entry by source path."""
-    return active_catalog(config).get(normalize_source(source))
+    return active_catalog(config).get(Note.normalize_source(source))
 
 
 def malformed_log_lines(config: WikiConfig) -> list[dict[str, Any]]:
