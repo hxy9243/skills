@@ -7,9 +7,9 @@ from wikicli.app import WikiCli
 
 def register(subparsers: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     parser = subparsers.add_parser("tree", help="Show approved category tree")
-    parser.add_argument("--format", choices=("json", "markdown"), default="json")
+    parser.add_argument("--format", choices=("json", "markdown"), default="markdown")
     parser.set_defaults(handler=run)
 
 
 def run(app: WikiCli, args: argparse.Namespace):
-    return app.tree()
+    return app.tree(format=args.format)

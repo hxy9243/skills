@@ -30,6 +30,14 @@ def print_result(result: CommandResult) -> None:
     print(json.dumps(result.to_json(), sort_keys=True, separators=(",", ":")))
 
 
+def print_cli_output(result: CommandResult) -> None:
+    """Print human-facing text for selected commands, JSON otherwise."""
+    if result.ok and result.command == "tree" and "tree" in result.data:
+        print(result.data["tree"])
+        return
+    print_result(result)
+
+
 def _config_error(message: str) -> CommandResult:
     """Convert config loading failures into the normal command result envelope."""
     return CommandResult(
@@ -47,7 +55,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     except (OSError, ValueError) as exc:
         result = _config_error(str(exc))
 
-    print_result(result)
+    print_cli_output(result)
     return result.exit_code
 
 

@@ -183,14 +183,19 @@ class WikiCli:
             exit_code=1 if any(issue.severity == "error" for issue in issues) else 0,
         )
 
-    def tree(self) -> CommandResult:
+    def tree(self, *, format: str = "markdown") -> CommandResult:
         """Return the approved category tree in command-result form."""
-        from .category import tree_to_json
+        from .category import tree_to_json, tree_to_markdown
         from .wiki import read_tree
 
-        return CommandResult(
-            True, "tree", data={"categories": tree_to_json(read_tree(self.config))}
-        )
+        tree = read_tree(self.config)
+        if format == "json":
+            data = {"categories": tree_to_json(tree)}
+        elif format == "markdown":
+            data = {"tree": tree_to_markdown(tree)}
+        else:
+            raise ValueError(f"unsupported tree format: {format}")
+        return CommandResult(True, "tree", data=data)
 
     def status(self) -> CommandResult:
         """Return resolved workspace paths and lightweight health metadata."""

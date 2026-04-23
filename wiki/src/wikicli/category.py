@@ -146,6 +146,20 @@ def tree_to_json(tree: list[dict[str, Any]]) -> list[dict[str, Any]]:
     ]
 
 
+def tree_to_markdown(tree: list[dict[str, Any]]) -> str:
+    """Render a category tree as indented Markdown bullets."""
+    lines: list[str] = []
+
+    def visit(nodes: list[dict[str, Any]], depth: int) -> None:
+        indent = "  " * depth
+        for node in nodes:
+            lines.append(f"{indent}- {node['name']}")
+            visit(node.get("children", []), depth + 1)
+
+    visit(tree, 0)
+    return "\n".join(lines)
+
+
 _LAYER_RE = re.compile(r"^\s*-\s*layer(?P<depth>\d+):\s*(?P<label>.+?)\s*$")
 _LINK_RE = re.compile(r"^\[(?P<label>.*?)\]\(.*?\)$")
 

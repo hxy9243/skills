@@ -65,6 +65,12 @@ class CliContractTests(unittest.TestCase):
             rc = cli.main(["--config", str(self.config_path), *args])
         return rc, json.loads(buffer.getvalue())
 
+    def run_cli_text(self, *args: str) -> tuple[int, str]:
+        buffer = StringIO()
+        with redirect_stdout(buffer):
+            rc = cli.main(["--config", str(self.config_path), *args])
+        return rc, buffer.getvalue()
+
     def test_command_result_envelope_is_stable_json(self) -> None:
         result = CommandResult(
             False,
@@ -196,6 +202,40 @@ class CliContractTests(unittest.TestCase):
         self.assertEqual(rc, 0)
         self.assertEqual(payload["ok"], True)
         self.assertEqual(payload["issues"][0]["code"], "source_unindexed")
+
+    def test_tree_defaults_to_plain_markdown_output(self) -> None:
+        rc, output = self.run_cli_text("tree")
+
+        self.assertEqual(rc, 0)
+        self.assertEqual(
+            output,
+            "- Computer Science\n"
+            "  - AI Systems\n"
+            "    - Agents\n"
+            "    - Memory\n",
+        )
+
+    def test_tree_json_format_preserves_nested_categories(self) -> None:
+        rc, payload = self.run_cli_json("tree", "--format", "json")
+
+        self.assertEqual(rc, 0)
+        self.assertEqual(
+            payload["data"]["categories"],
+            [
+                {
+                    "name": "Computer Science",
+                    "children": [
+                        {
+                            "name": "AI Systems",
+                            "children": [
+                                {"name": "Agents", "children": []},
+                                {"name": "Memory", "children": []},
+                            ],
+                        }
+                    ],
+                }
+            ],
+        )
 
     def test_thin_reconcile_alias_uses_index_command(self) -> None:
         rc, payload = self.run_cli_json("reconcile")
