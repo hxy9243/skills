@@ -120,11 +120,37 @@ Good synthesis responses usually include:
 
 # Result Output
 
-By default, if it's a synthesis for a given category in the tree, write the result into the `path/to/category/index.md` file, under the section `## Synthesis` or `## Summary`.
+By default, if it's a synthesis for a given category in the tree, you are responsible for writing the **entire** `path/to/category/index.md` file. The CLI no longer generates this file automatically. 
+
+You MUST use `uv run wiki list "Category > Path"` to retrieve the exact `subcategories` and `entries` (references), and then format the full `index.md` file using this structure:
+
+```markdown
+---
+category: "Computer Science > ... > Target Category"
+created: 2026-05-11T00:00:00Z
+modified: 2026-05-11T00:00:00Z
+tags: []
+---
+# layer[X]: Target Category
+
+## Layer Path
+- layer1: Computer Science
+...
+- layer[X]: Target Category
+
+## Subcategories
+(List the subcategories returned by `wiki list`, linked to their index.md files, e.g., `- [layer[X+1]: Subcategory](subcategory/index.md)`. If none, omit this section entirely. IMPORTANT: For non-leaf categories, make sure this subcategory list is at the very top of the page, immediately after the Layer Path.)
+
+## References
+(List the entries returned by `wiki list` in alphabetical order. Format: `- [[Note Path]] - summary (tags)`. If none, output `- None`)
+
+## Synthesis
+(Your deep textbook-level synthesis goes here...)
+```
 
 If it is a top-level synthesis (the entire wiki or notebook), save the result to a `HOME.md` file at the root level.
 
-If the topic is not covered in the category tree, you can propose and write a new `path/to/category/index.md` file, and add it into the tree structure.
+If the topic is not covered in the category tree, you can propose and write a new `path/to/category/index.md` file using the template above, and the user can later manually add it to the root category tree structure.
 
 If the result is not necessarily matching a category (e.g. a synthesis across different categories) you can save the results into a new note in the appropriate category.
 

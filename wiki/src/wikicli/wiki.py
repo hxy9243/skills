@@ -241,14 +241,12 @@ class WikiIndex:
         changed_files.append(
             str(self.config.log_path.relative_to(self.config.generated_root))
         )
-        render_result = self.render()
-        changed_files.extend(render_result["changed_files"])
         catalog = self.catalog()
         return {
             "packet": note.to_json(),
             "changed_files": sorted(set(changed_files)),
             "indexed_count": len(catalog),
-            "category_pages": render_result["category_pages"],
+            "category_pages": 0,
         }
 
     def index(self) -> dict[str, Any]:
@@ -277,93 +275,13 @@ class WikiIndex:
             != entry.source_mtime_ns / 1e9
         )
         unindexed = sorted(set(notes) - set(catalog), key=str.casefold)
-        render_result = self.render(notes=list(notes.values()))
         return {
             "indexed_count": len(catalog),
             "removed_notes": removed,
             "modified_notes": modified,
             "unindexed_notes": unindexed,
-            "category_pages": render_result["category_pages"],
-            "changed_files": render_result["changed_files"],
-        }
-
-    # --- rendering ---
-
-    def render(self, *, notes: list[Any] | None = None) -> dict[str, Any]:
-        """Rewrite `index.md` and generated category pages from catalog and tree."""
-        self._ensure_layout()
-        tree = self.read_tree()
-        catalog = self.catalog()
-        leafs = tree.leaf_paths()
-        renderable = [
-            entry
-            for entry in catalog.values()
-            if CategoryPath.parse(entry.category) in leafs
-        ]
-        all_category_paths = sorted(
-            tree.all_paths(), key=lambda item: item.display().casefold()
-        )
-        child_names = tree.child_names()
-        changed_files: list[str] = []
-
-        grouped: dict[CategoryPath, list[CatalogEntry]] = defaultdict(list)
-        for entry in renderable:
-            path = CategoryPath.parse(entry.category)
-            for depth in range(1, len(path.parts) + 1):
-                grouped[CategoryPath(path.parts[:depth])].append(entry)
-
-        valid_pages: set[Path] = set()
-        for path in all_category_paths:
-            page = category_page_path(self.config.categories_dir, path)
-            page.parent.mkdir(parents=True, exist_ok=True)
-            text = _render_category_page(
-                path, child_names.get(path, ()), grouped.get(path, [])
-            )
-            if _write_if_changed(page, text):
-                changed_files.append(
-                    str(page.relative_to(self.config.generated_root))
-                )
-            valid_pages.add(page.resolve())
-
-        if self.config.categories_dir.exists():
-            for page in sorted(
-                self.config.categories_dir.rglob("*.md"), reverse=True
-            ):
-                if page.resolve() not in valid_pages:
-                    page.unlink()
-                    changed_files.append(
-                        str(page.relative_to(self.config.generated_root))
-                    )
-            for directory in sorted(
-                self.config.categories_dir.rglob("*"), reverse=True
-            ):
-                if directory.is_dir():
-                    try:
-                        directory.rmdir()
-                    except OSError:
-                        pass
-
-        note_map = (
-            {note.source: note for note in notes}
-            if notes is not None
-            else {note.source: note for note in self.notebook.discover()}
-        )
-        unindexed = sorted(set(note_map) - set(catalog), key=str.casefold)
-        skipped_system = [
-            source for source in unindexed if _is_system_note(source)
-        ]
-        index_text = _render_index(tree, renderable, skipped_system)
-        if _write_if_changed(self.config.index_path, index_text):
-            changed_files.append(
-                str(
-                    self.config.index_path.relative_to(
-                        self.config.generated_root
-                    )
-                )
-            )
-        return {
-            "changed_files": sorted(set(changed_files)),
-            "category_pages": len(valid_pages),
+            "category_pages": 0,
+            "changed_files": [],
         }
 
     # --- search ---
@@ -565,118 +483,7 @@ class WikiIndex:
         return events, malformed
 
 
-# --- rendering helpers ---
-
-
-def _render_index(
-    tree: WikiCategoryTree,
-    entries: list[CatalogEntry],
-    skipped_system: list[str],
-) -> str:
-    """Render the generated `index.md` page."""
-    notes_by_path: dict[CategoryPath, list[CatalogEntry]] = defaultdict(list)
-    for entry in entries:
-        notes_by_path[CategoryPath.parse(entry.category)].append(entry)
-    lines = [
-        "# Wiki Index",
-        "",
-        "## Category Tree",
-        "",
-        "This tree is the classification reference for the wiki.",
-        "",
-    ]
-
-    def render_node(
-        node: Any, prefix: tuple[str, ...], depth: int
-    ) -> None:
-        path = CategoryPath((*prefix, str(node.name)))
-        rel = Path("categories", *path.slug_parts(), "index.md").as_posix()
-        indent = "  " * (depth - 1)
-        lines.append(f"{indent}- layer{depth}: [{path.parts[-1]}]({rel})")
-        if node.children:
-            for child in node.children:
-                render_node(child, path.parts, depth + 1)
-            return
-        for entry in sorted(
-            notes_by_path.get(path, []),
-            key=lambda item: item.source.casefold(),
-        ):
-            lines.append(f"{'  ' * depth}- [[{entry.source}]]")
-
-    for root in tree.roots:
-        render_node(root, (), 1)
-    if not tree.roots:
-        lines.append("- None")
-    lines.extend(["", "---", "", "## Skipped System Notes"])
-    if skipped_system:
-        lines.extend(f"- [[{source}]]" for source in skipped_system)
-    else:
-        lines.append("- None")
-    return "\n".join(lines).rstrip() + "\n"
-
-
-def _render_category_page(
-    path: CategoryPath,
-    children: tuple[str, ...],
-    entries: list[CatalogEntry],
-) -> str:
-    """Render one generated category page."""
-    depth = len(path.parts)
-    now = _utc_now()
-    lines = [
-        "---",
-        f'category: "{path.display()}"',
-        f"created: {now}",
-        f"modified: {now}",
-        "tags: []",
-        "---",
-        f"# layer{depth}: {path.parts[-1]}",
-        "",
-        "## Layer Path",
-        *[f"- {label}" for label in path.layer_labels()],
-        "",
-    ]
-    if children:
-        lines.append("## Subcategories")
-        for child in children:
-            child_path = CategoryPath((*path.parts, child))
-            rel = Path(child_path.slug_parts()[-1], "index.md").as_posix()
-            lines.append(f"- [layer{depth + 1}: {child}]({rel})")
-        lines.append("")
-
-    lines.append("## References")
-    if entries:
-        for entry in sorted(entries, key=lambda item: item.title.casefold()):
-            tag_text = f" ({' '.join(entry.tags)})" if entry.tags else ""
-            lines.append(
-                f"- [[{entry.source}]] - {entry.summary}{tag_text}"
-            )
-    else:
-        lines.append("- None")
-    return "\n".join(lines).rstrip() + "\n"
-
-
-def _is_system_note(source: str) -> bool:
-    """Return true for common dashboard/index notes that should not be indexed."""
-    stem = (
-        Path(source).stem.casefold().replace("_", "-").replace(" ", "-")
-    )
-    return stem in {
-        "dashboard",
-        "dashboard-index",
-        "index",
-        "readme",
-        "summary",
-        "log",
-    }
-
-
-def _write_if_changed(path: Path, text: str) -> bool:
-    if path.exists() and path.read_text(encoding="utf-8") == text:
-        return False
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(text, encoding="utf-8")
-    return True
+# --- private helpers ---
 
 
 def _utc_now() -> str:
