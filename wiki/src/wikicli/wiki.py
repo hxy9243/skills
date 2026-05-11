@@ -142,25 +142,53 @@ class WikiIndex:
         *,
         recursive: bool = False,
         include_body: bool = False,
-    ) -> list[CatalogEntry]:
-        """List catalog entries, optionally filtered by category."""
-        entries = list(self.catalog().values())
+    ) -> dict[str, Any]:
+        """List subcategories and catalog entries at a category level.
+
+        Without ``--recursive``, behaves like ``ls``:
+        - Shows direct child categories of the given path.
+        - Shows entries whose category exactly matches the given path.
+
+        With ``--recursive``, returns all entries under the subtree.
+
+        Returns a dict with ``subcategories`` (list of child category names)
+        and ``entries`` (list of CatalogEntry).
+        """
+        all_entries = list(self.catalog().values())
+        tree = self.read_tree()
+
         if category is not None:
             cat_str = (
                 category.display()
                 if isinstance(category, CategoryPath)
                 else category
             )
-            if recursive:
+        else:
+            cat_str = None
+
+        if recursive:
+            # Flat list of everything under this subtree (or everything).
+            if cat_str is not None:
                 entries = [
                     e
-                    for e in entries
-                    if e.category == cat_str or e.category.startswith(cat_str + " > ")
+                    for e in all_entries
+                    if e.category == cat_str
+                    or e.category.startswith(cat_str + " > ")
                 ]
             else:
-                entries = [e for e in entries if e.category == cat_str]
-        # include_body is handled at the WikiCli layer by enriching entries
-        return entries
+                entries = all_entries
+            return {"subcategories": [], "entries": entries}
+
+        # Non-recursive: show direct children + entries at this exact level.
+        try:
+            cat_path = CategoryPath.parse(cat_str) if cat_str else None
+        except ValueError:
+            cat_path = None
+
+        children = tree.children(cat_path)
+        subcategories = [node.name for node in children]
+        entries = [e for e in all_entries if e.category == cat_str] if cat_str else []
+        return {"subcategories": subcategories, "entries": entries}
 
     # --- mutations ---
 

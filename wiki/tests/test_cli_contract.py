@@ -148,41 +148,68 @@ class CliContractTests(unittest.TestCase):
         self.assertEqual(payload["data"]["results"][0]["source"], "Notes/DSPy.md")
         self.assertIn("content", payload["data"]["results"][0]["match_reasons"])
 
-    def test_list_returns_catalog_entries(self) -> None:
+    def test_list_root_shows_subcategories(self) -> None:
         self.test_add_indexes_note_and_renders_generated_files()
 
         rc, payload = self.run_cli_json("list")
 
         self.assertEqual(rc, 0)
         self.assertEqual(payload["command"], "list")
-        self.assertEqual(len(payload["data"]["entries"]), 1)
-        self.assertEqual(payload["data"]["entries"][0]["source"], "Notes/DSPy.md")
+        self.assertIn("Computer Science", payload["data"]["subcategories"])
+        # Root has no direct entries, only subcategories
+        self.assertEqual(len(payload["data"]["entries"]), 0)
 
-    def test_list_with_include_body(self) -> None:
+    def test_list_branch_shows_children(self) -> None:
         self.test_add_indexes_note_and_renders_generated_files()
 
-        rc, payload = self.run_cli_json("list", "--include-body")
-
+        rc, payload = self.run_cli_json(
+            "list", "Computer Science > AI Systems"
+        )
         self.assertEqual(rc, 0)
-        self.assertIn("body", payload["data"]["entries"][0])
-        self.assertIn("Prompt optimization", payload["data"]["entries"][0]["body"])
+        self.assertIn("Agents", payload["data"]["subcategories"])
+        self.assertIn("Memory", payload["data"]["subcategories"])
 
-    def test_list_filters_by_category(self) -> None:
+    def test_list_leaf_shows_entries(self) -> None:
         self.test_add_indexes_note_and_renders_generated_files()
 
-        # Exact match
         rc, payload = self.run_cli_json(
             "list", "Computer Science > AI Systems > Agents"
         )
         self.assertEqual(rc, 0)
         self.assertEqual(len(payload["data"]["entries"]), 1)
+        self.assertEqual(payload["data"]["entries"][0]["source"], "Notes/DSPy.md")
+        self.assertEqual(payload["data"]["subcategories"], [])
 
-        # Non-matching
+    def test_list_recursive_flattens_all_entries(self) -> None:
+        self.test_add_indexes_note_and_renders_generated_files()
+
+        rc, payload = self.run_cli_json(
+            "list", "Computer Science", "--recursive"
+        )
+        self.assertEqual(rc, 0)
+        self.assertEqual(len(payload["data"]["entries"]), 1)
+        self.assertEqual(payload["data"]["subcategories"], [])
+
+    def test_list_with_include_body(self) -> None:
+        self.test_add_indexes_note_and_renders_generated_files()
+
+        rc, payload = self.run_cli_json(
+            "list", "Computer Science > AI Systems > Agents", "--include-body"
+        )
+
+        self.assertEqual(rc, 0)
+        self.assertIn("body", payload["data"]["entries"][0])
+        self.assertIn("Prompt optimization", payload["data"]["entries"][0]["body"])
+
+    def test_list_nonmatching_leaf(self) -> None:
+        self.test_add_indexes_note_and_renders_generated_files()
+
         rc, payload = self.run_cli_json(
             "list", "Computer Science > AI Systems > Memory"
         )
         self.assertEqual(rc, 0)
         self.assertEqual(len(payload["data"]["entries"]), 0)
+        self.assertEqual(payload["data"]["subcategories"], [])
 
     def test_search_with_tags(self) -> None:
         self.test_add_indexes_note_and_renders_generated_files()
@@ -260,8 +287,8 @@ class CliContractTests(unittest.TestCase):
         rc, output = self.run_cli_text("list")
 
         self.assertEqual(rc, 0)
-        self.assertIn("DSPy", output)
-        self.assertIn("Notes/DSPy.md", output)
+        # Root list shows subcategory names with trailing slash
+        self.assertIn("Computer Science/", output)
 
 
 if __name__ == "__main__":

@@ -89,13 +89,16 @@ def print_result(result: CommandResult) -> None:
 
 def print_text_output(result: CommandResult) -> None:
     """Print human-facing text for commands that support it."""
-    if result.ok and result.command == "list" and "entries" in result.data:
-        entries = result.data["entries"]
-        if not entries:
+    if result.ok and result.command == "list":
+        subcats = result.data.get("subcategories", [])
+        entries = result.data.get("entries", [])
+        if not subcats and not entries:
             print("No entries found.")
         else:
+            for name in subcats:
+                print(f"  {name}/")
             for entry in entries:
-                print(f"- [{entry['category']}] {entry['title']} ({entry['source']})")
+                print(f"  {entry['title']} ({entry['source']})")
         return
     if result.ok and result.command == "search" and "results" in result.data:
         results = result.data["results"]

@@ -121,12 +121,12 @@ class WikiCli:
         recursive: bool = False,
         include_body: bool = False,
     ) -> CommandResult:
-        """List catalog entries, optionally filtered by category."""
+        """List subcategories and catalog entries at a category level."""
         index = WikiIndex(self.config, self._notebook)
-        entries = index.list(category, recursive=recursive)
-        result = [entry.to_json() for entry in entries]
+        listing = index.list(category, recursive=recursive)
+        entries = [entry.to_json() for entry in listing["entries"]]
         if include_body:
-            for item in result:
+            for item in entries:
                 try:
                     note = self._notebook.read(str(item["source"]))
                     item["body"] = Notebook.clean_body_text(note.body)
@@ -139,7 +139,8 @@ class WikiCli:
                 "category": category,
                 "recursive": recursive,
                 "include_body": include_body,
-                "entries": result,
+                "subcategories": listing["subcategories"],
+                "entries": entries,
             },
         )
 
