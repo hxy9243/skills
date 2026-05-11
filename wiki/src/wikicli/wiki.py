@@ -622,23 +622,30 @@ def _render_category_page(
 ) -> str:
     """Render one generated category page."""
     depth = len(path.parts)
+    now = _utc_now()
     lines = [
+        "---",
+        f'category: "{path.display()}"',
+        f"created: {now}",
+        f"modified: {now}",
+        "tags:",
+        "  - category-index",
+        "---",
         f"# layer{depth}: {path.parts[-1]}",
         "",
         "## Layer Path",
         *[f"- {label}" for label in path.layer_labels()],
         "",
-        "## Topics Covered",
     ]
-    for child in children:
-        child_path = CategoryPath((*path.parts, child))
-        rel = Path(child_path.slug_parts()[-1], "index.md").as_posix()
-        lines.append(f"- [layer{depth + 1}: {child}]({rel})")
-    for entry in sorted(entries, key=lambda item: item.title.casefold()):
-        lines.append(f"- [[{entry.source}]] - {entry.title}")
-    if not children and not entries:
-        lines.append("- None")
-    lines.extend(["", "## References"])
+    if children:
+        lines.append("## Subcategories")
+        for child in children:
+            child_path = CategoryPath((*path.parts, child))
+            rel = Path(child_path.slug_parts()[-1], "index.md").as_posix()
+            lines.append(f"- [layer{depth + 1}: {child}]({rel})")
+        lines.append("")
+
+    lines.append("## References")
     if entries:
         for entry in sorted(entries, key=lambda item: item.title.casefold()):
             tag_text = f" ({' '.join(entry.tags)})" if entry.tags else ""
