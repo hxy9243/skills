@@ -41,7 +41,8 @@ Prefer `agents/search.md` when the user mostly wants note discovery or direct Q&
    - Include category-page hits when they help explain the branch better than any single note.
    - If the topic is broad, also run a narrower follow-up search on the top two or three nearby terms.
 
-4. Cross-reference the notes.
+4. Cross-reference and analyze the notes.
+   - **Chronological Evolution**: Pay close attention to the creation dates (in filenames or frontmatter) of the notes. Trace how the topic's focus, technology, or sentiment has evolved over time.
    - Compare repeated ideas across notes.
    - Separate core agreements from one-off claims.
    - Identify useful distinctions such as method families, tradeoffs, or chronology.
@@ -81,12 +82,14 @@ Do **not** use an "Outline" section. Simply use `## Synthesis` followed by logic
 Good synthesis responses usually include:
 
 - `Deep Synthesis (The Core)`
-  - **Concept Walkthroughs**: Clear, detailed explanations of the underlying mechanisms and definitions.
+  - Use Markdown headers (`###` or `####`) for structural sub-sections, rather than bold text.
+  - **Chronological Evolution**: A walkthrough of how the concepts and focuses have shifted over time based on note dates.
+  - **Comprehensive Concept Walkthroughs**: Clear, detailed explanations of the underlying mechanisms, classic architectures, and definitions. Do not skip major themes present in the note set.
   - **In-Depth Analysis**: Detailed exploration of paradigms, frameworks, and state-of-the-art developments.
   - **Tradeoffs & Failure Modes**: Explicit discussion of edge cases, limitations, and architectural tradeoffs.
   - **Inline Citations**: Every major claim must be explicitly backed by an inline reference linking to the original source note.
 - `Key Topics & Terminologies`
-  - A structured list defining the core vocabularies and concepts introduced in the synthesis.
+  - A structured list defining the core vocabularies and concepts introduced in the synthesis. **Every term must include an inline citation** to the note that defines it.
 - `Insights & Visualizations`
   - Deep analytical insights, connections, and common themes.
   - Presentations like Markdown tables or Mermaid graphs/flowcharts **only if strictly necessary and genuinely helpful for understanding**.
@@ -98,8 +101,9 @@ Good synthesis responses usually include:
 ## Quality Bar
 
 - Search or list first. Do not synthesize from memory alone.
-- **Density & Depth**: The output must be substantial. Provide a meaningful, inside-out walkthrough of the topic, not just a surface-level gloss.
+- **Density & Depth**: The output must be substantial. Provide a meaningful, inside-out walkthrough of the topic, not just a surface-level gloss. Be exhaustive and ensure all major topics discovered in the notes are represented.
 - **No Tags**: Do not include hashtag tags (`#tag`) within the synthesis text. Keep them empty or remove them.
+- **Headers Over Bold**: Use markdown heading syntax for sub-sections rather than bold text.
 - Favor recurring patterns across notes over isolated claims.
 - Keep the output highly grounded. Heavily use inline references with Obsidian wiki syntax (`[[Note Title]]`) when backing up claims.
 - Prefer a coherent conceptual map over a bag of excerpts.
