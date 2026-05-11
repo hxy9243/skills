@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -156,6 +158,43 @@ class NoteMetadataTests(unittest.TestCase):
             self.assertFalse(unchanged)
             content = (notebook / "C.md").read_text(encoding="utf-8")
             self.assertIn('"reviewed"', content)
+
+    def test_config_autodiscovers_wiki_config_in_cwd(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            wiki_dir = root / "_WIKI"
+            wiki_dir.mkdir()
+            config_data = {
+                "notebook_root": str(root),
+                "generated_root": str(wiki_dir),
+                "include_roots": ["."],
+            }
+            (wiki_dir / "config.json").write_text(
+                json.dumps(config_data), encoding="utf-8"
+            )
+
+            old_cwd = os.getcwd()
+            try:
+                os.chdir(root)
+                config = WikiConfig.load()  # no config_path
+            finally:
+                os.chdir(old_cwd)
+
+            self.assertEqual(config.notebook_root, root.resolve())
+            self.assertEqual(config.generated_root, wiki_dir.resolve())
+
+    def test_config_falls_back_to_default_without_wiki_dir(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            old_cwd = os.getcwd()
+            try:
+                os.chdir(root)
+                config = WikiConfig.load()  # no config_path, no _WIKI/
+            finally:
+                os.chdir(old_cwd)
+
+            self.assertEqual(config.notebook_root, root.resolve())
+            self.assertEqual(config.generated_root, (root / "_WIKI").resolve())
 
 
 if __name__ == "__main__":

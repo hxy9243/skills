@@ -1,0 +1,15 @@
+{
+  "title": "Memory State",
+  "summary": "Notes on durable memory state and retrieval context for AI systems.",
+  "category": "Computer Science > AI Systems > Memory",
+  "tags": [
+    "#memory",
+    "#agents"
+  ],
+  "search_terms": [
+    "memory state",
+    "retrieval context",
+    "agent memory"
+  ],
+  "source": "Notes/Memory-State.md"
+}

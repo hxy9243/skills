@@ -1,0 +1,16 @@
+{
+  "notebook_root": "..",
+  "generated_root": ".",
+  "include_roots": [
+    "."
+  ],
+  "exclude_globs": [
+    "_WIKI/**",
+    ".obsidian/**",
+    "Templates/**",
+    "Archive/**"
+  ],
+  "search": {
+    "lexical_limit": 8
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "title": "DSPy",
+  "summary": "Prompt optimization framework patterns for building agentic AI systems.",
+  "category": "Computer Science > AI Systems > Agents",
+  "tags": [
+    "#agents",
+    "#prompting"
+  ],
+  "search_terms": [
+    "DSPy",
+    "prompt optimization",
+    "agent pipelines"
+  ],
+  "source": "Notes/DSPy.md"
+}

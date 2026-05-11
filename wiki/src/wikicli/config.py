@@ -17,8 +17,16 @@ class WikiConfig:
 
     @classmethod
     def load(cls, config_path: str | Path | None = None) -> "WikiConfig":
-        """Load config JSON or derive a minimal workspace from the current directory."""
+        """Load config JSON, auto-discover from cwd, or derive a minimal workspace.
+
+        Resolution order when config_path is None:
+        1. Look for ``_WIKI/config.json`` in the current working directory.
+        2. Fall back to a bare default (cwd as notebook root, ``_WIKI`` as generated root).
+        """
         if config_path is None:
+            discovered = Path.cwd().resolve() / "_WIKI" / "config.json"
+            if discovered.is_file():
+                return cls.load(discovered)
             return cls.default()
 
         path = Path(config_path).expanduser().resolve()
