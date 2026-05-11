@@ -72,14 +72,14 @@ uv run wiki search "user topic"
 
 Good synthesis responses usually include:
 
-- `Relevant notes`
-  - note path
-  - hierarchy when available
-  - short evidence snippet
 - `Outline`
   - a compact structure for the topic
 - `Synthesis`
   - the integrated presentation of the topic
+- `Insights`
+  - any insights, connections, common themes.
+  - presentation, graphs, charts, and diagrams that help us undertand the topics.
+  - list examples, Q&As, or any other presentation forms that helps understanding.
 - `Gaps or weak coverage`
   - missing concepts
   - contradictions
@@ -90,9 +90,9 @@ Good synthesis responses usually include:
 
 ## Quality Bar
 
-- Search first. Do not synthesize from memory alone.
+- Search or list first. Do not synthesize from memory alone.
 - Favor recurring patterns across notes over isolated claims.
-- Keep the output grounded in note evidence.
+- Keep the output grounded in note evidence, reference notes inline with obsidian wiki syntax if it references a particular note.
 - Prefer a coherent conceptual map over a bag of excerpts.
 - Use category-path context when it helps orient the user.
 - Explicitly distinguish note-supported conclusions from your own inference.
@@ -110,6 +110,8 @@ Good synthesis responses usually include:
 
 By default, if it's a synthesis for a given category in the tree, write the result into the `path/to/category/index.md` file, under the section `## Synthesis`, `## Summary`, or `## Topics Covered`.
 
+If it is a top-level synthesis (the entire wiki or notebook), save the result to a `HOME.md` file at the root level.
+
 If the topic is not covered in the category tree, you can propose and write a new `path/to/category/index.md` file, and add it into the tree structure.
 
 If the result is not necessarily matching a category (e.g. a synthesis across different categories) you can save the results into a new note in the appropriate category.
@@ -120,7 +122,7 @@ If the synthesis represents a highly valuable new concept, deep analysis, or com
 
 To save a synthesis:
 1. Create a new markdown file in the user's notebook (e.g., alongside related source notes or in a `Syntheses/` folder).
-2. **Rich Frontmatter**: Include rich YAML frontmatter to fully leverage Obsidian tools like Dataview and Graph View. You must include `date`, `tags`, `source_count` (number of notes synthesized), and `entity_links` (direct wikilinks to the core notes used).
+2. **Rich Frontmatter**: Include rich YAML frontmatter to fully leverage Obsidian tools like Dataview and Graph View. You must include `date`, `modified`, `tags`, `source_count` (number of notes synthesized), and `entity_links` (direct wikilinks to the core notes used). Always update the `modified` timestamp when updating an existing synthesis.
 3. When necessary, use rich representations to better present your ideas, like a mermaid flowchart, table, or lists.
 4. Write the synthesized content into the file.
 5. Build a single add packet for the new note, then run `uv run wiki add --json '<json-packet>'` to index it back into the wiki.

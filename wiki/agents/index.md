@@ -32,7 +32,7 @@ Use the active model from the invoking skill/session for any synthesis or classi
 uv run wiki index
 ```
 
-7. Review the generated category pages for touched branches. Use subagents to refine the synthesis at each layer when you need a better intro, topics-covered list, or search/Q&A framing than the deterministic baseline.
+7. **Cascading Bottom-Up Synthesis**: After rebuilding, ensure that synthesis is rolled up at *each* category level. For any given category level, read the synthesis notes of its immediate depth-1 children to construct and update the synthesis of the current level. Repeat this process up to the root to create and update a `HOME.md` file that represents the top-level synthesis of the entire wiki.
 8. If notes still need classification, generate packets and feed them through `add --json` before rebuilding.
 
 ## Responsibilities

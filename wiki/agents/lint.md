@@ -37,6 +37,7 @@ After structural validation, perform a content-aware health check:
    - **Stale Claims**: Statements in the synthesis pages that have been superseded by newer notes (check dates or recent log entries).
    - **Missing Cross-references**: Important concepts mentioned in the text that should be explicitly linked (`[[Concept]]`) to their respective pages.
    - **Orphan Pages**: Identify notes that are in the catalog but have zero inbound links from other notes or category pages. You can use `rg "\[\[Note Title\]\]"` to verify if a note is linked elsewhere.
+   - **Cascading Synthesis Gaps**: If there are new or recently modified notes in a sub-category, verify if their new topics or insights have been incorporated into the synthesis of that category, and recursively rolled up to its parent levels (all the way up to `HOME.md`).
 
 ### Phase 3: Remediation Plan
 
@@ -49,3 +50,4 @@ Recommend the smallest repair action that restores both structural and semantic 
 - Suggest `add --json` when notes exist but have not been classified.
 - Call out missing source notes explicitly when logged entries point to deleted files.
 - For semantic issues, suggest specific edits to the source notes or recommend re-running the `synthesize` agent for specific categories to resolve contradictions or stale claims.
+- For new topics or insights discovered in sub-categories, explicitly recommend updating the synthesis of the affected category and cascading those updates up through parent levels to `HOME.md`.
