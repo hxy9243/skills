@@ -33,7 +33,7 @@ uv run wiki index
 ```
 
 7. Review the generated category pages for touched branches. Use subagents to refine the synthesis at each layer when you need a better intro, topics-covered list, or search/Q&A framing than the deterministic baseline.
-8. If notes still need classification, generate packets and feed them through `add --packet` before rebuilding.
+8. If notes still need classification, generate packets and feed them through `add --json` before rebuilding.
 
 ## Responsibilities
 

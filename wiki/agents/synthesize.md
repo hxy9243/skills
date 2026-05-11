@@ -123,4 +123,4 @@ To save a synthesis:
 2. **Rich Frontmatter**: Include rich YAML frontmatter to fully leverage Obsidian tools like Dataview and Graph View. You must include `date`, `tags`, `source_count` (number of notes synthesized), and `entity_links` (direct wikilinks to the core notes used).
 3. When necessary, use rich representations to better present your ideas, like a mermaid flowchart, table, or lists.
 4. Write the synthesized content into the file.
-5. Build a single add packet for the new note, then run `uv run wiki add --packet '<json-packet>'` to index it back into the wiki.
+5. Build a single add packet for the new note, then run `uv run wiki add --json '<json-packet>'` to index it back into the wiki.

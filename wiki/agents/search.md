@@ -14,6 +14,7 @@ Use the active model from the invoking skill/session for answer synthesis. Retri
 
 ```bash
 uv run wiki search "user query"
+# You can also use `uv run wiki list "Category Name" --recursive` to browse a whole branch.
 ```
 
 2. Read note matches from the combined backends: Obsidian content search, tag matches, and hierarchy-aware matches.

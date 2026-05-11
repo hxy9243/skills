@@ -34,7 +34,7 @@ The backend keeps this packet shape lightweight and deterministic. `wiki add` ac
 4. **Entity & Concept Page Maintenance**: Check if there is an existing synthesis or summary source note for the target category. If a concept page already exists for this topic, read it and use your file editing tools to update it by integrating any new information, nuances, or contradictions introduced by the new note.
 5. Choose the branch that would make this note easiest to rediscover later through natural search queries.
 6. Keep category paths broad and durable, but add a deeper level when a dense concept family is already forming.
-7. If the note clearly does not fit, extend the tree with the smallest necessary new subtree rather than forcing a weak placement.
+7. If the note clearly does not fit, extend the tree with the smallest necessary new subtree rather than forcing a weak placement. When adding a note to a new category that is not yet in the approved `index.md` tree, be sure to use the `--allow-undeclared` flag.
 8. Keep concept families consistent across folders. If an AI note in `10_Projects` and an AI note in `20_Subjects` belong together for search, place them together.
 9. Prefer stable concept titles over catchy phrasing.
 10. Pull reusable tags from frontmatter when available and normalize them into short search-friendly tags.
@@ -42,13 +42,14 @@ The backend keeps this packet shape lightweight and deterministic. `wiki add` ac
 12. Call the add command with the packet as an inline JSON string:
 
 ```bash
-uv run wiki add --packet '{"title": "Note title", "summary": "One paragraph summary", "category": "Layer 1 > Layer 2 > Layer 3", "tags": ["#tag-a"], "source": "relative/path/to/note.md"}'
+uv run wiki add --json '{"title": "Note title", "summary": "One paragraph summary", "category": "Layer 1 > Layer 2 > Layer 3", "tags": ["#tag-a"], "source": "relative/path/to/note.md"}'
+# Use --allow-undeclared if the category is not yet in the approved tree
 ```
 
 ## Quality Bar
 
 - **Contextual Framing (5W1H)**: The summary must strictly answer: Who is involved? What is the core concept? When/Where does it apply? Why does it matter? How is it implemented or used? This captures human intent and prevents generic summaries.
-- Category path should fit the approved tree, not invent brittle micro-buckets.
+- Category path should preferably fit the approved tree, not invent brittle micro-buckets. Since the `lint` command no longer strictly rejects unapproved categories, you are responsible for maintaining category hygiene.
 - Category path should reflect retrieval intent, not just where the note happens to live in the notebook.
 - Tags should be short and reusable.
 - Source note paths must be relative to the notebook root.

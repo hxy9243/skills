@@ -15,16 +15,16 @@ Use the active model from the invoking skill/session if you summarize findings, 
 1. Run:
 
 ```bash
-uv run wiki lint --log
+uv run wiki lint
+# To focus on specific issues, use the --filter flag (e.g. --filter unindexed)
 ```
 
-2. Read the JSON report.
-3. Group findings by severity:
-- broken or missing generated artifacts
+2. Read the text report.
+3. Group findings by severity and type:
+- missing source notes
 - notes modified since their last recorded add event
-- notes that are missing from the approved category tree
 - unindexed notes
-- missing source notes or broken category coverage
+- notes assigned to an invalid category
 
 ### Phase 2: Semantic Lint
 
@@ -45,7 +45,7 @@ Recommend the smallest repair action that restores both structural and semantic 
 ## Preferred Remediation Guidance
 
 - Suggest `index` when generated category pages or `index.md` need rebuilding, or when removed notes need to be recorded.
-- Suggest `add --packet` when a note was modified and should be reclassified or refreshed in the log.
-- Suggest `add --packet` when notes exist but have not been classified.
+- Suggest `add --json` when a note was modified and should be reclassified or refreshed in the log.
+- Suggest `add --json` when notes exist but have not been classified.
 - Call out missing source notes explicitly when logged entries point to deleted files.
 - For semantic issues, suggest specific edits to the source notes or recommend re-running the `synthesize` agent for specific categories to resolve contradictions or stale claims.

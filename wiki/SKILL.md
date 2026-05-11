@@ -59,7 +59,7 @@ The backend resolves config in this order:
 3. `~/.wiki/config.json`
 4. built-in defaults
 
-Prefer keeping the active notebook config in `_WIKI/config.json`, next to `index.md` and `log.md`.
+By default, the CLI will auto-discover `_WIKI/config.json` in the current working directory, so subagents do not usually need to pass `--config` if they are operating from the workspace root.
 
 Use [`templates/config.json.example`](/home/kevin/Workspace/skills/wiki/templates/config.json.example) as the starting template.
 
@@ -115,6 +115,7 @@ Small example:
 - Keep the approved category tree at the top of `index.md` as the classification reference for `add` and first-time `index`.
 - Keep `index.md` focused on the category tree itself. Do not regenerate a second browse-by-category section below it.
 - Prefer `index` for broad refreshes and `add` for small targeted updates.
+- `lint` evaluates source synchronization (missing notes, modified notes, unindexed notes). It does not strictly reject categories or test directory structure. Agents should enforce category hygiene when calling `add`.
 - `index` detects missing source notes, reports modified notes via source `mtime`, and rebuilds generated views.
 - For notebook-wide indexing, classify new notes with subagents in parallel when feasible, but cap concurrency at 8 notes at a time.
 - For broad or ambiguous note sets, have subagents propose better topical branches instead of forcing notes into a weak existing category.
@@ -124,7 +125,7 @@ Small example:
 
 ```bash
 # ensure you're in the wiki skill directory, or use uv run --directory <path to wiki skill> wiki ...
-uv run wiki add --packet '{"title":"Note title","summary":"One paragraph summary","category":"Layer 1 > Layer 2 > Layer 3","tags":["#tag-a"],"source":"relative/path/to/note.md"}'
+uv run wiki add --json '{"title":"Note title","summary":"One paragraph summary","category":"Layer 1 > Layer 2 > Layer 3","tags":["#tag-a"],"source":"relative/path/to/note.md"}'
 uv run wiki index
 ```
 
