@@ -6,6 +6,7 @@ import sys
 from collections.abc import Sequence
 
 from .app import CommandResult, WikiCli
+from .wiki import IssueType
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -75,8 +76,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     # --- lint ---
-    subparsers.add_parser(
+    lint_parser = subparsers.add_parser(
         "lint", help="Run read-only workspace integrity checks"
+    )
+    lint_parser.add_argument(
+        "--filter",
+        dest="filters",
+        action="append",
+        choices=[e.value for e in IssueType],
+        default=[],
+        help="Filter lint issues by type",
     )
 
     return parser
@@ -133,6 +142,22 @@ def print_text_output(result: CommandResult) -> None:
             for hit in results:
                 print(f"- [{hit['score']}] {hit['title']} ({hit['source']})")
         return
+    if result.command == "lint":
+        if not result.issues:
+            print("No lint issues found.")
+        else:
+            for issue in result.issues:
+                code_str = issue.code.value if hasattr(issue.code, "value") else issue.code
+                location = ""
+                if issue.source:
+                    location = f" ({issue.source})"
+                elif issue.path:
+                    location = f" ({issue.path}"
+                    if issue.line:
+                        location += f":{issue.line}"
+                    location += ")"
+                print(f"[{issue.severity.upper()}] {code_str}: {issue.message}{location}")
+        return
     # Fall back to JSON for everything else
     print_result(result)
 
@@ -180,7 +205,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 include_body=args.include_body,
             )
         elif command == "lint":
-            result = app.lint()
+            result = app.lint(filters=tuple(args.filters))
         else:
             parser.error(f"unknown command: {command}")
             return 2  # unreachable

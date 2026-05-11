@@ -6,23 +6,7 @@ from typing import Any
 
 from .config import WikiConfig
 from .notebook import Notebook
-from .wiki import WikiIndex
-
-
-@dataclass(frozen=True)
-class Issue:
-    """Structured problem report returned in command JSON instead of stderr text."""
-
-    code: str
-    message: str
-    severity: str = "error"
-    source: str | None = None
-    path: str | None = None
-    line: int | None = None
-
-    def to_json(self) -> dict[str, Any]:
-        """Serialize for stable CLI JSON, omitting unset optional fields."""
-        return {key: value for key, value in asdict(self).items() if value is not None}
+from .wiki import Issue, WikiIndex
 
 
 @dataclass(frozen=True)
@@ -172,10 +156,12 @@ class WikiCli:
             exit_code=0 if results else 1,
         )
 
-    def lint(self) -> CommandResult:
+    def lint(self, filters: tuple[str, ...] = ()) -> CommandResult:
         """Run read-only workspace integrity checks."""
         index = WikiIndex(self.config, self._notebook)
         issues = tuple(index.lint())
+        if filters:
+            issues = tuple(issue for issue in issues if issue.code in filters)
         return CommandResult(
             not any(issue.severity == "error" for issue in issues),
             "lint",

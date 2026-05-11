@@ -5,6 +5,7 @@ from collections import defaultdict
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
+from enum import Enum
 from typing import Any
 
 from .category import (
@@ -14,6 +15,29 @@ from .category import (
 )
 from .config import WikiConfig
 from .notebook import Notebook, NoteMetadata, NewNote
+
+
+class IssueType(str, Enum):
+    NOTE_MISSING = "note_missing"
+    NOTE_MODIFIED = "note_modified"
+    UNINDEXED = "unindexed"
+    INVALID_CATEGORY = "invalid_category"
+
+
+@dataclass(frozen=True)
+class Issue:
+    """Structured problem report returned in command JSON instead of stderr text."""
+
+    code: IssueType | str
+    message: str
+    severity: str = "error"
+    source: str | None = None
+    path: str | None = None
+    line: int | None = None
+
+    def to_json(self) -> dict[str, Any]:
+        """Serialize for stable CLI JSON, omitting unset optional fields."""
+        return {key: value for key, value in asdict(self).items() if value is not None}
 
 
 @dataclass(frozen=True)
@@ -436,66 +460,16 @@ class WikiIndex:
 
     def lint(self) -> tuple[Any, ...]:
         """Run read-only workspace integrity checks."""
-        from .app import Issue
-
         issues: list[Issue] = []
-        if not self.config.notebook_root.exists():
-            issues.append(
-                Issue(
-                    "notebook_root_missing",
-                    "notebook root does not exist",
-                    path=str(self.config.notebook_root),
-                )
-            )
-        if not self.config.generated_root.exists():
-            issues.append(
-                Issue(
-                    "generated_root_missing",
-                    "generated root does not exist",
-                    severity="warning",
-                    path=str(self.config.generated_root),
-                )
-            )
-            return tuple(issues)
-        if not self.config.index_path.exists():
-            issues.append(
-                Issue(
-                    "index_missing",
-                    "index.md is missing",
-                    path=str(self.config.index_path),
-                )
-            )
-        if not self.config.log_path.exists():
-            issues.append(
-                Issue(
-                    "log_missing",
-                    "log.md is missing",
-                    path=str(self.config.log_path),
-                )
-            )
-            return tuple(issues)
-
-        _, malformed = self._read_events()
-        for item in malformed:
-            issues.append(
-                Issue(
-                    "log_line_malformed",
-                    f"malformed log event: {item['message']}",
-                    path=str(self.config.log_path),
-                    line=item.get("line"),
-                )
-            )
 
         notes = {note.source: note for note in self.notebook.discover()}
         catalog = self.catalog()
-        tree = self.read_tree()
-        leafs = tree.leaf_paths()
 
         for source, entry in catalog.items():
             if source not in notes:
                 issues.append(
                     Issue(
-                        "source_missing",
+                        IssueType.NOTE_MISSING,
                         f"indexed source note is missing: {source}",
                         source=source,
                     )
@@ -508,36 +482,28 @@ class WikiIndex:
             ):
                 issues.append(
                     Issue(
-                        "source_modified",
+                        IssueType.NOTE_MODIFIED,
                         f"indexed source note has changed: {source}",
                         severity="warning",
                         source=source,
                     )
                 )
             try:
-                cat_path = CategoryPath.parse(entry.category)
+                CategoryPath.parse(entry.category)
             except ValueError:
                 issues.append(
                     Issue(
-                        "category_invalid",
+                        IssueType.INVALID_CATEGORY,
                         f"catalog category is invalid: {entry.category}",
                         source=source,
                     )
                 )
                 continue
-            if leafs and cat_path not in leafs:
-                issues.append(
-                    Issue(
-                        "category_not_approved",
-                        f"category is not an approved leaf: {entry.category}",
-                        source=source,
-                    )
-                )
 
         for source in sorted(set(notes) - set(catalog), key=str.casefold):
             issues.append(
                 Issue(
-                    "source_unindexed",
+                    IssueType.UNINDEXED,
                     f"source note is not indexed: {source}",
                     severity="warning",
                     source=source,

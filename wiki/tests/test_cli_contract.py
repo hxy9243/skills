@@ -251,7 +251,7 @@ class CliContractTests(unittest.TestCase):
 
         self.assertEqual(rc, 0)
         self.assertEqual(payload["ok"], True)
-        self.assertEqual(payload["issues"][0]["code"], "source_unindexed")
+        self.assertEqual(payload["issues"][0]["code"], "unindexed")
 
     def test_removed_commands_fail(self) -> None:
         """Removed commands (tree, show, status, synthesize, reconcile) should not parse."""
