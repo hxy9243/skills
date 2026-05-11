@@ -74,34 +74,34 @@ Prefer `agents/search.md` when the user mostly wants note discovery or direct Q&
 
 ## Output Shape
 
-You must produce a **textbook-level** deep dive. Do not generate shallow 3-bullet summaries. Your synthesis should read like an authoritative, comprehensive chapter that explains the topic inside-out.
+You must produce a **textbook-level** deep dive. Do not generate shallow bullet summaries. Your synthesis should read like an authoritative, comprehensive chapter that explains the topic inside-out, heavily backed by inline references to the source notes.
+
+Do **not** use an "Outline" section. Simply use `## Synthesis` followed by logical sub-sections.
 
 Good synthesis responses usually include:
 
-- `Outline`
-  - a compact structure for the topic
 - `Deep Synthesis (The Core)`
-  - **Fundamentals**: Core definitions, architectural concepts, and boundaries.
-  - **In-Depth Analysis**: Detailed exploration of mechanisms, paradigms, and state-of-the-art developments.
+  - **Concept Walkthroughs**: Clear, detailed explanations of the underlying mechanisms and definitions.
+  - **In-Depth Analysis**: Detailed exploration of paradigms, frameworks, and state-of-the-art developments.
   - **Tradeoffs & Failure Modes**: Explicit discussion of edge cases, limitations, and architectural tradeoffs.
-- `Insights`
-  - any insights, connections, common themes.
-  - presentation, graphs, charts, and diagrams that help us undertand the topics.
-  - list examples, Q&As, or any other presentation forms that helps understanding.
+  - **Inline Citations**: Every major claim must be explicitly backed by an inline reference linking to the original source note.
+- `Key Topics & Terminologies`
+  - A structured list defining the core vocabularies and concepts introduced in the synthesis.
+- `Insights & Visualizations`
+  - Deep analytical insights, connections, and common themes.
+  - Presentations like Markdown tables or Mermaid graphs/flowcharts **only if strictly necessary and genuinely helpful for understanding**.
 - `Gaps or weak coverage`
-  - missing concepts
-  - contradictions
-  - thin areas in the note set
+  - missing concepts, contradictions, or thin areas in the note set.
 - `References`
-  - all notes materially used
-  - note path and brief evidence cue
+  - all notes materially used (note path and brief evidence cue).
 
 ## Quality Bar
 
 - Search or list first. Do not synthesize from memory alone.
 - **Density & Depth**: The output must be substantial. Provide a meaningful, inside-out walkthrough of the topic, not just a surface-level gloss.
+- **No Tags**: Do not include hashtag tags (`#tag`) within the synthesis text. Keep them empty or remove them.
 - Favor recurring patterns across notes over isolated claims.
-- Keep the output grounded in note evidence, reference notes inline with obsidian wiki syntax if it references a particular note.
+- Keep the output highly grounded. Heavily use inline references with Obsidian wiki syntax (`[[Note Title]]`) when backing up claims.
 - Prefer a coherent conceptual map over a bag of excerpts.
 - Explicitly distinguish note-supported conclusions from your own inference.
 - Always include a final `References` section.
