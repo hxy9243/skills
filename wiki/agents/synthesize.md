@@ -127,6 +127,7 @@ You MUST use `uv run wiki list "Category > Path"` to retrieve the exact `subcate
 ```markdown
 ---
 category: "Computer Science > ... > Target Category"
+parent: "[[path/to/parent/index.md|Parent Category]]"
 created: 2026-05-11T00:00:00Z
 modified: 2026-05-11T00:00:00Z
 tags: []
@@ -141,14 +142,14 @@ tags: []
 ## Subcategories
 (List the subcategories returned by `wiki list`, linked to their index.md files, e.g., `- [layer[X+1]: Subcategory](subcategory/index.md)`. If none, omit this section entirely. IMPORTANT: For non-leaf categories, make sure this subcategory list is at the very top of the page, immediately after the Layer Path.)
 
-## References
-(List the entries returned by `wiki list` in alphabetical order. Format: `- [[Note Path]] - summary (tags)`. If none, output `- None`)
-
 ## Synthesis
 (Your deep textbook-level synthesis goes here...)
+
+## References
+(List the entries returned by `wiki list` in alphabetical order. Format: `- [[Note Path]] - summary (tags)`. If none, output `- None`)
 ```
 
-If it is a top-level synthesis (the entire wiki or notebook), save the result to a `HOME.md` file at the root level.
+If it is a top-level synthesis (the entire wiki or notebook), save the result to a `HOME.md` file at the root level, and omit the `parent` property in the frontmatter.
 
 If the topic is not covered in the category tree, you can propose and write a new `path/to/category/index.md` file using the template above, and the user can later manually add it to the root category tree structure.
 

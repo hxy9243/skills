@@ -38,6 +38,7 @@ After structural validation, perform a content-aware health check:
    - **Missing Cross-references**: Important concepts mentioned in the text that should be explicitly linked (`[[Concept]]`) to their respective pages.
    - **Orphan Pages**: Identify notes that are in the catalog but have zero inbound links from other notes or category pages. You can use `rg "\[\[Note Title\]\]"` to verify if a note is linked elsewhere.
    - **Cascading Synthesis Gaps**: If there are new or recently modified notes in a sub-category, verify if their new topics or insights have been incorporated into the synthesis of that category, and recursively rolled up to its parent levels (all the way up to `HOME.md`).
+   - **Missing Parent Links**: Check that every non-root `index.md` synthesis page has a `parent: "[[path/to/parent/index.md|Parent Category]]"` property in its frontmatter correctly pointing to its parent category.
 
 ### Phase 3: Remediation Plan
 
