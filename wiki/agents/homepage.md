@@ -18,7 +18,7 @@ When instructed to generate the homepage, perform the following steps:
 2. **Template Enforcement**:
    You MUST write the homepage file to `HOME.md` at the root of the notebook, using exactly the following structure:
 
-   ```markdown
+   ````markdown
    ---
    created: 2026-05-11T00:00:00Z
    modified: 2026-05-11T00:00:00Z
@@ -45,7 +45,7 @@ When instructed to generate the homepage, perform the following steps:
    LIMIT 50
    ```
 
-   ```
+   ````
 
 ## Constraints
 
