@@ -82,6 +82,31 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+_GLOBAL_FLAGS = {"--config", "--format"}
+
+
+def _normalize_argv(argv: list[str]) -> list[str]:
+    """Move --config and --format to the front so they work after subcommands.
+
+    This allows both ``wiki --config X list`` and ``wiki list --config X``.
+    """
+    global_args: list[str] = []
+    rest: list[str] = []
+    it = iter(argv)
+    for arg in it:
+        if arg in _GLOBAL_FLAGS:
+            global_args.append(arg)
+            try:
+                global_args.append(next(it))
+            except StopIteration:
+                global_args.append("")
+        elif any(arg.startswith(f + "=") for f in _GLOBAL_FLAGS):
+            global_args.append(arg)
+        else:
+            rest.append(arg)
+    return global_args + rest
+
+
 def print_result(result: CommandResult) -> None:
     """Print compact, deterministic JSON for machine consumers."""
     print(json.dumps(result.to_json(), sort_keys=True, separators=(",", ":")))
@@ -124,7 +149,8 @@ def _config_error(message: str) -> CommandResult:
 def main(argv: Sequence[str] | None = None) -> int:
     """Parse args, run one command, print output, and return the process exit code."""
     parser = build_parser()
-    args = parser.parse_args(argv)
+    normalized = _normalize_argv(list(argv) if argv is not None else sys.argv[1:])
+    args = parser.parse_args(normalized)
     try:
         app = WikiCli.from_config_path(args.config)
     except (OSError, ValueError) as exc:
