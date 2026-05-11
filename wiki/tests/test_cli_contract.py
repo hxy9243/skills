@@ -62,7 +62,7 @@ class CliContractTests(unittest.TestCase):
     def run_cli_json(self, *args: str) -> tuple[int, dict[str, object]]:
         buffer = StringIO()
         with redirect_stdout(buffer):
-            rc = cli.main(["--config", str(self.config_path), *args])
+            rc = cli.main(["--config", str(self.config_path), "--format", "json", *args])
         return rc, json.loads(buffer.getvalue())
 
     def run_cli_text(self, *args: str) -> tuple[int, str]:
@@ -98,18 +98,8 @@ class CliContractTests(unittest.TestCase):
             },
         )
 
-    def test_status_prints_json(self) -> None:
-        rc, payload = self.run_cli_json("status")
-
-        self.assertEqual(rc, 0)
-        self.assertEqual(payload["ok"], True)
-        self.assertEqual(payload["command"], "status")
-        self.assertEqual(
-            payload["data"]["generated_root"], str(self.generated.resolve())
-        )
-
     def test_add_rejects_packet_lists_as_json_issue(self) -> None:
-        rc, payload = self.run_cli_json("add", "--packet", "[]")
+        rc, payload = self.run_cli_json("add", "--json", "[]")
 
         self.assertEqual(rc, 1)
         self.assertEqual(payload["ok"], False)
@@ -120,7 +110,7 @@ class CliContractTests(unittest.TestCase):
 
         rc, payload = self.run_cli_json(
             "add",
-            "--packet",
+            "--json",
             json.dumps(
                 {
                     "title": "DSPy",
@@ -158,22 +148,55 @@ class CliContractTests(unittest.TestCase):
         self.assertEqual(payload["data"]["results"][0]["source"], "Notes/DSPy.md")
         self.assertIn("content", payload["data"]["results"][0]["match_reasons"])
 
-    def test_show_and_synthesize_return_indexed_catalog_entries(self) -> None:
+    def test_list_returns_catalog_entries(self) -> None:
         self.test_add_indexes_note_and_renders_generated_files()
 
-        show_rc, show_payload = self.run_cli_json("show", "Notes/DSPy.md")
-        synth_rc, synth_payload = self.run_cli_json("synthesize", "--tag", "#agents")
+        rc, payload = self.run_cli_json("list")
 
-        self.assertEqual(show_rc, 0)
-        self.assertEqual(show_payload["data"]["note"]["title"], "DSPy")
-        self.assertEqual(synth_rc, 0)
-        self.assertEqual(synth_payload["data"]["notes"][0]["source"], "Notes/DSPy.md")
+        self.assertEqual(rc, 0)
+        self.assertEqual(payload["command"], "list")
+        self.assertEqual(len(payload["data"]["entries"]), 1)
+        self.assertEqual(payload["data"]["entries"][0]["source"], "Notes/DSPy.md")
+
+    def test_list_with_include_body(self) -> None:
+        self.test_add_indexes_note_and_renders_generated_files()
+
+        rc, payload = self.run_cli_json("list", "--include-body")
+
+        self.assertEqual(rc, 0)
+        self.assertIn("body", payload["data"]["entries"][0])
+        self.assertIn("Prompt optimization", payload["data"]["entries"][0]["body"])
+
+    def test_list_filters_by_category(self) -> None:
+        self.test_add_indexes_note_and_renders_generated_files()
+
+        # Exact match
+        rc, payload = self.run_cli_json(
+            "list", "Computer Science > AI Systems > Agents"
+        )
+        self.assertEqual(rc, 0)
+        self.assertEqual(len(payload["data"]["entries"]), 1)
+
+        # Non-matching
+        rc, payload = self.run_cli_json(
+            "list", "Computer Science > AI Systems > Memory"
+        )
+        self.assertEqual(rc, 0)
+        self.assertEqual(len(payload["data"]["entries"]), 0)
+
+    def test_search_with_tags(self) -> None:
+        self.test_add_indexes_note_and_renders_generated_files()
+
+        rc, payload = self.run_cli_json("search", "--tag", "#agents")
+
+        self.assertEqual(rc, 0)
+        self.assertEqual(len(payload["data"]["results"]), 1)
 
     def test_index_reports_unindexed_and_removed_notes(self) -> None:
         note = self.write_note("Notes/State.md", "# State\n\nMemory state.")
         rc, _ = self.run_cli_json(
             "add",
-            "--packet",
+            "--json",
             json.dumps(
                 {
                     "title": "State",
@@ -203,52 +226,42 @@ class CliContractTests(unittest.TestCase):
         self.assertEqual(payload["ok"], True)
         self.assertEqual(payload["issues"][0]["code"], "source_unindexed")
 
-    def test_tree_defaults_to_plain_markdown_output(self) -> None:
-        rc, output = self.run_cli_text("tree")
+    def test_removed_commands_fail(self) -> None:
+        """Removed commands (tree, show, status, synthesize, reconcile) should not parse."""
+        for cmd in ("tree", "show", "status", "synthesize", "reconcile"):
+            with self.assertRaises(SystemExit):
+                cli.main(
+                    ["--config", str(self.config_path), "--format", "json", cmd]
+                )
 
-        self.assertEqual(rc, 0)
-        self.assertEqual(
-            output,
-            "- Computer Science\n"
-            "  - AI Systems\n"
-            "    - Agents\n"
-            "    - Memory\n",
-        )
+    def test_format_json_returns_stable_envelope(self) -> None:
+        """--format json always produces the CommandResult envelope."""
+        rc, payload = self.run_cli_json("lint")
 
-    def test_tree_json_format_preserves_nested_categories(self) -> None:
-        rc, payload = self.run_cli_json("tree", "--format", "json")
-
-        self.assertEqual(rc, 0)
-        self.assertEqual(
-            payload["data"]["categories"],
-            [
-                {
-                    "name": "Computer Science",
-                    "children": [
-                        {
-                            "name": "AI Systems",
-                            "children": [
-                                {"name": "Agents", "children": []},
-                                {"name": "Memory", "children": []},
-                            ],
-                        }
-                    ],
-                }
-            ],
-        )
-
-    def test_thin_reconcile_alias_uses_index_command(self) -> None:
-        rc, payload = self.run_cli_json("reconcile")
-
-        self.assertEqual(rc, 0)
-        self.assertEqual(payload["command"], "index")
+        self.assertIn("ok", payload)
+        self.assertIn("command", payload)
+        self.assertIn("data", payload)
+        self.assertIn("issues", payload)
+        self.assertIn("fixes", payload)
 
     def test_wikicli_method_surface_exists(self) -> None:
         app = WikiCli(WikiConfig(self.notebook, self.generated, (self.notebook,)))
 
-        self.assertEqual(app.tree().command, "tree")
-        self.assertEqual(app.show("Notes/A.md").command, "show")
-        self.assertEqual(app.synthesize_bundle(tags=("x",)).command, "synthesize")
+        self.assertEqual(app.lint().command, "lint")
+        self.assertEqual(app.index().command, "index")
+        self.assertEqual(app.list().command, "list")
+        self.assertEqual(
+            app.search(query="test", limit=5).command, "search"
+        )
+
+    def test_default_text_output_for_list(self) -> None:
+        self.test_add_indexes_note_and_renders_generated_files()
+
+        rc, output = self.run_cli_text("list")
+
+        self.assertEqual(rc, 0)
+        self.assertIn("DSPy", output)
+        self.assertIn("Notes/DSPy.md", output)
 
 
 if __name__ == "__main__":

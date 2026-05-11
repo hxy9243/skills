@@ -2,22 +2,18 @@ from __future__ import annotations
 
 import json
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 from .category import (
     CategoryPath,
-    all_paths,
+    WikiCategoryTree,
     category_page_path,
-    child_names,
-    leaf_paths,
-    parse_category_tree,
 )
 from .config import WikiConfig
-from .notebook import Note
-from .packet import Packet
+from .notebook import Notebook, NoteMetadata, NewNote
 
 
 @dataclass(frozen=True)
@@ -47,246 +43,541 @@ class CatalogEntry:
         }
 
 
-def ensure_layout(config: WikiConfig) -> None:
-    """Create the generated wiki directory and required files."""
-    config.generated_root.mkdir(parents=True, exist_ok=True)
-    config.categories_dir.mkdir(parents=True, exist_ok=True)
-    if not config.log_path.exists():
-        config.log_path.write_text("# Wiki Log\n\n", encoding="utf-8")
-    if not config.index_path.exists():
-        config.index_path.write_text(
-            "# Wiki Index\n\n## Category Tree\n\n---\n\n## Skipped System Notes\n- None\n",
-            encoding="utf-8",
+@dataclass(frozen=True)
+class SearchResult:
+    """Normalized search hit from source notes, generated pages, or metadata."""
+
+    source: str
+    title: str
+    hierarchy: str
+    score: int
+    match_reasons: tuple[str, ...]
+    snippets: tuple[str, ...]
+    tags: tuple[str, ...]
+
+    def to_json(self) -> dict[str, Any]:
+        """Serialize tuple fields as JSON arrays for CLI responses."""
+        data = asdict(self)
+        data["match_reasons"] = list(self.match_reasons)
+        data["snippets"] = list(self.snippets)
+        data["tags"] = list(self.tags)
+        return data
+
+
+class WikiIndex:
+    """Generated wiki state: category tree, catalog, listings, search, and lint."""
+
+    def __init__(self, config: WikiConfig, notebook: Notebook) -> None:
+        self.config = config
+        self.notebook = notebook
+
+    # --- tree ---
+
+    def read_tree(self) -> WikiCategoryTree:
+        """Parse the approved category tree from `index.md`."""
+        if not self.config.index_path.exists():
+            return WikiCategoryTree.empty()
+        return WikiCategoryTree.parse(
+            self.config.index_path.read_text(encoding="utf-8")
         )
 
+    def add_category(self, path: str | CategoryPath) -> WikiCategoryTree:
+        """Add a category path to the tree in index.md (stub for future)."""
+        if isinstance(path, str):
+            path = CategoryPath.parse(path)
+        # For now just return the current tree — full implementation deferred
+        return self.read_tree()
 
-def read_tree(config: WikiConfig) -> list[dict[str, Any]]:
-    """Parse the approved category tree from `index.md`."""
-    if not config.index_path.exists():
-        return []
-    return parse_category_tree(config.index_path.read_text(encoding="utf-8"))
+    # --- catalog ---
 
-
-def approved_leaf_paths(config: WikiConfig) -> set[CategoryPath]:
-    """Return approved leaf category paths from the current index."""
-    return leaf_paths(read_tree(config))
-
-
-def append_event(config: WikiConfig, event: dict[str, Any]) -> None:
-    """Append one JSON event to `log.md`."""
-    ensure_layout(config)
-    with config.log_path.open("a", encoding="utf-8") as handle:
-        handle.write(f"- {json.dumps(event, ensure_ascii=True, sort_keys=True)}\n")
-
-
-def read_events(
-    config: WikiConfig,
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """Read valid log events and return malformed line diagnostics separately."""
-    if not config.log_path.exists():
-        return [], []
-    events: list[dict[str, Any]] = []
-    malformed: list[dict[str, Any]] = []
-    for line_no, line in enumerate(
-        config.log_path.read_text(encoding="utf-8").splitlines(), start=1
-    ):
-        stripped = line.strip()
-        if not stripped.startswith("- "):
-            continue
-        raw = stripped[2:].strip()
-        if not raw.startswith("{"):
-            continue
-        try:
-            event = json.loads(raw)
-        except json.JSONDecodeError as exc:
-            malformed.append({"line": line_no, "message": exc.msg})
-            continue
-        if isinstance(event, dict):
-            events.append(event)
-        else:
-            malformed.append(
-                {"line": line_no, "message": "event must be a JSON object"}
+    def catalog(self) -> dict[str, CatalogEntry]:
+        """Replay add/remove log events into the current active catalog."""
+        events, _ = self._read_events()
+        result: dict[str, CatalogEntry] = {}
+        for event in events:
+            source = event.get("source")
+            if not isinstance(source, str):
+                continue
+            try:
+                source = Notebook.normalize_source(source)
+            except ValueError:
+                continue
+            action = event.get("action")
+            if action == "remove":
+                result.pop(source, None)
+                continue
+            if action != "add":
+                continue
+            title = str(event.get("title") or Path(source).stem)
+            summary = str(event.get("summary") or "")
+            category = str(
+                event.get("category") or event.get("category_path") or ""
             )
-    return events, malformed
+            if not category:
+                continue
+            try:
+                category = CategoryPath.parse(category).display()
+            except ValueError:
+                continue
+            tags = _string_tuple(event.get("tags", ()))
+            search_terms = _string_tuple(event.get("search_terms", ()))
+            mtime = event.get("source_mtime_ns")
+            result[source] = CatalogEntry(
+                source=source,
+                title=title,
+                summary=summary,
+                category=category,
+                tags=tags,
+                search_terms=search_terms,
+                source_mtime_ns=mtime if isinstance(mtime, int) else None,
+                updated_at=str(event.get("timestamp") or ""),
+            )
+        return dict(sorted(result.items(), key=lambda item: item[0].casefold()))
 
+    # --- listing ---
 
-def active_catalog(config: WikiConfig) -> dict[str, CatalogEntry]:
-    """Replay add/remove log events into the current active catalog."""
-    events, _ = read_events(config)
-    catalog: dict[str, CatalogEntry] = {}
-    for event in events:
-        source = event.get("source")
-        if not isinstance(source, str):
-            continue
-        try:
-            source = Note.normalize_source(source)
-        except ValueError:
-            continue
-        action = event.get("action")
-        if action == "remove":
-            catalog.pop(source, None)
-            continue
-        if action != "add":
-            continue
-        title = str(event.get("title") or Path(source).stem)
-        summary = str(event.get("summary") or "")
-        category = str(event.get("category") or event.get("category_path") or "")
-        if not category:
-            continue
-        try:
-            category = CategoryPath.parse(category).display()
-        except ValueError:
-            continue
-        tags = _string_tuple(event.get("tags", ()))
-        search_terms = _string_tuple(event.get("search_terms", ()))
-        mtime = event.get("source_mtime_ns")
-        catalog[source] = CatalogEntry(
-            source=source,
-            title=title,
-            summary=summary,
-            category=category,
-            tags=tags,
-            search_terms=search_terms,
-            source_mtime_ns=mtime if isinstance(mtime, int) else None,
-            updated_at=str(event.get("timestamp") or ""),
-        )
-    return dict(sorted(catalog.items(), key=lambda item: item[0].casefold()))
+    def list(
+        self,
+        category: str | CategoryPath | None = None,
+        *,
+        recursive: bool = False,
+        include_body: bool = False,
+    ) -> list[CatalogEntry]:
+        """List catalog entries, optionally filtered by category."""
+        entries = list(self.catalog().values())
+        if category is not None:
+            cat_str = (
+                category.display()
+                if isinstance(category, CategoryPath)
+                else category
+            )
+            if recursive:
+                entries = [
+                    e
+                    for e in entries
+                    if e.category == cat_str or e.category.startswith(cat_str + " > ")
+                ]
+            else:
+                entries = [e for e in entries if e.category == cat_str]
+        # include_body is handled at the WikiCli layer by enriching entries
+        return entries
 
+    # --- mutations ---
 
-def add_packet(config: WikiConfig, packet: Packet) -> dict[str, Any]:
-    """Apply an accepted packet: update frontmatter, append log, render views."""
-    ensure_layout(config)
-    source_path = Note.resolve_source(config, packet.source)
-    changed_files: list[str] = []
-    if Note.write_category(source_path, packet.category.display()):
-        changed_files.append(packet.source)
-    append_event(
-        config,
-        {
-            "timestamp": utc_now(),
-            "action": "add",
-            "title": packet.title,
-            "summary": packet.summary,
-            "category": packet.category.display(),
-            "tags": list(packet.tags),
-            "search_terms": list(packet.search_terms),
-            "source": packet.source,
-            "source_mtime_ns": source_path.stat().st_mtime_ns,
-        },
-    )
-    changed_files.append(str(config.log_path.relative_to(config.generated_root)))
-    render_result = rebuild_generated(config)
-    changed_files.extend(render_result["changed_files"])
-    catalog = active_catalog(config)
-    return {
-        "packet": packet.to_json(),
-        "changed_files": sorted(set(changed_files)),
-        "indexed_count": len(catalog),
-        "category_pages": render_result["category_pages"],
-    }
-
-
-def index_workspace(config: WikiConfig) -> dict[str, Any]:
-    """Scan notebook state, record missing catalog entries, and regenerate views."""
-    ensure_layout(config)
-    catalog = active_catalog(config)
-    notes = {note.source: note for note in Note.discover(config)}
-    removed: list[str] = []
-    for source in sorted(set(catalog) - set(notes), key=str.casefold):
-        append_event(
-            config,
+    def add_note(
+        self, note: NewNote, *, allow_undeclared: bool = False
+    ) -> dict[str, Any]:
+        """Apply an accepted new note: update frontmatter, append log, render views."""
+        self._ensure_layout()
+        source_path = self.notebook.resolve(note.source)
+        changed_files: list[str] = []
+        if NoteMetadata.write_category(source_path, note.category.display()):
+            changed_files.append(note.source)
+        self._append_event(
             {
-                "timestamp": utc_now(),
-                "action": "remove",
-                "source": source,
-                "reason": "source note missing",
+                "timestamp": _utc_now(),
+                "action": "add",
+                "title": note.title,
+                "summary": note.summary,
+                "category": note.category.display(),
+                "tags": list(note.tags),
+                "search_terms": list(note.search_terms),
+                "source": note.source,
+                "source_mtime_ns": source_path.stat().st_mtime_ns,
             },
         )
-        removed.append(source)
-    catalog = active_catalog(config)
-    modified = sorted(
-        source
-        for source, entry in catalog.items()
-        if source in notes
-        and entry.source_mtime_ns is not None
-        and notes[source].mtime_ns != entry.source_mtime_ns
-    )
-    unindexed = sorted(set(notes) - set(catalog), key=str.casefold)
-    render_result = rebuild_generated(config, notes=list(notes.values()))
-    return {
-        "indexed_count": len(catalog),
-        "removed_notes": removed,
-        "modified_notes": modified,
-        "unindexed_notes": unindexed,
-        "category_pages": render_result["category_pages"],
-        "changed_files": render_result["changed_files"],
-    }
+        changed_files.append(
+            str(self.config.log_path.relative_to(self.config.generated_root))
+        )
+        render_result = self.render()
+        changed_files.extend(render_result["changed_files"])
+        catalog = self.catalog()
+        return {
+            "packet": note.to_json(),
+            "changed_files": sorted(set(changed_files)),
+            "indexed_count": len(catalog),
+            "category_pages": render_result["category_pages"],
+        }
 
+    def index(self) -> dict[str, Any]:
+        """Scan notebook state, record missing catalog entries, and regenerate views."""
+        self._ensure_layout()
+        catalog = self.catalog()
+        notes = {note.source: note for note in self.notebook.discover()}
+        removed: list[str] = []
+        for source in sorted(set(catalog) - set(notes), key=str.casefold):
+            self._append_event(
+                {
+                    "timestamp": _utc_now(),
+                    "action": "remove",
+                    "source": source,
+                    "reason": "source note missing",
+                },
+            )
+            removed.append(source)
+        catalog = self.catalog()
+        modified = sorted(
+            source
+            for source, entry in catalog.items()
+            if source in notes
+            and entry.source_mtime_ns is not None
+            and notes[source].last_modified.timestamp()
+            != entry.source_mtime_ns / 1e9
+        )
+        unindexed = sorted(set(notes) - set(catalog), key=str.casefold)
+        render_result = self.render(notes=list(notes.values()))
+        return {
+            "indexed_count": len(catalog),
+            "removed_notes": removed,
+            "modified_notes": modified,
+            "unindexed_notes": unindexed,
+            "category_pages": render_result["category_pages"],
+            "changed_files": render_result["changed_files"],
+        }
 
-def rebuild_generated(
-    config: WikiConfig, *, notes: list[Note] | None = None
-) -> dict[str, Any]:
-    """Rewrite `index.md` and generated category pages from catalog and tree."""
-    ensure_layout(config)
-    tree = read_tree(config)
-    catalog = active_catalog(config)
-    leafs = leaf_paths(tree)
-    renderable = [
-        entry
-        for entry in catalog.values()
-        if CategoryPath.parse(entry.category) in leafs
-    ]
-    all_category_paths = sorted(
-        all_paths(tree), key=lambda item: item.display().casefold()
-    )
-    children = child_names(tree)
-    changed_files: list[str] = []
+    # --- rendering ---
 
-    grouped: dict[CategoryPath, list[CatalogEntry]] = defaultdict(list)
-    for entry in renderable:
-        path = CategoryPath.parse(entry.category)
-        for depth in range(1, len(path.parts) + 1):
-            grouped[CategoryPath(path.parts[:depth])].append(entry)
+    def render(self, *, notes: list[Any] | None = None) -> dict[str, Any]:
+        """Rewrite `index.md` and generated category pages from catalog and tree."""
+        self._ensure_layout()
+        tree = self.read_tree()
+        catalog = self.catalog()
+        leafs = tree.leaf_paths()
+        renderable = [
+            entry
+            for entry in catalog.values()
+            if CategoryPath.parse(entry.category) in leafs
+        ]
+        all_category_paths = sorted(
+            tree.all_paths(), key=lambda item: item.display().casefold()
+        )
+        child_names = tree.child_names()
+        changed_files: list[str] = []
 
-    valid_pages: set[Path] = set()
-    for path in all_category_paths:
-        page = category_page_path(config.categories_dir, path)
-        page.parent.mkdir(parents=True, exist_ok=True)
-        text = render_category_page(path, children.get(path, ()), grouped.get(path, []))
-        if _write_if_changed(page, text):
-            changed_files.append(str(page.relative_to(config.generated_root)))
-        valid_pages.add(page.resolve())
+        grouped: dict[CategoryPath, list[CatalogEntry]] = defaultdict(list)
+        for entry in renderable:
+            path = CategoryPath.parse(entry.category)
+            for depth in range(1, len(path.parts) + 1):
+                grouped[CategoryPath(path.parts[:depth])].append(entry)
 
-    if config.categories_dir.exists():
-        for page in sorted(config.categories_dir.rglob("*.md"), reverse=True):
-            if page.resolve() not in valid_pages:
-                page.unlink()
-                changed_files.append(str(page.relative_to(config.generated_root)))
-        for directory in sorted(config.categories_dir.rglob("*"), reverse=True):
-            if directory.is_dir():
+        valid_pages: set[Path] = set()
+        for path in all_category_paths:
+            page = category_page_path(self.config.categories_dir, path)
+            page.parent.mkdir(parents=True, exist_ok=True)
+            text = _render_category_page(
+                path, child_names.get(path, ()), grouped.get(path, [])
+            )
+            if _write_if_changed(page, text):
+                changed_files.append(
+                    str(page.relative_to(self.config.generated_root))
+                )
+            valid_pages.add(page.resolve())
+
+        if self.config.categories_dir.exists():
+            for page in sorted(
+                self.config.categories_dir.rglob("*.md"), reverse=True
+            ):
+                if page.resolve() not in valid_pages:
+                    page.unlink()
+                    changed_files.append(
+                        str(page.relative_to(self.config.generated_root))
+                    )
+            for directory in sorted(
+                self.config.categories_dir.rglob("*"), reverse=True
+            ):
+                if directory.is_dir():
+                    try:
+                        directory.rmdir()
+                    except OSError:
+                        pass
+
+        note_map = (
+            {note.source: note for note in notes}
+            if notes is not None
+            else {note.source: note for note in self.notebook.discover()}
+        )
+        unindexed = sorted(set(note_map) - set(catalog), key=str.casefold)
+        skipped_system = [
+            source for source in unindexed if _is_system_note(source)
+        ]
+        index_text = _render_index(tree, renderable, skipped_system)
+        if _write_if_changed(self.config.index_path, index_text):
+            changed_files.append(
+                str(
+                    self.config.index_path.relative_to(
+                        self.config.generated_root
+                    )
+                )
+            )
+        return {
+            "changed_files": sorted(set(changed_files)),
+            "category_pages": len(valid_pages),
+        }
+
+    # --- search ---
+
+    def find(
+        self,
+        query: str | None = None,
+        *,
+        tags: tuple[str, ...] = (),
+        limit: int = 10,
+        include_body: bool = False,
+    ) -> list[SearchResult]:
+        """Return ranked search results for a query."""
+        catalog = self.catalog()
+
+        # Tag-only filtering
+        if tags:
+            requested = set(tags)
+            catalog = {
+                s: e
+                for s, e in catalog.items()
+                if requested & set(e.tags)
+            }
+
+        if query:
+            terms = Notebook.tokenize(query)
+        else:
+            terms = ()
+
+        if not terms and not tags:
+            return []
+        if limit <= 0:
+            return []
+
+        results: list[SearchResult] = []
+        for entry in catalog.values():
+            score = 0
+            reasons: list[str] = []
+            snippets: list[str] = []
+
+            if terms:
+                haystacks = {
+                    "title": entry.title,
+                    "summary": entry.summary,
+                    "hierarchy": entry.category,
+                    "tags": " ".join(entry.tags),
+                    "search_terms": " ".join(entry.search_terms),
+                }
+                for reason, text in haystacks.items():
+                    overlap = _overlap(terms, text)
+                    if not overlap:
+                        continue
+                    score += _weight(reason) * len(overlap)
+                    reasons.append(reason)
+                    if reason in {"title", "summary", "hierarchy"}:
+                        snippets.append(
+                            Notebook.snippet_around(text, overlap)
+                        )
                 try:
-                    directory.rmdir()
+                    note = self.notebook.read(entry.source)
                 except OSError:
-                    pass
+                    note = None
+                if note is not None:
+                    body_text = Notebook.clean_body_text(note.body)
+                    overlap = _overlap(terms, body_text)
+                    if overlap:
+                        score += len(overlap)
+                        reasons.append("content")
+                        snippets.append(
+                            Notebook.snippet_around(body_text, overlap)
+                        )
+            else:
+                # Tag-only search — score by tag match count
+                score = len(set(tags) & set(entry.tags))
+                reasons.append("tags")
 
-    note_map = (
-        {note.source: note for note in notes}
-        if notes is not None
-        else {note.source: note for note in Note.discover(config)}
-    )
-    unindexed = sorted(set(note_map) - set(catalog), key=str.casefold)
-    skipped_system = [source for source in unindexed if is_system_note(source)]
-    index_text = render_index(tree, renderable, skipped_system)
-    if _write_if_changed(config.index_path, index_text):
-        changed_files.append(str(config.index_path.relative_to(config.generated_root)))
-    return {
-        "changed_files": sorted(set(changed_files)),
-        "category_pages": len(valid_pages),
-    }
+            if score <= 0:
+                continue
+            results.append(
+                SearchResult(
+                    source=entry.source,
+                    title=entry.title,
+                    hierarchy=entry.category,
+                    score=score,
+                    match_reasons=tuple(dict.fromkeys(reasons)),
+                    snippets=tuple(dict.fromkeys(snippets))[:3],
+                    tags=entry.tags,
+                )
+            )
+        results.sort(key=lambda item: (-item.score, item.source.casefold()))
+        return results[:limit]
+
+    # --- checks ---
+
+    def lint(self) -> tuple[Any, ...]:
+        """Run read-only workspace integrity checks."""
+        from .app import Issue
+
+        issues: list[Issue] = []
+        if not self.config.notebook_root.exists():
+            issues.append(
+                Issue(
+                    "notebook_root_missing",
+                    "notebook root does not exist",
+                    path=str(self.config.notebook_root),
+                )
+            )
+        if not self.config.generated_root.exists():
+            issues.append(
+                Issue(
+                    "generated_root_missing",
+                    "generated root does not exist",
+                    severity="warning",
+                    path=str(self.config.generated_root),
+                )
+            )
+            return tuple(issues)
+        if not self.config.index_path.exists():
+            issues.append(
+                Issue(
+                    "index_missing",
+                    "index.md is missing",
+                    path=str(self.config.index_path),
+                )
+            )
+        if not self.config.log_path.exists():
+            issues.append(
+                Issue(
+                    "log_missing",
+                    "log.md is missing",
+                    path=str(self.config.log_path),
+                )
+            )
+            return tuple(issues)
+
+        _, malformed = self._read_events()
+        for item in malformed:
+            issues.append(
+                Issue(
+                    "log_line_malformed",
+                    f"malformed log event: {item['message']}",
+                    path=str(self.config.log_path),
+                    line=item.get("line"),
+                )
+            )
+
+        notes = {note.source: note for note in self.notebook.discover()}
+        catalog = self.catalog()
+        tree = self.read_tree()
+        leafs = tree.leaf_paths()
+
+        for source, entry in catalog.items():
+            if source not in notes:
+                issues.append(
+                    Issue(
+                        "source_missing",
+                        f"indexed source note is missing: {source}",
+                        source=source,
+                    )
+                )
+                continue
+            if (
+                entry.source_mtime_ns is not None
+                and notes[source].last_modified.timestamp()
+                != entry.source_mtime_ns / 1e9
+            ):
+                issues.append(
+                    Issue(
+                        "source_modified",
+                        f"indexed source note has changed: {source}",
+                        severity="warning",
+                        source=source,
+                    )
+                )
+            try:
+                cat_path = CategoryPath.parse(entry.category)
+            except ValueError:
+                issues.append(
+                    Issue(
+                        "category_invalid",
+                        f"catalog category is invalid: {entry.category}",
+                        source=source,
+                    )
+                )
+                continue
+            if leafs and cat_path not in leafs:
+                issues.append(
+                    Issue(
+                        "category_not_approved",
+                        f"category is not an approved leaf: {entry.category}",
+                        source=source,
+                    )
+                )
+
+        for source in sorted(set(notes) - set(catalog), key=str.casefold):
+            issues.append(
+                Issue(
+                    "source_unindexed",
+                    f"source note is not indexed: {source}",
+                    severity="warning",
+                    source=source,
+                )
+            )
+        return tuple(issues)
+
+    # --- private helpers ---
+
+    def _ensure_layout(self) -> None:
+        """Create the generated wiki directory and required files."""
+        self.config.generated_root.mkdir(parents=True, exist_ok=True)
+        self.config.categories_dir.mkdir(parents=True, exist_ok=True)
+        if not self.config.log_path.exists():
+            self.config.log_path.write_text("# Wiki Log\n\n", encoding="utf-8")
+        if not self.config.index_path.exists():
+            self.config.index_path.write_text(
+                "# Wiki Index\n\n## Category Tree\n\n---\n\n## Skipped System Notes\n- None\n",
+                encoding="utf-8",
+            )
+
+    def _append_event(self, event: dict[str, Any]) -> None:
+        """Append one JSON event to `log.md`."""
+        self._ensure_layout()
+        with self.config.log_path.open("a", encoding="utf-8") as handle:
+            handle.write(
+                f"- {json.dumps(event, ensure_ascii=True, sort_keys=True)}\n"
+            )
+
+    def _read_events(
+        self,
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+        """Read valid log events and return malformed line diagnostics separately."""
+        if not self.config.log_path.exists():
+            return [], []
+        events: list[dict[str, Any]] = []
+        malformed: list[dict[str, Any]] = []
+        for line_no, line in enumerate(
+            self.config.log_path.read_text(encoding="utf-8").splitlines(),
+            start=1,
+        ):
+            stripped = line.strip()
+            if not stripped.startswith("- "):
+                continue
+            raw = stripped[2:].strip()
+            if not raw.startswith("{"):
+                continue
+            try:
+                event = json.loads(raw)
+            except json.JSONDecodeError as exc:
+                malformed.append({"line": line_no, "message": exc.msg})
+                continue
+            if isinstance(event, dict):
+                events.append(event)
+            else:
+                malformed.append(
+                    {"line": line_no, "message": "event must be a JSON object"}
+                )
+        return events, malformed
 
 
-def render_index(
-    tree: list[dict[str, Any]], entries: list[CatalogEntry], skipped_system: list[str]
+# --- rendering helpers ---
+
+
+def _render_index(
+    tree: WikiCategoryTree,
+    entries: list[CatalogEntry],
+    skipped_system: list[str],
 ) -> str:
     """Render the generated `index.md` page."""
     notes_by_path: dict[CategoryPath, list[CatalogEntry]] = defaultdict(list)
@@ -301,24 +592,26 @@ def render_index(
         "",
     ]
 
-    def render_node(node: dict[str, Any], prefix: tuple[str, ...], depth: int) -> None:
-        path = CategoryPath((*prefix, str(node["name"])))
+    def render_node(
+        node: Any, prefix: tuple[str, ...], depth: int
+    ) -> None:
+        path = CategoryPath((*prefix, str(node.name)))
         rel = Path("categories", *path.slug_parts(), "index.md").as_posix()
         indent = "  " * (depth - 1)
         lines.append(f"{indent}- layer{depth}: [{path.parts[-1]}]({rel})")
-        children = node.get("children", [])
-        if children:
-            for child in children:
+        if node.children:
+            for child in node.children:
                 render_node(child, path.parts, depth + 1)
             return
         for entry in sorted(
-            notes_by_path.get(path, []), key=lambda item: item.source.casefold()
+            notes_by_path.get(path, []),
+            key=lambda item: item.source.casefold(),
         ):
             lines.append(f"{'  ' * depth}- [[{entry.source}]]")
 
-    for root in tree:
+    for root in tree.roots:
         render_node(root, (), 1)
-    if not tree:
+    if not tree.roots:
         lines.append("- None")
     lines.extend(["", "---", "", "## Skipped System Notes"])
     if skipped_system:
@@ -328,8 +621,10 @@ def render_index(
     return "\n".join(lines).rstrip() + "\n"
 
 
-def render_category_page(
-    path: CategoryPath, children: tuple[str, ...], entries: list[CatalogEntry]
+def _render_category_page(
+    path: CategoryPath,
+    children: tuple[str, ...],
+    entries: list[CatalogEntry],
 ) -> str:
     """Render one generated category page."""
     depth = len(path.parts)
@@ -353,37 +648,27 @@ def render_category_page(
     if entries:
         for entry in sorted(entries, key=lambda item: item.title.casefold()):
             tag_text = f" ({' '.join(entry.tags)})" if entry.tags else ""
-            lines.append(f"- [[{entry.source}]] - {entry.summary}{tag_text}")
+            lines.append(
+                f"- [[{entry.source}]] - {entry.summary}{tag_text}"
+            )
     else:
         lines.append("- None")
     return "\n".join(lines).rstrip() + "\n"
 
 
-def catalog_notes(config: WikiConfig) -> list[dict[str, Any]]:
-    """Return active catalog entries as JSON-safe sorted dictionaries."""
-    return [entry.to_json() for entry in active_catalog(config).values()]
-
-
-def get_entry(config: WikiConfig, source: str) -> CatalogEntry | None:
-    """Return one active catalog entry by source path."""
-    return active_catalog(config).get(Note.normalize_source(source))
-
-
-def malformed_log_lines(config: WikiConfig) -> list[dict[str, Any]]:
-    """Return malformed log line diagnostics for lint."""
-    _, malformed = read_events(config)
-    return malformed
-
-
-def utc_now() -> str:
-    """Return a UTC timestamp suitable for log events."""
-    return datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
-
-
-def is_system_note(source: str) -> bool:
+def _is_system_note(source: str) -> bool:
     """Return true for common dashboard/index notes that should not be indexed."""
-    stem = Path(source).stem.casefold().replace("_", "-").replace(" ", "-")
-    return stem in {"dashboard", "dashboard-index", "index", "readme", "summary", "log"}
+    stem = (
+        Path(source).stem.casefold().replace("_", "-").replace(" ", "-")
+    )
+    return stem in {
+        "dashboard",
+        "dashboard-index",
+        "index",
+        "readme",
+        "summary",
+        "log",
+    }
 
 
 def _write_if_changed(path: Path, text: str) -> bool:
@@ -394,9 +679,34 @@ def _write_if_changed(path: Path, text: str) -> bool:
     return True
 
 
+def _utc_now() -> str:
+    """Return a UTC timestamp suitable for log events."""
+    return (
+        datetime.now(UTC)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
+
+
 def _string_tuple(value: Any) -> tuple[str, ...]:
     if isinstance(value, str):
         return (value,)
     if isinstance(value, list):
         return tuple(str(item) for item in value if str(item).strip())
     return ()
+
+
+def _overlap(terms: tuple[str, ...], text: str) -> tuple[str, ...]:
+    tokens = set(Notebook.tokenize(text))
+    return tuple(term for term in terms if term in tokens)
+
+
+def _weight(reason: str) -> int:
+    return {
+        "title": 8,
+        "search_terms": 6,
+        "tags": 5,
+        "hierarchy": 4,
+        "summary": 3,
+    }.get(reason, 1)

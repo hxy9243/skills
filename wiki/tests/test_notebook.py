@@ -7,6 +7,7 @@ from pathlib import Path
 from wikicli.config import WikiConfig
 from wikicli.notebook import (
     Note,
+    Notebook,
     NoteMetadata,
 )
 
@@ -41,11 +42,11 @@ class NoteMetadataTests(unittest.TestCase):
             self.assertIn('category: "A > B > C"', path.read_text(encoding="utf-8"))
 
     def test_normalize_source_rejects_absolute_and_parent_paths(self) -> None:
-        self.assertEqual(Note.normalize_source("Notes/A.md"), "Notes/A.md")
+        self.assertEqual(Notebook.normalize_source("Notes/A.md"), "Notes/A.md")
         with self.assertRaises(ValueError):
-            Note.normalize_source("/tmp/A.md")
+            Notebook.normalize_source("/tmp/A.md")
         with self.assertRaises(ValueError):
-            Note.normalize_source("../A.md")
+            Notebook.normalize_source("../A.md")
 
     def test_discover_notes_excludes_generated_and_configured_paths(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -65,7 +66,8 @@ class NoteMetadataTests(unittest.TestCase):
                 exclude_globs=("Templates/**",),
             )
 
-            notes = Note.discover(config)
+            nb = Notebook(config)
+            notes = nb.discover()
 
             self.assertEqual([note.source for note in notes], ["Notes/A.md"])
 
@@ -79,10 +81,81 @@ class NoteMetadataTests(unittest.TestCase):
             )
             config = WikiConfig(notebook, generated, (notebook,))
 
-            note = Note.load(config, "A.md")
+            nb = Notebook(config)
+            note = nb.read("A.md")
 
             self.assertEqual(note.title, "Heading Title")
             self.assertEqual(note.tags, ())
+
+    def test_note_has_created_and_last_modified_timestamps(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            notebook = Path(tmp)
+            generated = notebook / "_WIKI"
+            generated.mkdir()
+            (notebook / "B.md").write_text("# B\n\nBody.\n", encoding="utf-8")
+            config = WikiConfig(notebook, generated, (notebook,))
+
+            nb = Notebook(config)
+            note = nb.read("B.md")
+
+            self.assertIsNotNone(note.created)
+            self.assertIsNotNone(note.last_modified)
+
+    def test_parse_new_note_validates_json(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            notebook = Path(tmp)
+            generated = notebook / "_WIKI"
+            generated.mkdir()
+            config = WikiConfig(notebook, generated, (notebook,))
+            nb = Notebook(config)
+
+            # Invalid JSON
+            note, issues = nb.parse_new_note("not json")
+            self.assertIsNone(note)
+            self.assertEqual(issues[0].code, "packet_json_invalid")
+
+            # List instead of object
+            note, issues = nb.parse_new_note("[]")
+            self.assertIsNone(note)
+            self.assertEqual(issues[0].code, "packet_not_object")
+
+            # Missing required fields
+            note, issues = nb.parse_new_note('{"title":""}')
+            self.assertIsNone(note)
+            self.assertTrue(any(i.code == "packet_field_invalid" for i in issues))
+
+    def test_parse_new_note_succeeds(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            notebook = Path(tmp)
+            generated = notebook / "_WIKI"
+            generated.mkdir()
+            config = WikiConfig(notebook, generated, (notebook,))
+            nb = Notebook(config)
+
+            note, issues = nb.parse_new_note(
+                '{"title":"DSPy","summary":"Prompt opt","category":"CS > AI",'
+                '"tags":["#ai"],"source":"Notes/DSPy.md"}'
+            )
+            self.assertIsNotNone(note)
+            self.assertEqual(issues, [])
+            self.assertEqual(note.title, "DSPy")
+            self.assertEqual(note.category.display(), "CS > AI")
+
+    def test_notebook_update_property(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            notebook = Path(tmp)
+            generated = notebook / "_WIKI"
+            generated.mkdir()
+            (notebook / "C.md").write_text("# C\n\nBody.\n", encoding="utf-8")
+            config = WikiConfig(notebook, generated, (notebook,))
+            nb = Notebook(config)
+
+            changed = nb.update_property("C.md", "status", "reviewed")
+            self.assertTrue(changed)
+            unchanged = nb.update_property("C.md", "status", "reviewed")
+            self.assertFalse(unchanged)
+            content = (notebook / "C.md").read_text(encoding="utf-8")
+            self.assertIn('"reviewed"', content)
 
 
 if __name__ == "__main__":

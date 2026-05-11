@@ -4,7 +4,9 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
-from .config import WikiConfig, load_config
+from .config import WikiConfig
+from .notebook import Notebook
+from .wiki import WikiIndex
 
 
 @dataclass(frozen=True)
@@ -51,32 +53,31 @@ class WikiCli:
     def __init__(self, config: WikiConfig):
         """Create an app facade over one resolved wiki workspace config."""
         self.config = config
+        self._notebook = Notebook(config)
 
     @classmethod
     def from_config_path(cls, config_path: str | Path | None) -> "WikiCli":
         """Load config once at the CLI boundary, then run commands against it."""
-        return cls(load_config(config_path))
+        return cls(WikiConfig.load(config_path))
 
-    def add_packet(
-        self, raw_packet: str, *, allow_undeclared: bool = False
+    def add(
+        self, raw_json: str, *, allow_undeclared: bool = False
     ) -> CommandResult:
-        """Validate and apply one agent packet.
+        """Validate and apply one agent new-note payload.
 
         Example input: JSON with title, summary, category, tags, and source.
-        Output includes normalized packet metadata and files changed by rendering.
+        Output includes normalized note metadata and files changed by rendering.
         """
-        from .packet import parse_packet
-        from .wiki import add_packet, approved_leaf_paths, ensure_layout
+        notebook = self._notebook
+        index = WikiIndex(self.config, notebook)
+        index._ensure_layout()
 
-        ensure_layout(self.config)
-        packet, issues = parse_packet(raw_packet)
+        note, issues = notebook.parse_new_note(raw_json)
         if issues:
             return CommandResult(False, "add", issues=tuple(issues), exit_code=1)
 
-        assert packet is not None
-        from .notebook import Note
-
-        source_path = Note.resolve_source(self.config, packet.source)
+        assert note is not None
+        source_path = notebook.resolve(note.source)
         if not source_path.exists():
             return CommandResult(
                 False,
@@ -84,152 +85,102 @@ class WikiCli:
                 issues=(
                     Issue(
                         "source_missing",
-                        f"source note does not exist: {packet.source}",
-                        source=packet.source,
+                        f"source note does not exist: {note.source}",
+                        source=note.source,
                     ),
                 ),
                 exit_code=1,
             )
-        leafs = approved_leaf_paths(self.config)
-        if packet.category not in leafs and not allow_undeclared:
+        tree = index.read_tree()
+        leafs = tree.leaf_paths()
+        if note.category not in leafs and not allow_undeclared:
             return CommandResult(
                 False,
                 "add",
                 issues=(
                     Issue(
                         "category_not_approved",
-                        f"category is not an approved leaf: {packet.category.display()}",
+                        f"category is not an approved leaf: {note.category.display()}",
                     ),
                 ),
                 exit_code=1,
             )
-        data = add_packet(self.config, packet)
+        data = index.add_note(note, allow_undeclared=allow_undeclared)
         data["allow_undeclared"] = allow_undeclared
-        return CommandResult(
-            True,
-            "add",
-            data=data,
-        )
+        return CommandResult(True, "add", data=data)
 
     def index(self) -> CommandResult:
         """Reconcile notebook state and generated wiki files."""
-        from .wiki import index_workspace
+        index = WikiIndex(self.config, self._notebook)
+        return CommandResult(True, "index", data=index.index())
 
-        return CommandResult(True, "index", data=index_workspace(self.config))
-
-    def search(self, query: str, *, limit: int) -> CommandResult:
-        """Return ranked search candidates for a user query."""
-        from .search import search
-
-        results = search(self.config, query, limit=limit)
-        return CommandResult(
-            bool(results),
-            "search",
-            data={"query": query, "results": results},
-            exit_code=0 if results else 1,
-        )
-
-    def synthesize_bundle(
+    def list(
         self,
         category: str | None = None,
+        *,
+        recursive: bool = False,
+        include_body: bool = False,
+    ) -> CommandResult:
+        """List catalog entries, optionally filtered by category."""
+        index = WikiIndex(self.config, self._notebook)
+        entries = index.list(category, recursive=recursive)
+        result = [entry.to_json() for entry in entries]
+        if include_body:
+            for item in result:
+                try:
+                    note = self._notebook.read(str(item["source"]))
+                    item["body"] = Notebook.clean_body_text(note.body)
+                except OSError:
+                    item["body"] = ""
+        return CommandResult(
+            True,
+            "list",
+            data={
+                "category": category,
+                "recursive": recursive,
+                "include_body": include_body,
+                "entries": result,
+            },
+        )
+
+    def search(
+        self,
+        query: str | None = None,
+        *,
         tags: tuple[str, ...] = (),
         limit: int = 10,
         include_body: bool = False,
     ) -> CommandResult:
-        """Return a deterministic note bundle for agent-written synthesis."""
-        from .wiki import active_catalog
-
-        entries = [entry.to_json() for entry in active_catalog(self.config).values()]
-        if category:
-            entries = [entry for entry in entries if entry["category"] == category]
-        if tags:
-            requested = set(tags)
-            entries = [
-                entry for entry in entries if requested & set(entry.get("tags", []))
-            ]
-        entries = entries[:limit]
+        """Return ranked search candidates for a user query."""
+        index = WikiIndex(self.config, self._notebook)
+        results = index.find(
+            query, tags=tags, limit=limit, include_body=include_body
+        )
+        result_dicts = [r.to_json() for r in results]
         if include_body:
-            from .notebook import Note
-
-            for entry in entries:
+            for item in result_dicts:
                 try:
-                    entry["body"] = Note.clean_body_text(
-                        Note.load(self.config, str(entry["source"])).body
-                    )
+                    note = self._notebook.read(str(item["source"]))
+                    item["body"] = Notebook.clean_body_text(note.body)
                 except OSError:
-                    entry["body"] = ""
+                    item["body"] = ""
         return CommandResult(
-            True,
-            "synthesize",
-            data={
-                "category": category,
-                "tags": list(tags),
-                "limit": limit,
-                "include_body": include_body,
-                "notes": entries,
-            },
+            bool(results),
+            "search",
+            data={"query": query, "results": result_dicts},
+            exit_code=0 if results else 1,
         )
 
     def lint(self) -> CommandResult:
         """Run read-only workspace integrity checks."""
-        from .lint import lint_workspace
-
-        issues = tuple(lint_workspace(self.config))
+        index = WikiIndex(self.config, self._notebook)
+        issues = tuple(index.lint())
         return CommandResult(
             not any(issue.severity == "error" for issue in issues),
             "lint",
             data={"checked": True, "phase": "skeleton"},
             issues=issues,
-            exit_code=1 if any(issue.severity == "error" for issue in issues) else 0,
-        )
-
-    def tree(self, *, format: str = "markdown") -> CommandResult:
-        """Return the approved category tree in command-result form."""
-        from .category import tree_to_json, tree_to_markdown
-        from .wiki import read_tree
-
-        tree = read_tree(self.config)
-        if format == "json":
-            data = {"categories": tree_to_json(tree)}
-        elif format == "markdown":
-            data = {"tree": tree_to_markdown(tree)}
-        else:
-            raise ValueError(f"unsupported tree format: {format}")
-        return CommandResult(True, "tree", data=data)
-
-    def status(self) -> CommandResult:
-        """Return resolved workspace paths and lightweight health metadata."""
-        return CommandResult(
-            True,
-            "status",
-            data={
-                "notebook_root": str(self.config.notebook_root),
-                "generated_root": str(self.config.generated_root),
-                "include_roots": [str(path) for path in self.config.include_roots],
-            },
-        )
-
-    def show(self, source: str) -> CommandResult:
-        """Return one catalog/source entry by normalized source path."""
-        from .notebook import Note
-        from .wiki import get_entry
-
-        normalized = Note.normalize_source(source)
-        entry = get_entry(self.config, normalized)
-        if entry is None:
-            return CommandResult(
-                False,
-                "show",
-                data={"source": normalized, "note": None},
-                issues=(
-                    Issue(
-                        "not_found",
-                        f"source is not indexed: {normalized}",
-                        source=normalized,
-                    ),
-                ),
-                exit_code=1,
-            )
-        return CommandResult(
-            True, "show", data={"source": normalized, "note": entry.to_json()}
+            exit_code=1
+            if any(issue.severity == "error" for issue in issues)
+            else 0,
         )
