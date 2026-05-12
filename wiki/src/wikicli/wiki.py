@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import json
+import os
 from collections import defaultdict
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
-from pathlib import Path
 from enum import Enum
+from pathlib import Path
 from typing import Any
 
 from .category import (
@@ -241,12 +242,14 @@ class WikiIndex:
         changed_files.append(
             str(self.config.log_path.relative_to(self.config.generated_root))
         )
+        rebuild = self._rebuild_generated()
+        changed_files.extend(rebuild["changed_files"])
         catalog = self.catalog()
         return {
             "packet": note.to_json(),
             "changed_files": sorted(set(changed_files)),
             "indexed_count": len(catalog),
-            "category_pages": 0,
+            "category_pages": rebuild["category_pages"],
         }
 
     def index(self) -> dict[str, Any]:
@@ -275,13 +278,14 @@ class WikiIndex:
             != entry.source_mtime_ns / 1e9
         )
         unindexed = sorted(set(notes) - set(catalog), key=str.casefold)
+        rebuild = self._rebuild_generated(unindexed=unindexed)
         return {
             "indexed_count": len(catalog),
             "removed_notes": removed,
             "modified_notes": modified,
             "unindexed_notes": unindexed,
-            "category_pages": 0,
-            "changed_files": [],
+            "category_pages": rebuild["category_pages"],
+            "changed_files": rebuild["changed_files"],
         }
 
     # --- search ---
@@ -451,6 +455,173 @@ class WikiIndex:
                 f"- {json.dumps(event, ensure_ascii=True, sort_keys=True)}\n"
             )
 
+    def _rebuild_generated(self, unindexed: list[str] | None = None) -> dict[str, Any]:
+        """Rewrite index and category pages with lightweight metadata."""
+        catalog = self.catalog()
+        tree = self.read_tree()
+        child_map = tree.child_names()
+        all_paths = sorted(tree.all_paths(), key=lambda item: (len(item.parts), item.display().casefold()))
+        grouped: dict[CategoryPath, list[CatalogEntry]] = defaultdict(list)
+        for entry in catalog.values():
+            try:
+                entry_path = CategoryPath.parse(entry.category)
+            except ValueError:
+                continue
+            for depth in range(1, len(entry_path.parts) + 1):
+                grouped[CategoryPath(entry_path.parts[:depth])].append(entry)
+
+        valid_pages: set[Path] = set()
+        changed_files: list[str] = []
+        for path in all_paths:
+            page = category_page_path(self.config.categories_dir, path)
+            page.parent.mkdir(parents=True, exist_ok=True)
+            content = self._render_category_page(
+                path,
+                child_map.get(path, ()),
+                grouped.get(path, ()),
+            )
+            if _write_if_changed(page, content):
+                changed_files.append(str(page.relative_to(self.config.notebook_root)))
+            valid_pages.add(page.resolve())
+
+        for path in sorted(self.config.categories_dir.rglob("*.md"), reverse=True):
+            if path.resolve() not in valid_pages:
+                path.unlink()
+                changed_files.append(str(path.relative_to(self.config.notebook_root)))
+        for path in sorted(self.config.categories_dir.rglob("*"), reverse=True):
+            if path.is_dir():
+                try:
+                    path.rmdir()
+                except OSError:
+                    pass
+
+        index_content = self._render_index(tree, grouped, unindexed or [])
+        if _write_if_changed(self.config.index_path, index_content):
+            changed_files.append(str(self.config.index_path.relative_to(self.config.notebook_root)))
+
+        return {
+            "category_pages": len(valid_pages),
+            "changed_files": changed_files,
+        }
+
+    def _render_index(
+        self,
+        tree: WikiCategoryTree,
+        grouped: dict[CategoryPath, list[CatalogEntry]],
+        unindexed: list[str],
+    ) -> str:
+        """Render the machine-facing wiki index."""
+        lines = ["# Wiki Index", "", "## Category Tree", "", "This tree is the classification reference for the wiki.", "", "Human-facing entry point: [[../HOME.md|Human-facing homepage]].", ""]
+        if not tree.roots:
+            lines.append("- None")
+        else:
+            for root in tree.roots:
+                self._append_tree_lines(lines, root, (), grouped)
+        lines.extend(["", "---", "", "## Skipped System Notes"])
+        if unindexed:
+            for source in unindexed:
+                lines.append(f"- [[{source}]]")
+        else:
+            lines.append("- None")
+        return "\n".join(lines).rstrip() + "\n"
+
+    def _append_tree_lines(
+        self,
+        lines: list[str],
+        node: Any,
+        prefix: tuple[str, ...],
+        grouped: dict[CategoryPath, list[CatalogEntry]],
+    ) -> None:
+        """Render one category subtree into the index."""
+        current = CategoryPath((*prefix, node.name))
+        depth = len(current.parts)
+        indent = "  " * (depth - 1)
+        rel = category_page_path(self.config.categories_dir, current).relative_to(self.config.generated_root).as_posix()
+        lines.append(f"{indent}- layer{depth}: [{node.name}]({rel})")
+        for child in node.children:
+            self._append_tree_lines(lines, child, current.parts, grouped)
+        if not node.children:
+            for entry in sorted(grouped.get(current, ()), key=lambda item: item.source.casefold()):
+                lines.append(f"{indent}  - [[{entry.source}]]")
+
+    def _render_category_page(
+        self,
+        path: CategoryPath,
+        child_names: tuple[str, ...],
+        notes: tuple[CatalogEntry, ...] | list[CatalogEntry],
+    ) -> str:
+        """Render one generated category page with frontmatter metadata."""
+        notes = list(notes)
+        page_path = category_page_path(self.config.categories_dir, path)
+        existing = NoteMetadata.read(page_path) if page_path.exists() else None
+        existing_text = page_path.read_text(encoding="utf-8") if page_path.exists() else None
+        created = existing.frontmatter.get("created") if existing else None
+        modified = existing.frontmatter.get("modified") if existing else None
+        timestamp = _utc_now()
+        summary = _compact_summary(path, child_names, notes)
+        frontmatter: dict[str, object] = {
+            "category": path.display(),
+            "created": created or timestamp,
+            "modified": modified or timestamp,
+            "summary": summary,
+            "tags": ["#wiki", "#synthesis"],
+            "wiki_role": "synthesis",
+            "wiki_depth": len(path.parts),
+            "wiki_kind": "leaf" if not child_names else "branch",
+            "wiki_note_count": len(notes),
+            "wiki_child_count": len(child_names),
+            "wiki_status": "empty" if not notes else "active",
+        }
+        if len(path.parts) > 1:
+            parent = CategoryPath(path.parts[:-1])
+            parent_rel = Path(
+                os.path.relpath(
+                    category_page_path(self.config.categories_dir, parent),
+                    start=page_path.parent,
+                )
+            ).as_posix()
+            frontmatter["parent"] = f"[[{parent_rel}|{parent.parts[-1]}]]"
+
+        synthesis = self._category_synthesis(path, child_names, notes, summary)
+        meta = NoteMetadata(frontmatter, synthesis)
+        rendered = meta.render()
+        if existing_text is None or rendered == existing_text:
+            return rendered
+
+        frontmatter["modified"] = timestamp
+        return NoteMetadata(frontmatter, synthesis).render()
+
+    def _category_synthesis(
+        self,
+        path: CategoryPath,
+        child_names: tuple[str, ...],
+        notes: list[CatalogEntry],
+        summary: str,
+    ) -> str:
+        """Generate a compact category body."""
+        depth = len(path.parts)
+        lines = [f"# layer{depth}: {path.parts[-1]}", "", "## Layer Path"]
+        lines.extend(f"- layer{index}: {part}" for index, part in enumerate(path.parts, start=1))
+        lines.extend(["", "## Subcategories"])
+        page_path = category_page_path(self.config.categories_dir, path)
+        if child_names:
+            for child in child_names:
+                child_path = CategoryPath((*path.parts, child))
+                rel = Path(os.path.relpath(category_page_path(self.config.categories_dir, child_path), start=page_path.parent)).as_posix()
+                lines.append(f"- [layer{depth + 1}: {child}]({rel})")
+        else:
+            lines.append("- None")
+
+        lines.extend(["", "## Synthesis", ""])
+        lines.append(summary)
+        lines.extend(["", "## References"])
+        if notes:
+            for note in sorted(notes, key=lambda item: item.title.casefold()):
+                lines.append(f"- [[{note.source}]] - {note.summary}")
+        else:
+            lines.append("- None")
+        return "\n".join(lines).rstrip() + "\n"
+
     def _read_events(
         self,
     ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
@@ -517,3 +688,44 @@ def _weight(reason: str) -> int:
         "hierarchy": 4,
         "summary": 3,
     }.get(reason, 1)
+
+
+def _write_if_changed(path: Path, content: str) -> bool:
+    """Write only when content changed."""
+    if path.exists() and path.read_text(encoding="utf-8") == content:
+        return False
+    path.write_text(content, encoding="utf-8")
+    return True
+
+
+def _compact_summary(
+    path: CategoryPath,
+    child_names: tuple[str, ...],
+    notes: list[CatalogEntry],
+) -> str:
+    """Generate a short human-facing summary for one category page."""
+    title = path.parts[-1]
+    parent = path.parts[-2] if len(path.parts) > 1 else None
+    if not notes and child_names:
+        if parent:
+            return f"{title} is a branching area under {parent}. This page groups nearby subtopics but still needs a stronger synthesis."
+        return f"{title} is a branching area in the wiki. This page groups nearby subtopics but still needs a stronger synthesis."
+    if not notes:
+        return f"{title} is currently thin and should either be populated with real notes or folded back into a stronger neighboring category."
+
+    if child_names:
+        if title == "AI Agents":
+            return "AI Agents tracks how language-model systems become managed runtimes with memory, tools, retrieval, skills, and operational structure. The strongest notes here are about harness design and the shift from demos to maintained agent systems."
+        if title == "AI Systems":
+            return "AI Systems covers the production layer around models, especially inference, infrastructure, deployment, and training economics. It is the best place to read the vault as an operating stack rather than a set of isolated papers."
+        if title == "Machine Learning":
+            return "Machine Learning links theory, model behavior, language models, and systems concerns into one continuous layer. It helps connect abstract learning ideas to the practical realities of modern model building."
+        if title == "Computer Systems":
+            return "Computer Systems is the grounding layer for the vault. It keeps the AI material honest by emphasizing state, coordination, latency, reliability, and infrastructure constraints."
+        if title == "Knowledge Systems":
+            return "Knowledge Systems focuses on retrieval, indexing, memory structure, and information control. The recurring theme is that good recall depends as much on selection and organization as on search itself."
+        return f"{title} is a synthesis branch that gathers related notes into a broader conceptual area. Use it to understand the main subject first, then drill down into the more specific subcategories."
+
+    if parent:
+        return f"{title} is a focused leaf under {parent}. This page collects the notes that most directly define this topic in the current wiki."
+    return f"{title} is a focused synthesis page for one concrete topic cluster in the wiki."

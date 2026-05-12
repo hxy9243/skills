@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import sys
 import tempfile
+import time
 import unittest
 from contextlib import redirect_stdout
 from io import StringIO
@@ -137,7 +138,11 @@ class CliContractTests(unittest.TestCase):
             / "index.md"
         )
         self.assertTrue(category_page.exists())
-        self.assertIn("Prompt optimization", category_page.read_text(encoding="utf-8"))
+        category_text = category_page.read_text(encoding="utf-8")
+        self.assertIn("Prompt optimization", category_text)
+        self.assertIn('wiki_role: "synthesis"', category_text)
+        self.assertIn('wiki_note_count: 1', category_text)
+        self.assertIn('tags:', category_text)
 
     def test_search_finds_indexed_note_content_and_metadata(self) -> None:
         self.test_add_indexes_note_and_renders_generated_files()
@@ -243,6 +248,19 @@ class CliContractTests(unittest.TestCase):
         self.assertEqual(rc, 0)
         self.assertIn("Notes/State.md", payload["data"]["removed_notes"])
         self.assertIn("Notes/Loose.md", payload["data"]["unindexed_notes"])
+
+    def test_index_does_not_rewrite_unchanged_generated_pages(self) -> None:
+        self.test_add_indexes_note_and_renders_generated_files()
+        time.sleep(1.1)
+
+        first_rc, first_payload = self.run_cli_json("index")
+        time.sleep(1.1)
+        second_rc, second_payload = self.run_cli_json("index")
+
+        self.assertEqual(first_rc, 0)
+        self.assertEqual(second_rc, 0)
+        self.assertEqual(first_payload["data"]["changed_files"], [])
+        self.assertEqual(second_payload["data"]["changed_files"], [])
 
     def test_lint_is_read_only_and_reports_unindexed_notes(self) -> None:
         self.write_note("Notes/Loose.md", "# Loose\n\nUnindexed.")
