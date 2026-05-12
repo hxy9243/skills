@@ -43,6 +43,24 @@ class NoteMetadataTests(unittest.TestCase):
             self.assertFalse(unchanged)
             self.assertIn('category: "A > B > C"', path.read_text(encoding="utf-8"))
 
+    def test_render_preserves_numeric_frontmatter_values(self) -> None:
+        metadata = NoteMetadata(
+            {
+                "wiki_depth": 3,
+                "wiki_note_count": 12,
+                "wiki_child_count": 4,
+                "tags": ["#wiki", "#synthesis"],
+            },
+            "# Test\n",
+        )
+
+        rendered = metadata.render()
+
+        self.assertIn("wiki_depth: 3", rendered)
+        self.assertIn("wiki_note_count: 12", rendered)
+        self.assertIn("wiki_child_count: 4", rendered)
+        self.assertIn('- "#wiki"', rendered)
+
     def test_normalize_source_rejects_absolute_and_parent_paths(self) -> None:
         self.assertEqual(Notebook.normalize_source("Notes/A.md"), "Notes/A.md")
         with self.assertRaises(ValueError):

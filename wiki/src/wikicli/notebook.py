@@ -397,6 +397,10 @@ class NoteMetadata:
                 lines.append(f"{key}:")
                 for item in value:
                     lines.append(f"- {json.dumps(str(item), ensure_ascii=False)}")
+            elif isinstance(value, bool):
+                lines.append(f"{key}: {'true' if value else 'false'}")
+            elif isinstance(value, int | float):
+                lines.append(f"{key}: {value}")
             else:
                 lines.append(f"{key}: {json.dumps(str(value), ensure_ascii=False)}")
         lines.append("---")
