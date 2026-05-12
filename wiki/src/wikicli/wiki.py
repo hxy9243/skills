@@ -23,6 +23,7 @@ class IssueType(str, Enum):
     NOTE_MODIFIED = "note_modified"
     UNINDEXED = "unindexed"
     INVALID_CATEGORY = "invalid_category"
+    EMPTY_CATEGORY = "empty_category"
 
 
 @dataclass(frozen=True)
@@ -424,6 +425,9 @@ class WikiIndex:
 
         notes = {note.source: note for note in self.notebook.discover()}
         catalog = self.catalog()
+        tree = self.read_tree()
+        leaf_paths = tree.leaf_paths()
+        catalog_categories = {entry.category for entry in catalog.values()}
 
         for source, entry in catalog.items():
             if source not in notes:
@@ -467,6 +471,18 @@ class WikiIndex:
                     f"source note is not indexed: {source}",
                     severity="warning",
                     source=source,
+                )
+            )
+
+        for category in sorted(leaf_paths, key=lambda item: item.display().casefold()):
+            if category.display() in catalog_categories:
+                continue
+            issues.append(
+                Issue(
+                    IssueType.EMPTY_CATEGORY,
+                    f"leaf category has no indexed notes: {category.display()}",
+                    severity="warning",
+                    path=str(category_page_path(self.config.categories_dir, category)),
                 )
             )
         return tuple(issues)

@@ -271,6 +271,16 @@ class CliContractTests(unittest.TestCase):
         self.assertEqual(payload["ok"], True)
         self.assertEqual(payload["issues"][0]["code"], "unindexed")
 
+    def test_lint_reports_empty_leaf_categories(self) -> None:
+        rc, payload = self.run_cli_json("lint", "--filter", "empty_category")
+
+        self.assertEqual(rc, 0)
+        self.assertEqual(payload["ok"], True)
+        self.assertEqual(
+            [issue["code"] for issue in payload["issues"]],
+            ["empty_category", "empty_category"],
+        )
+
     def test_tree_returns_deterministic_structure(self) -> None:
         self.test_add_indexes_note_and_renders_generated_files()
 
