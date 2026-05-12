@@ -106,6 +106,44 @@ class WikiIndex:
             self.config.index_path.read_text(encoding="utf-8")
         )
 
+    def tree(self) -> dict[str, Any]:
+        """Return a deterministic category tree with note counts and leaf notes."""
+        tree = self.read_tree()
+        catalog = self.catalog()
+        grouped: dict[CategoryPath, list[CatalogEntry]] = defaultdict(list)
+        for entry in catalog.values():
+            try:
+                entry_path = CategoryPath.parse(entry.category)
+            except ValueError:
+                continue
+            for depth in range(1, len(entry_path.parts) + 1):
+                grouped[CategoryPath(entry_path.parts[:depth])].append(entry)
+
+        def render_node(node: Any, prefix: tuple[str, ...]) -> dict[str, Any]:
+            path = CategoryPath((*prefix, node.name))
+            notes = sorted(grouped.get(path, ()), key=lambda item: item.source.casefold())
+            children = [render_node(child, path.parts) for child in node.children]
+            return {
+                "name": node.name,
+                "path": path.display(),
+                "depth": len(path.parts),
+                "page": str(category_page_path(self.config.categories_dir, path).relative_to(self.config.notebook_root)),
+                "note_count": len(notes),
+                "leaf": len(node.children) == 0,
+                "notes": [
+                    {
+                        "source": entry.source,
+                        "title": entry.title,
+                        "summary": entry.summary,
+                    }
+                    for entry in notes
+                ] if len(node.children) == 0 else [],
+                "children": children,
+            }
+
+        roots = [render_node(root, ()) for root in tree.roots]
+        return {"roots": roots}
+
     def add_category(self, path: str | CategoryPath) -> WikiCategoryTree:
         """Add a category path to the tree in index.md (stub for future)."""
         if isinstance(path, str):

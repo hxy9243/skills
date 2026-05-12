@@ -171,3 +171,8 @@ class WikiCli:
             if any(issue.severity == "error" for issue in issues)
             else 0,
         )
+
+    def tree(self) -> CommandResult:
+        """Return a deterministic category tree derived from wiki state."""
+        index = WikiIndex(self.config, self._notebook)
+        return CommandResult(True, "tree", data=index.tree())

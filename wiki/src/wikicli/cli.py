@@ -39,6 +39,9 @@ def build_parser() -> argparse.ArgumentParser:
         "index", help="Reconcile notebook state and regenerate wiki files"
     )
 
+    # --- tree ---
+    subparsers.add_parser("tree", help="Show deterministic category tree")
+
     # --- list ---
     list_parser = subparsers.add_parser("list", help="List catalog entries")
     list_parser.add_argument(
@@ -123,6 +126,19 @@ def print_result(result: CommandResult) -> None:
 
 def print_text_output(result: CommandResult) -> None:
     """Print human-facing text for commands that support it."""
+    if result.ok and result.command == "tree":
+        roots = result.data.get("roots", [])
+        if not roots:
+            print("No tree nodes found.")
+        else:
+            def walk(nodes: list[dict[str, object]], indent: int = 0) -> None:
+                for node in nodes:
+                    name = str(node.get("name", ""))
+                    note_count = int(node.get("note_count", 0))
+                    print(f"{'  ' * indent}- {name} ({note_count})")
+                    walk(list(node.get("children", [])), indent + 1)
+            walk(list(roots))
+        return
     if result.ok and result.command == "list":
         subcats = result.data.get("subcategories", [])
         entries = result.data.get("entries", [])
@@ -191,6 +207,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
         elif command == "index":
             result = app.index()
+        elif command == "tree":
+            result = app.tree()
         elif command == "list":
             result = app.list(
                 args.category,

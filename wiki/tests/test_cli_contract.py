@@ -271,9 +271,26 @@ class CliContractTests(unittest.TestCase):
         self.assertEqual(payload["ok"], True)
         self.assertEqual(payload["issues"][0]["code"], "unindexed")
 
+    def test_tree_returns_deterministic_structure(self) -> None:
+        self.test_add_indexes_note_and_renders_generated_files()
+
+        rc, payload = self.run_cli_json("tree")
+
+        self.assertEqual(rc, 0)
+        self.assertEqual(payload["command"], "tree")
+        roots = payload["data"]["roots"]
+        self.assertEqual(roots[0]["name"], "Computer Science")
+        ai_systems = roots[0]["children"][0]
+        self.assertEqual(ai_systems["name"], "AI Systems")
+        agents = ai_systems["children"][0]
+        self.assertEqual(agents["name"], "Agents")
+        self.assertTrue(agents["leaf"])
+        self.assertEqual(agents["note_count"], 1)
+        self.assertEqual(agents["notes"][0]["source"], "Notes/DSPy.md")
+
     def test_removed_commands_fail(self) -> None:
-        """Removed commands (tree, show, status, synthesize, reconcile) should not parse."""
-        for cmd in ("tree", "show", "status", "synthesize", "reconcile"):
+        """Removed commands (show, status, synthesize, reconcile) should not parse."""
+        for cmd in ("show", "status", "synthesize", "reconcile"):
             with self.assertRaises(SystemExit):
                 cli.main(
                     ["--config", str(self.config_path), "--format", "json", cmd]
@@ -298,6 +315,7 @@ class CliContractTests(unittest.TestCase):
         self.assertEqual(
             app.search(query="test", limit=5).command, "search"
         )
+        self.assertEqual(app.tree().command, "tree")
 
     def test_default_text_output_for_list(self) -> None:
         self.test_add_indexes_note_and_renders_generated_files()
