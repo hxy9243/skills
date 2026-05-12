@@ -29,9 +29,10 @@ You can interact with the wiki natively through the agent using natural language
 
 ## What It Generates
 
+- `HOME.md`: the human-facing homepage in the notebook root
 - `index.md`: the approved category tree and note placement index
 - `log.md`: append-only add/remove/lint history
-- `categories/`: one generated synthesis page per category node
+- `categories/`: one generated synthesis page per category node, each with frontmatter metadata like `category`, `created`, `modified`, `summary`, `parent`, `wiki_role`, `wiki_kind`, `wiki_note_count`, and `wiki_child_count`
 - `config.json`: notebook-local configuration, typically stored under `_WIKI/`
 - `RULES.md`: category rules, notes, exceptions and overrides from user.
 
@@ -116,6 +117,34 @@ The backend resolves config in this order:
 
 Use [`templates/config.json.example`](./templates/config.json.example) as the starter template.
 
+## Homepage Preferences
+
+- Write the human-facing homepage to `HOME.md` in the notebook root, not under `_WIKI/`.
+- Keep the homepage readable. Use light emoji where they help scanability.
+- Render the homepage tree from the deterministic `wiki tree` backend command, not from a hand-written parallel structure.
+- Prefer tables mainly for `New Syntheses` and `Recent Notes`, not every section.
+- For `New Syntheses`, prefer a Dataview table that uses `category`, `summary`, and `modified` from generated synthesis metadata.
+
+## Generated Category Page Metadata
+
+Generated category pages should carry lightweight frontmatter so homepage queries and downstream Obsidian tooling can treat them as first-class synthesis notes.
+
+Expected metadata includes:
+- `category`: canonical display path like `Computer Science > Artificial Intelligence > AI Agents`
+- `created`: first generation timestamp, preserved across rebuilds when possible
+- `modified`: latest regeneration timestamp
+- `summary`: a short human-facing highlight of the category, usually one or two sentences
+- `parent`: optional relative wiki link to the immediate parent category page
+- `tags`: include at least `#wiki` and `#synthesis`
+- `wiki_role: synthesis`
+- `wiki_kind`: `branch` or `leaf`
+- `wiki_depth`: integer category depth
+- `wiki_note_count`: integer count of indexed notes rolled into the page
+- `wiki_child_count`: integer count of direct child categories
+- `wiki_status`: `active` or `empty`
+
+This metadata exists to support cleaner Dataview queries, better browsing, and future promotion logic for homepage sections like `New Syntheses`. In particular, `summary` is meant to power homepage tables without forcing manual annotation.
+
 ## Category Rules
 
 If the user has specific classification preferences, they should be documented in `RULES.md` in the wiki root. Subagents should consult `RULES.md` alongside the approved category tree when classifying notes.
@@ -135,7 +164,7 @@ If the user has specific classification preferences, they should be documented i
 - `agents/add.md` classifies targeted notes against the approved tree in `index.md`.
 - `agents/search.md` combines content search, tag search, and hierarchy/index search.
 - `agents/synthesize.md` searches, cross-references, extracts core topics, and produces a synthesized presentation with references at the end.
-- `agents/lint.md` checks for modified notes, missing notes, and branches that no longer match the tree.
+- `agents/lint.md` checks for modified notes, missing notes, empty leaf categories, and branches that no longer match the tree.
 
 ## Synthesis Workflow
 

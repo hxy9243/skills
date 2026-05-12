@@ -14,6 +14,8 @@ This skill formalizes a notebook into a generated wiki workspace for easier inde
 - The approved category tree lives at the top of `index.md` and is the classification reference.
 - User preferences live in the `RULES.md` file to guide or override categorization decisions.
 - Category, subcategory, and topic layers each get a generated markdown synthesis page.
+- Generated category pages should carry lightweight frontmatter metadata so they behave like real synthesis notes in Obsidian and Dataview.
+- The human-facing homepage belongs at `HOME.md` in the notebook root, not inside `_WIKI/`.
 - Search combines `obsidian-cli search-content` when available, tag-aware note matching, and generated index/category search.
 - `log.md` is the persistent record of adds, removals, and lint runs.
 - Layer labels are written deterministically as `layer1: ...`, `layer2: ...`, `layer3: ...`, and deeper when needed, so prompts and search can target a specific depth.
@@ -114,8 +116,13 @@ Small example:
 - Let `src/wikicli` own deterministic operations like file IO, category-page regeneration, log updates, indexing, delegated search, and lint checks.
 - Keep the approved category tree at the top of `index.md` as the classification reference for `add` and first-time `index`.
 - Keep `index.md` focused on the category tree itself. Do not regenerate a second browse-by-category section below it.
+- Keep `HOME.md` concise and human-facing. Prefer prose plus light emoji, with tables mainly for `New Syntheses` and `Recent Notes`.
+- When rendering the homepage tree, derive it from the backend `wiki tree` command rather than hand-writing or improvising a parallel structure.
+- `New Syntheses` should prefer a Dataview table built from synthesis-page metadata, especially `category`, `summary`, and `modified`.
+- Generated category pages should include stable metadata fields like `category`, `created`, `modified`, `summary`, optional `parent`, `wiki_role`, `wiki_kind`, `wiki_depth`, `wiki_note_count`, `wiki_child_count`, and `wiki_status` so downstream homepage queries can treat them as synthesis documents.
+- The `summary` field should be a short human-facing highlight of the category itself, usually one or two sentences, not a list of note titles.
 - Prefer `index` for broad refreshes and `add` for small targeted updates.
-- `lint` evaluates source synchronization (missing notes, modified notes, unindexed notes). It does not strictly reject categories or test directory structure. Agents should enforce category hygiene when calling `add`.
+- `lint` evaluates source synchronization (missing notes, modified notes, unindexed notes) and should also flag empty leaf categories as taxonomy cleanup candidates. Agents should enforce category hygiene when calling `add`.
 - `index` detects missing source notes, reports modified notes via source `mtime`, and rebuilds generated views.
 - For notebook-wide indexing, classify new notes with subagents in parallel when feasible, but cap concurrency at 8 notes at a time.
 - For broad or ambiguous note sets, have subagents propose better topical branches instead of forcing notes into a weak existing category.

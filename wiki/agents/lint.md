@@ -25,6 +25,7 @@ uv run wiki lint
 - notes modified since their last recorded add event
 - unindexed notes
 - notes assigned to an invalid category
+- empty leaf categories with no indexed notes
 
 ### Phase 2: Semantic Lint
 
@@ -51,4 +52,5 @@ Recommend the smallest repair action that restores both structural and semantic 
 - Suggest `add --json` when notes exist but have not been classified.
 - Call out missing source notes explicitly when logged entries point to deleted files.
 - For semantic issues, suggest specific edits to the source notes or recommend re-running the `synthesize` agent for specific categories to resolve contradictions or stale claims.
+- Empty leaf categories should usually be removed from the category tree unless there is an explicit reason to keep them as placeholders.
 - For new topics or insights discovered in sub-categories, explicitly recommend updating the synthesis of the affected category and cascading those updates up through parent levels to `HOME.md`.

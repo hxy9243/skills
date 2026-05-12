@@ -130,6 +130,7 @@ category: "Computer Science > ... > Target Category"
 parent: "[[path/to/parent/index.md|Parent Category]]"
 created: 2026-05-11T00:00:00Z
 modified: 2026-05-11T00:00:00Z
+summary: "One or two sentences that highlight the subject of the category itself, not a list of note titles or references."
 tags: []
 ---
 # layer[X]: Target Category
@@ -150,6 +151,8 @@ tags: []
 ```
 
 If it is a top-level synthesis (the entire wiki or notebook), save the result to a `HOME.md` file at the root level, and omit the `parent` property in the frontmatter.
+
+For generated category syntheses, the `summary` frontmatter is mandatory. It should be compact, human-facing, and Dataview-friendly: one or two sentences that explain why the category matters or what it covers. Do not turn the summary into a roll call of note titles.
 
 If the topic is not covered in the category tree, you can propose and write a new `path/to/category/index.md` file using the template above, and the user can later manually add it to the root category tree structure.
 

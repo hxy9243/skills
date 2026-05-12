@@ -76,6 +76,11 @@ class WikiConfig:
         """Path to generated category pages."""
         return self.generated_root / "categories"
 
+    @property
+    def homepage_path(self) -> Path:
+        """Path to the human-facing homepage in the notebook root."""
+        return self.notebook_root / "HOME.md"
+
 
 def _resolve_path(value: Any, base: Path) -> Path:
     """Resolve a config path relative to a base directory."""
