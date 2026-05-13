@@ -16,18 +16,30 @@ class WikiConfig:
     exclude_globs: tuple[str, ...] = ()
 
     @classmethod
-    def load(cls, config_path: str | Path | None = None) -> "WikiConfig":
+    def load(
+        cls,
+        config_path: str | Path | None = None,
+        *,
+        root_path: str | Path | None = None,
+    ) -> "WikiConfig":
         """Load config JSON, auto-discover from cwd, or derive a minimal workspace.
 
-        Resolution order when config_path is None:
-        1. Look for ``_WIKI/config.json`` in the current working directory.
-        2. Fall back to a bare default (cwd as notebook root, ``_WIKI`` as generated root).
+        Resolution order:
+        1. Use ``config_path`` when provided.
+        2. Look for ``_WIKI/config.json`` under ``root_path`` when provided.
+        3. Look for ``_WIKI/config.json`` in the current working directory.
+        4. Fall back to a bare default using ``root_path`` or cwd as notebook root.
         """
         if config_path is None:
-            discovered = Path.cwd().resolve() / "_WIKI" / "config.json"
+            root = (
+                Path(root_path).expanduser().resolve()
+                if root_path is not None
+                else Path.cwd().resolve()
+            )
+            discovered = root / "_WIKI" / "config.json"
             if discovered.is_file():
                 return cls.load(discovered)
-            return cls.default()
+            return cls.default(root)
 
         path = Path(config_path).expanduser().resolve()
         raw = json.loads(path.read_text(encoding="utf-8"))

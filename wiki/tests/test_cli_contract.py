@@ -72,6 +72,12 @@ class CliContractTests(unittest.TestCase):
             rc = cli.main(["--config", str(self.config_path), *args])
         return rc, buffer.getvalue()
 
+    def run_cli_json_with_root(self, *args: str) -> tuple[int, dict[str, object]]:
+        buffer = StringIO()
+        with redirect_stdout(buffer):
+            rc = cli.main(["--root", str(self.notebook), "--format", "json", *args])
+        return rc, json.loads(buffer.getvalue())
+
     def test_command_result_envelope_is_stable_json(self) -> None:
         result = CommandResult(
             False,
@@ -163,6 +169,57 @@ class CliContractTests(unittest.TestCase):
         self.assertIn("Computer Science", payload["data"]["subcategories"])
         # Root has no direct entries, only subcategories
         self.assertEqual(len(payload["data"]["entries"]), 0)
+
+    def test_root_flag_loads_notebook_wiki_config(self) -> None:
+        (self.generated / "config.json").write_text(
+            json.dumps(
+                {
+                    "notebook_root": str(self.notebook),
+                    "generated_root": str(self.generated),
+                    "include_roots": ["."],
+                    "exclude_globs": ["Templates/**"],
+                }
+            ),
+            encoding="utf-8",
+        )
+        self.test_add_indexes_note_and_renders_generated_files()
+
+        rc, payload = self.run_cli_json_with_root("list", "Computer Science")
+
+        self.assertEqual(rc, 0)
+        self.assertEqual(payload["command"], "list")
+        self.assertIn("AI Systems", payload["data"]["subcategories"])
+
+    def test_path_alias_works_after_subcommand(self) -> None:
+        (self.generated / "config.json").write_text(
+            json.dumps(
+                {
+                    "notebook_root": str(self.notebook),
+                    "generated_root": str(self.generated),
+                    "include_roots": ["."],
+                    "exclude_globs": ["Templates/**"],
+                }
+            ),
+            encoding="utf-8",
+        )
+        self.test_add_indexes_note_and_renders_generated_files()
+
+        buffer = StringIO()
+        with redirect_stdout(buffer):
+            rc = cli.main(
+                [
+                    "--format",
+                    "json",
+                    "list",
+                    "Computer Science",
+                    "--path",
+                    str(self.notebook),
+                ]
+            )
+        payload = json.loads(buffer.getvalue())
+
+        self.assertEqual(rc, 0)
+        self.assertIn("AI Systems", payload["data"]["subcategories"])
 
     def test_list_branch_shows_children(self) -> None:
         self.test_add_indexes_note_and_renders_generated_files()

@@ -15,7 +15,7 @@ Use the active model from the invoking skill/session if you summarize findings, 
 1. Run:
 
 ```bash
-uv run wiki lint
+uv run --directory <wiki skill path> wiki --root <notebook-root> lint
 # To focus on specific issues, use the --filter flag (e.g. --filter unindexed)
 ```
 

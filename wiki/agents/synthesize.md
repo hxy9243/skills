@@ -25,11 +25,11 @@ Prefer `agents/search.md` when the user mostly wants note discovery or direct Q&
 1. Discover the notes.
    - If synthesizing an ad-hoc topic, use search:
      ```bash
-     uv run wiki search "user topic"
+     uv run --directory <wiki skill path> wiki --root <notebook-root> search "user topic"
      ```
    - If synthesizing an entire category, use list recursively:
      ```bash
-     uv run wiki list "Category > Path" --recursive
+     uv run --directory <wiki skill path> wiki --root <notebook-root> list "Category > Path" --recursive
      ```
 
 2. Expand the topic mentally before judging the results.
@@ -122,7 +122,7 @@ Good synthesis responses usually include:
 
 By default, if it's a synthesis for a given category in the tree, you are responsible for writing the **entire** `path/to/category/index.md` file. The CLI no longer generates this file automatically. 
 
-You MUST use `uv run wiki list "Category > Path"` to retrieve the exact `subcategories` and `entries` (references), and then format the full `index.md` file using this structure:
+You MUST use `uv run --directory <wiki skill path> wiki --root <notebook-root> list "Category > Path"` to retrieve the exact `subcategories` and `entries` (references), and then format the full `index.md` file using this structure:
 
 ```markdown
 ---
@@ -167,4 +167,4 @@ To save a synthesis:
 2. **Rich Frontmatter**: Include rich YAML frontmatter to fully leverage Obsidian tools like Dataview and Graph View. You must include `date`, `modified`, `tags`, `source_count` (number of notes synthesized), and `entity_links` (direct wikilinks to the core notes used). Always update the `modified` timestamp when updating an existing synthesis.
 3. When necessary, use rich representations to better present your ideas, like a mermaid flowchart, table, or lists.
 4. Write the synthesized content into the file.
-5. Build a single add packet for the new note, then run `uv run wiki add --json '<json-packet>'` to index it back into the wiki.
+5. Build a single add packet for the new note, then run `uv run --directory <wiki skill path> wiki --root <notebook-root> add --json '<json-packet>'` to index it back into the wiki.

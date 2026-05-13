@@ -42,7 +42,7 @@ The backend keeps this packet shape lightweight and deterministic. `wiki add` ac
 12. Call the add command with the packet as an inline JSON string:
 
 ```bash
-uv run wiki add --json '{"title": "Note title", "summary": "One paragraph summary", "category": "Layer 1 > Layer 2 > Layer 3", "tags": ["#tag-a"], "source": "relative/path/to/note.md"}'
+uv run --directory <wiki skill path> wiki --root <notebook-root> add --json '{"title": "Note title", "summary": "One paragraph summary", "category": "Layer 1 > Layer 2 > Layer 3", "tags": ["#tag-a"], "source": "relative/path/to/note.md"}'
 # Use --allow-undeclared if the category is not yet in the approved tree
 ```
 

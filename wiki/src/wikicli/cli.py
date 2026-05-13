@@ -14,6 +14,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="wiki")
     parser.add_argument("--config", help="Path to wiki config JSON")
     parser.add_argument(
+        "--root",
+        "--path",
+        dest="root",
+        help=(
+            "Notebook root containing _WIKI/config.json. "
+            "--config takes precedence when both are supplied."
+        ),
+    )
+    parser.add_argument(
         "--format",
         choices=["json", "text"],
         default="text",
@@ -94,13 +103,13 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-_GLOBAL_FLAGS = {"--config", "--format"}
+_GLOBAL_FLAGS = {"--config", "--format", "--root", "--path"}
 
 
 def _normalize_argv(argv: list[str]) -> list[str]:
-    """Move --config and --format to the front so they work after subcommands.
+    """Move global flags to the front so they work after subcommands.
 
-    This allows both ``wiki --config X list`` and ``wiki list --config X``.
+    This allows both ``wiki --root X list`` and ``wiki list --root X``.
     """
     global_args: list[str] = []
     rest: list[str] = []
@@ -193,7 +202,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     normalized = _normalize_argv(list(argv) if argv is not None else sys.argv[1:])
     args = parser.parse_args(normalized)
     try:
-        app = WikiCli.from_config_path(args.config)
+        app = WikiCli.from_config_path(args.config, root_path=args.root)
     except (OSError, ValueError) as exc:
         result = _config_error(str(exc))
         print_result(result)

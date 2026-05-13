@@ -40,9 +40,14 @@ class WikiCli:
         self._notebook = Notebook(config)
 
     @classmethod
-    def from_config_path(cls, config_path: str | Path | None) -> "WikiCli":
+    def from_config_path(
+        cls,
+        config_path: str | Path | None,
+        *,
+        root_path: str | Path | None = None,
+    ) -> "WikiCli":
         """Load config once at the CLI boundary, then run commands against it."""
-        return cls(WikiConfig.load(config_path))
+        return cls(WikiConfig.load(config_path, root_path=root_path))
 
     def add(
         self, raw_json: str, *, allow_undeclared: bool = False

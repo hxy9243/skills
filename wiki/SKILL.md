@@ -57,11 +57,11 @@ Use when the user wants validation, cleanup guidance, or integrity checks.
 The backend resolves config in this order:
 
 1. `--config <path>`
-2. `<generated_root>/config.json`
-3. `~/.wiki/config.json`
-4. built-in defaults
+2. `--root <notebook-root>` or `--path <notebook-root>`
+3. `<current-working-directory>/_WIKI/config.json`
+4. built-in defaults using `--root`/`--path` or the current working directory as the notebook root
 
-By default, the CLI will auto-discover `_WIKI/config.json` in the current working directory, so subagents do not usually need to pass `--config` if they are operating from the workspace root.
+When running via `uv --directory <wiki skill path>`, always pass `--root <notebook-root>` or `--config <notebook-root>/_WIKI/config.json`. `uv --directory` changes the process working directory to the skill package, so cwd auto-discovery will otherwise look for the wrong `_WIKI/config.json`.
 
 Use [`templates/config.json.example`](/home/kevin/Workspace/skills/wiki/templates/config.json.example) as the starting template.
 
@@ -111,7 +111,7 @@ Small example:
 
 ## Operating Rules
 
-- Always run `uv` commands from the wiki skill directory, or use `--directory <wiki skill path>` to ensure dependencies are loaded correctly.
+- Always run `uv` commands from the wiki skill directory, or use `--directory <wiki skill path>` to ensure dependencies are loaded correctly. When using `--directory`, also pass `wiki --root <notebook-root>` so the backend resolves the target notebook instead of the skill package directory.
 - Let subagents interpret notes and queries.
 - Let `src/wikicli` own deterministic operations like file IO, category-page regeneration, log updates, indexing, delegated search, and lint checks.
 - Keep the approved category tree at the top of `index.md` as the classification reference for `add` and first-time `index`.
@@ -131,9 +131,9 @@ Small example:
 - Use `add` only when a subagent has already normalized a single note into one packet:
 
 ```bash
-# ensure you're in the wiki skill directory, or use uv run --directory <path to wiki skill> wiki ...
-uv run wiki add --json '{"title":"Note title","summary":"One paragraph summary","category":"Layer 1 > Layer 2 > Layer 3","tags":["#tag-a"],"source":"relative/path/to/note.md"}'
-uv run wiki index
+# ensure dependencies come from the wiki skill and workspace state comes from the notebook root
+uv run --directory <path to wiki skill> wiki --root <notebook-root> add --json '{"title":"Note title","summary":"One paragraph summary","category":"Layer 1 > Layer 2 > Layer 3","tags":["#tag-a"],"source":"relative/path/to/note.md"}'
+uv run --directory <path to wiki skill> wiki --root <notebook-root> index
 ```
 
 - Keep three layers as the default floor, not a hard ceiling. Add deeper layers when a branch becomes crowded or needs a finer conceptual split.

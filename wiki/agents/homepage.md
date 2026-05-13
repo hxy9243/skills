@@ -11,8 +11,8 @@ Generate a concise, human-friendly homepage that highlights newly generated synt
 When instructed to generate the homepage, perform the following steps:
 
 1. **Context Gathering**:
-   - Run `uv run wiki tree --format json` to retrieve the deterministic category tree from the backend.
-   - Run `uv run wiki lint` to identify recently modified notes, unindexed files, and empty leaf categories without regenerating wiki files.
+   - Run `uv run --directory <wiki skill path> wiki --root <notebook-root> tree --format json` to retrieve the deterministic category tree from the backend.
+   - Run `uv run --directory <wiki skill path> wiki --root <notebook-root> lint` to identify recently modified notes, unindexed files, and empty leaf categories without regenerating wiki files.
    - Inspect recently modified generated category pages, especially their `summary`, `modified`, `wiki_role`, and `wiki_status` metadata, plus the `# Synthesis` blocks when needed, to extract new topics, keywords, and key ideas.
 
 2. **Template Enforcement**:

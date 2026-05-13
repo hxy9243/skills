@@ -29,7 +29,7 @@ Use the active model from the invoking skill/session for any synthesis or classi
 6. After notes have been classified into the approved tree, rebuild generated views:
 
 ```bash
-uv run wiki index
+uv run --directory <wiki skill path> wiki --root <notebook-root> index
 ```
 
 7. **Cascading Bottom-Up Synthesis**: After rebuilding, ensure that synthesis is rolled up at *each* category level. For any given category level, read the synthesis notes of its immediate depth-1 children to construct and update the synthesis of the current level. Repeat this process up to the root to create and update a `HOME.md` file that represents the top-level synthesis of the entire wiki.
@@ -44,7 +44,7 @@ uv run wiki index
 - Split overloaded branches when they exceed roughly 12 direct children or when the notes form obvious subclusters.
 - Consolidate parallel branches when users would search them as one idea cluster.
 - Prefer concept consistency across source folders. A topic family should usually live in one subtree even if notes came from projects, inbox, and subject folders.
-- Run `uv run wiki lint` to discover all unindexed notes.
+- Run `uv run --directory <wiki skill path> wiki --root <notebook-root> lint` to discover all unindexed notes.
 - If there are unindexed notes, read the approved category tree at the top of `index.md` and any custom rules in `RULES.md` to guide classification.
 - Keep hierarchy labels broad enough to survive future indexing.
 - Keep the approved category tree in `index.md` updated when genuinely new subtrees are needed.

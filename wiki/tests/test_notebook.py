@@ -201,6 +201,34 @@ class NoteMetadataTests(unittest.TestCase):
             self.assertEqual(config.notebook_root, root.resolve())
             self.assertEqual(config.generated_root, wiki_dir.resolve())
 
+    def test_config_autodiscovers_wiki_config_from_root_path(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            wiki_dir = root / "_WIKI"
+            wiki_dir.mkdir()
+            config_data = {
+                "notebook_root": str(root),
+                "generated_root": str(wiki_dir),
+                "include_roots": ["."],
+            }
+            (wiki_dir / "config.json").write_text(
+                json.dumps(config_data), encoding="utf-8"
+            )
+
+            config = WikiConfig.load(root_path=root)
+
+            self.assertEqual(config.notebook_root, root.resolve())
+            self.assertEqual(config.generated_root, wiki_dir.resolve())
+
+    def test_config_root_path_falls_back_to_default_for_that_root(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+
+            config = WikiConfig.load(root_path=root)
+
+            self.assertEqual(config.notebook_root, root.resolve())
+            self.assertEqual(config.generated_root, (root / "_WIKI").resolve())
+
     def test_config_falls_back_to_default_without_wiki_dir(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
