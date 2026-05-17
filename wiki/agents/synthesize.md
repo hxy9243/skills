@@ -59,7 +59,9 @@ Prefer `agents/search.md` when the user mostly wants note discovery or direct Q&
      - open questions or gaps
 
 6. Create the synthesized presentation.
-   - **Contextual Framing (5W1H)**: Start with a short framing paragraph that defines the topic using the 5W1H framework (Who, What, When, Where, Why, How) to capture human intent and prevent generic summaries.
+   - Start with `## Emerging Topics & Key Ideas` as the first content section. Use up to 10 concise bullets to highlight the most important new topics, keywords, connections, contradictions, trends, or key ideas discovered in the note set. Each bullet should include direct wikilinks to the relevant notes or category pages when available.
+   - Then add `## Synthesis`.
+   - **Contextual Framing (5W1H)**: Begin the synthesis body with a short framing paragraph that defines the topic using the 5W1H framework (Who, What, When, Where, Why, How) to capture human intent and prevent generic summaries.
    - Then present the major themes in a deliberate order.
    - Prefer synthesis over note-by-note recitation.
    - Keep each claim tied to note evidence.
@@ -77,7 +79,7 @@ Prefer `agents/search.md` when the user mostly wants note discovery or direct Q&
 
 You must produce a **textbook-level** deep dive. Do not generate shallow bullet summaries. Your synthesis should read like an authoritative, comprehensive chapter that explains the topic inside-out, heavily backed by inline references to the source notes.
 
-Do **not** use an "Outline" section. Simply use `## Synthesis` followed by logical sub-sections.
+Do **not** use an "Outline" section. Start the content with `## Emerging Topics & Key Ideas`, then use `## Synthesis` followed by logical sub-sections.
 
 Good synthesis responses usually include:
 
@@ -101,6 +103,7 @@ Good synthesis responses usually include:
 ## Quality Bar
 
 - Search or list first. Do not synthesize from memory alone.
+- Always include `## Emerging Topics & Key Ideas` as the first content section before `## Synthesis`, limited to 10 bullets.
 - **Density & Depth**: The output must be substantial. Provide a meaningful, inside-out walkthrough of the topic, not just a surface-level gloss. Be exhaustive and ensure all major topics discovered in the notes are represented.
 - **No Tags**: Do not include hashtag tags (`#tag`) within the synthesis text. Keep them empty or remove them.
 - **Headers Over Bold**: Use markdown heading syntax for sub-sections rather than bold text.
@@ -142,6 +145,9 @@ tags: []
 
 ## Subcategories
 (List the subcategories returned by `wiki list`, linked to their index.md files, e.g., `- [layer[X+1]: Subcategory](subcategory/index.md)`. If none, omit this section entirely. IMPORTANT: For non-leaf categories, make sure this subcategory list is at the very top of the page, immediately after the Layer Path.)
+
+## Emerging Topics & Key Ideas
+(Up to 10 concise bullets summarizing the most important new topics, keywords, connections, contradictions, trends, or key ideas from the category. Link directly to relevant notes, subcategories, or category pages. If there are no meaningful emerging items, write `- None`.)
 
 ## Synthesis
 (Your deep textbook-level synthesis goes here...)
