@@ -33,7 +33,8 @@ After structural validation, perform a content-aware health check:
 
 1. Read `index.md` to understand the category tree structure.
 2. Inspect a subset (or all, if small) of the generated category synthesis pages (`categories/*/index.md`) and cross-reference them with recently modified or relevant notes.
-3. Actively look for:
+3. If a category synthesis page is empty, missing its `## Synthesis` body, or contains only placeholder text, invoke `agents/synthesize.md` for that exact category before continuing semantic lint. Treat the newly synthesized category page as the current source of truth for subsequent checks.
+4. Actively look for:
    - **Contradictions**: Conflicting statements between different category pages, or between a category synthesis and its underlying source notes.
    - **Stale Claims**: Statements in the synthesis pages that have been superseded by newer notes (check dates or recent log entries).
    - **Missing Cross-references**: Important concepts mentioned in the text that should be explicitly linked (`[[Concept]]`) to their respective pages.
@@ -41,7 +42,17 @@ After structural validation, perform a content-aware health check:
    - **Cascading Synthesis Gaps**: If there are new or recently modified notes in a sub-category, verify if their new topics or insights have been incorporated into the synthesis of that category, and recursively rolled up to its parent levels (all the way up to `HOME.md`).
    - **Missing Parent Links**: Check that every non-root `index.md` synthesis page has a `parent: "[[path/to/parent/index.md|Parent Category]]"` property in its frontmatter correctly pointing to its parent category.
 
-### Phase 3: Remediation Plan
+### Phase 3: Cascading Rollup
+
+When semantic lint identifies important new or changed knowledge in a category, propagate the change upward instead of stopping at the leaf page:
+
+1. Start with the most specific affected category.
+2. Invoke `agents/synthesize.md` for that category if its synthesis is missing, empty, stale, or does not reflect the important change.
+3. Re-run `agents/synthesize.md` for each parent category in order, using the updated child category page as part of the evidence considered by the parent synthesis.
+4. Continue until the root category boundary is reached.
+5. If there is no more specific sub-category to update, or after all affected parent categories have been updated, invoke `agents/homepage.md` so `HOME.md` reflects the propagated change.
+
+### Phase 4: Remediation Plan
 
 Recommend the smallest repair action that restores both structural and semantic coherence.
 
@@ -53,4 +64,5 @@ Recommend the smallest repair action that restores both structural and semantic 
 - Call out missing source notes explicitly when logged entries point to deleted files.
 - For semantic issues, suggest specific edits to the source notes or recommend re-running the `synthesize` agent for specific categories to resolve contradictions or stale claims.
 - Empty leaf categories should usually be removed from the category tree unless there is an explicit reason to keep them as placeholders.
-- For new topics or insights discovered in sub-categories, explicitly recommend updating the synthesis of the affected category and cascading those updates up through parent levels to `HOME.md`.
+- For empty or placeholder semantic syntheses, invoke `agents/synthesize.md` for the affected category instead of only reporting the problem.
+- For new topics or insights discovered in sub-categories, update the synthesis of the affected category, cascade those updates up through each parent category, and invoke `agents/homepage.md` so the change reaches `HOME.md`.
