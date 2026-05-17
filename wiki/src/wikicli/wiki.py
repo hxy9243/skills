@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from collections import defaultdict
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
@@ -613,6 +614,7 @@ class WikiIndex:
         modified = existing.frontmatter.get("modified") if existing else None
         timestamp = _utc_now()
         summary = _compact_summary(path, child_names, notes)
+        synthesis_body = _extract_section(existing.body, "Synthesis") if existing else None
         frontmatter: dict[str, object] = {
             "category": path.display(),
             "created": created or timestamp,
@@ -636,7 +638,13 @@ class WikiIndex:
             ).as_posix()
             frontmatter["parent"] = f"[[{parent_rel}|{parent.parts[-1]}]]"
 
-        synthesis = self._category_synthesis(path, child_names, notes, summary)
+        synthesis = self._category_synthesis(
+            path,
+            child_names,
+            notes,
+            summary,
+            existing_synthesis=synthesis_body,
+        )
         meta = NoteMetadata(frontmatter, synthesis)
         rendered = meta.render()
         if existing_text is None or rendered == existing_text:
@@ -651,8 +659,10 @@ class WikiIndex:
         child_names: tuple[str, ...],
         notes: list[CatalogEntry],
         summary: str,
+        *,
+        existing_synthesis: str | None = None,
     ) -> str:
-        """Generate a compact category body."""
+        """Generate a category body while preserving richer existing synthesis text."""
         depth = len(path.parts)
         lines = [f"# layer{depth}: {path.parts[-1]}", "", "## Layer Path"]
         lines.extend(f"- layer{index}: {part}" for index, part in enumerate(path.parts, start=1))
@@ -667,13 +677,11 @@ class WikiIndex:
             lines.append("- None")
 
         lines.extend(["", "## Synthesis", ""])
-        lines.append(summary)
+        preserved = _normalize_preserved_synthesis(existing_synthesis, summary)
+        lines.extend(preserved.splitlines() if preserved else [summary])
         lines.extend(["", "## References"])
-        if notes:
-            for note in sorted(notes, key=lambda item: item.title.casefold()):
-                lines.append(f"- [[{note.source}]] - {note.summary}")
-        else:
-            lines.append("- None")
+        references = _render_references(notes)
+        lines.extend(references.splitlines() if references else ["- None"])
         return "\n".join(lines).rstrip() + "\n"
 
     def _read_events(
@@ -750,6 +758,36 @@ def _write_if_changed(path: Path, content: str) -> bool:
         return False
     path.write_text(content, encoding="utf-8")
     return True
+
+
+def _extract_section(body: str, heading: str) -> str | None:
+    match = re.search(rf"(?m)^## {re.escape(heading)}\s*$", body)
+    if not match:
+        return None
+    section = body[match.end() :]
+    next_heading = re.search(r"(?m)^##\s+", section)
+    if next_heading:
+        section = section[: next_heading.start()]
+    cleaned = section.strip()
+    return cleaned or None
+
+
+def _normalize_preserved_synthesis(existing_synthesis: str | None, summary: str) -> str:
+    if not existing_synthesis:
+        return summary
+    stripped = existing_synthesis.strip()
+    if not stripped or stripped == summary or stripped == "- None":
+        return summary
+    return stripped
+
+
+def _render_references(notes: list[CatalogEntry]) -> str:
+    if not notes:
+        return "- None"
+    lines = []
+    for note in sorted(notes, key=lambda item: item.title.casefold()):
+        lines.append(f"- [[{note.source}]] - {note.summary}")
+    return "\n".join(lines)
 
 
 def _compact_summary(

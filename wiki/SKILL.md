@@ -121,6 +121,8 @@ Small example:
 - `New Syntheses` should prefer a Dataview table built from synthesis-page metadata, especially `category`, `summary`, and `modified`.
 - Generated category pages should include stable metadata fields like `category`, `created`, `modified`, `summary`, optional `parent`, `wiki_role`, `wiki_kind`, `wiki_depth`, `wiki_note_count`, `wiki_child_count`, and `wiki_status` so downstream homepage queries can treat them as synthesis documents.
 - The `summary` field should be a short human-facing highlight of the category itself, usually one or two sentences, not a list of note titles.
+- Synthesis writing belongs to the skill and its agents, not to the deterministic Python backend. Let `wiki.py` preserve existing synthesis text and update deterministic structures like metadata, subcategory lists, and references.
+- When a category synthesis needs updating, integrate the new ideas organically into the existing `## Synthesis` prose. Do not replace the whole synthesis with a fresh rewrite unless the user explicitly asks for a full resynthesis.
 - Prefer `index` for broad refreshes and `add` for small targeted updates.
 - `lint` evaluates source synchronization (missing notes, modified notes, unindexed notes) and should also flag empty leaf categories as taxonomy cleanup candidates. Agents should enforce category hygiene when calling `add`.
 - `index` detects missing source notes, reports modified notes via source `mtime`, and rebuilds generated views.

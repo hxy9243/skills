@@ -31,15 +31,18 @@ The backend keeps this packet shape lightweight and deterministic. `wiki add` ac
 1. Read the source note carefully.
 2. Read the approved category tree from the top of `index.md` and infer the best-fitting branch to the best of your effort instead of defaulting to "Needs Review". Check `RULES.md` in the wiki root if it exists to apply any custom user rules. If you are truly not sure of the category, ask the user before adding.
 3. Normalize it into one concept packet unless there is a strong reason to split it.
-4. **Entity & Concept Page Maintenance**: Check if there is an existing synthesis or summary source note for the target category. If a concept page already exists for this topic, read it and use your file editing tools to update it by integrating any new information, nuances, or contradictions introduced by the new note.
-5. Choose the branch that would make this note easiest to rediscover later through natural search queries.
-6. Keep category paths broad and durable, but add a deeper level when a dense concept family is already forming.
-7. If the note clearly does not fit, extend the tree with the smallest necessary new subtree rather than forcing a weak placement. When adding a note to a new category that is not yet in the approved `index.md` tree, be sure to use the `--allow-undeclared` flag.
-8. Keep concept families consistent across folders. If an AI note in `10_Projects` and an AI note in `20_Subjects` belong together for search, place them together.
-9. Prefer stable concept titles over catchy phrasing.
-10. Pull reusable tags from frontmatter when available and normalize them into short search-friendly tags.
-11. **Rich Frontmatter**: Before calling the add command, ensure the source note has rich YAML frontmatter to fully leverage Obsidian tools like Dataview and Graph View. Use your file editing tools to add or update `tags`, `date` (if missing), and any relevant `entity_links` to other notes. If you updated a concept page in step 4, also ensure its `source_count` or `related_notes` is updated.
-12. Call the add command with the packet as an inline JSON string:
+4. **Entity & Concept Page Maintenance**: Check whether the target category already has a generated or maintained category synthesis page. If it exists and contains a real multi-paragraph `## Synthesis` section, treat that prose as durable content. Do not collapse it back into the short frontmatter `summary`.
+5. When new information materially strengthens an existing category synthesis, update the existing `## Synthesis` body by integrating the new idea, nuance, example, or contradiction into the current prose. Wrap new material organically into the existing synthesis instead of dropping in a detached replacement block.
+6. Treat the short `summary` field as homepage and metadata fuel only. It should remain a compact 1 to 2 sentence highlight of the category, but it must not overwrite a richer existing category synthesis body.
+7. Let the deterministic Python backend handle metadata and references only. Do not push synthesis merge logic down into `wiki.py`; synthesis upkeep belongs in the skill workflow and should be performed through deliberate file edits.
+8. Choose the branch that would make this note easiest to rediscover later through natural search queries.
+9. Keep category paths broad and durable, but add a deeper level when a dense concept family is already forming.
+10. If the note clearly does not fit, extend the tree with the smallest necessary new subtree rather than forcing a weak placement. When adding a note to a new category that is not yet in the approved `index.md` tree, be sure to use the `--allow-undeclared` flag.
+11. Keep concept families consistent across folders. If an AI note in `10_Projects` and an AI note in `20_Subjects` belong together for search, place them together.
+12. Prefer stable concept titles over catchy phrasing.
+13. Pull reusable tags from frontmatter when available and normalize them into short search-friendly tags.
+14. **Rich Frontmatter**: Before calling the add command, ensure the source note has rich YAML frontmatter to fully leverage Obsidian tools like Dataview and Graph View. Use your file editing tools to add or update `tags`, `date` (if missing), and any relevant `entity_links` to other notes. If you updated a concept page in steps 4 to 5, also ensure its `source_count` or `related_notes` is updated.
+15. Call the add command with the packet as an inline JSON string:
 
 ```bash
 uv run --directory <wiki skill path> wiki --root <notebook-root> add --json '{"title": "Note title", "summary": "One paragraph summary", "category": "Layer 1 > Layer 2 > Layer 3", "tags": ["#tag-a"], "source": "relative/path/to/note.md"}'
@@ -49,6 +52,8 @@ uv run --directory <wiki skill path> wiki --root <notebook-root> add --json '{"t
 ## Quality Bar
 
 - **Contextual Framing (5W1H)**: The summary must strictly answer: Who is involved? What is the core concept? When/Where does it apply? Why does it matter? How is it implemented or used? This captures human intent and prevents generic summaries.
+- The short packet `summary` is metadata, not a replacement for a rich category synthesis body.
+- If a category page already has a substantial `## Synthesis` section, preserve and extend it instead of flattening it into a summary stub.
 - Category path should preferably fit the approved tree, not invent brittle micro-buckets. Since the `lint` command no longer strictly rejects unapproved categories, you are responsible for maintaining category hygiene.
 - Category path should reflect retrieval intent, not just where the note happens to live in the notebook.
 - Tags should be short and reusable.

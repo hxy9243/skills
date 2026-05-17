@@ -150,6 +150,60 @@ class CliContractTests(unittest.TestCase):
         self.assertIn('wiki_note_count: 1', category_text)
         self.assertIn('tags:', category_text)
 
+    def test_rebuild_preserves_rich_category_synthesis(self) -> None:
+        self.test_add_indexes_note_and_renders_generated_files()
+        category_page = (
+            self.generated
+            / "categories"
+            / "computer-science"
+            / "ai-systems"
+            / "agents"
+            / "index.md"
+        )
+        original = category_page.read_text(encoding="utf-8")
+        compact = (
+            "Agents is a focused leaf under AI Systems. This page collects the notes "
+            "that most directly define this topic in the current wiki."
+        )
+        rich_synthesis = (
+            "Agents pages track runtime design for model-backed workers.\n\n"
+            "They emphasize how memory, tools, and prompt programs turn isolated "
+            "model calls into maintained systems."
+        )
+        category_page.write_text(
+            original.replace(f"\n{compact}\n", f"\n{rich_synthesis}\n", 1),
+            encoding="utf-8",
+        )
+        self.write_note("Notes/Reflexion.md", "# Reflexion\n\nSelf-critique loops.")
+
+        rc, payload = self.run_cli_json(
+            "add",
+            "--json",
+            json.dumps(
+                {
+                    "title": "Reflexion",
+                    "summary": "Self-critique loops for agents.",
+                    "category": "Computer Science > AI Systems > Agents",
+                    "tags": ["#agents"],
+                    "source": "Notes/Reflexion.md",
+                }
+            ),
+        )
+
+        self.assertEqual(rc, 0)
+        self.assertEqual(payload["ok"], True)
+        category_text = category_page.read_text(encoding="utf-8")
+        self.assertIn(rich_synthesis, category_text)
+        self.assertNotIn(f"\n{compact}\n", category_text)
+        self.assertIn(
+            "[[Notes/DSPy.md]] - Prompt optimization for agents.",
+            category_text,
+        )
+        self.assertIn(
+            "[[Notes/Reflexion.md]] - Self-critique loops for agents.",
+            category_text,
+        )
+
     def test_search_finds_indexed_note_content_and_metadata(self) -> None:
         self.test_add_indexes_note_and_renders_generated_files()
 

@@ -26,14 +26,17 @@ Use the active model from the invoking skill/session for any synthesis or classi
 3. Once the category tree in `index.md` is approved, treat it as the classification source of truth.
 4. For each new or changed note, spawn a classification subagent to determine its best category path against the approved tree.
 5. Parallelize that note-classification work when the batch is large, but cap concurrency at 8 subagents at a time so runs stay tractable.
-6. After notes have been classified into the approved tree, rebuild generated views:
+6. Before rebuilding generated views, inspect important existing category pages, especially branches with hand-maintained multi-paragraph syntheses. Treat those synthesis bodies as durable content, not disposable generated filler.
+7. After notes have been classified into the approved tree, rebuild generated views:
 
 ```bash
 uv run --directory <wiki skill path> wiki --root <notebook-root> index
 ```
 
-7. **Cascading Bottom-Up Synthesis**: After rebuilding, ensure that synthesis is rolled up at *each* category level. For any given category level, read the synthesis notes of its immediate depth-1 children to construct and update the synthesis of the current level. Repeat this process up to the root to create and update a `HOME.md` file that represents the top-level synthesis of the entire wiki.
-8. If notes still need classification, generate packets and feed them through `add --json` before rebuilding.
+8. **Cascading Bottom-Up Synthesis**: After rebuilding, ensure that synthesis is rolled up at *each* category level. For any given category level, read the synthesis notes of its immediate depth-1 children to construct and update the synthesis of the current level. Repeat this process up to the root to create and update a `HOME.md` file that represents the top-level synthesis of the entire wiki.
+9. When a category page already has a substantial `## Synthesis` section, preserve and update that body organically instead of replacing it with the short metadata `summary`. New ideas should be woven into the existing prose rather than dropped in as a full rewrite, unless the user explicitly wants a full resynthesis.
+10. Keep this synthesis work in the skill workflow, not in the deterministic Python backend. `wiki.py` should update metadata, references, and structure, while the agent owns narrative synthesis edits.
+11. If notes still need classification, generate packets and feed them through `add --json` before rebuilding.
 
 ## Responsibilities
 
@@ -48,6 +51,8 @@ uv run --directory <wiki skill path> wiki --root <notebook-root> index
 - If there are unindexed notes, read the approved category tree at the top of `index.md` and any custom rules in `RULES.md` to guide classification.
 - Keep hierarchy labels broad enough to survive future indexing.
 - Keep the approved category tree in `index.md` updated when genuinely new subtrees are needed.
+- Preserve existing rich category synthesis pages during rebuild-oriented workflows. Do not treat a one or two sentence summary as a full synthesis replacement.
+- When synthesis needs to evolve, revise the existing prose in place. Prefer organic integration of new material over detached appendices or complete rewrites.
 - Use the deterministic `layer1:`, `layer2:`, `layer3:`, and deeper `layerN:` labels when proposing or editing branch names.
 - For bulk indexing, use note-level subagents as the classification workers and keep the run bounded to 8 concurrent workers.
 
