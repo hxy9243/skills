@@ -147,10 +147,22 @@ class WikiIndex:
         return {"roots": roots}
 
     def add_category(self, path: str | CategoryPath) -> WikiCategoryTree:
-        """Add a category path to the tree in index.md (stub for future)."""
+        """Add a category path to the tree in index.md."""
         if isinstance(path, str):
             path = CategoryPath.parse(path)
-        # For now just return the current tree — full implementation deferred
+        self._ensure_layout()
+        tree = self.read_tree()
+        if tree.contains(path):
+            return tree
+
+        paths = set(tree.all_paths())
+        for depth in range(1, len(path.parts) + 1):
+            paths.add(CategoryPath(path.parts[:depth]))
+
+        original = self.config.index_path.read_text(encoding="utf-8")
+        tree_block = _render_tree_block(self.config.categories_dir, paths)
+        updated = _replace_tree_block(original, tree_block)
+        _write_if_changed(self.config.index_path, updated)
         return self.read_tree()
 
     # --- catalog ---
@@ -262,6 +274,8 @@ class WikiIndex:
     ) -> dict[str, Any]:
         """Apply an accepted new note: update frontmatter, append log, render views."""
         self._ensure_layout()
+        if allow_undeclared and not self.read_tree().contains(note.category):
+            self.add_category(note.category)
         source_path = self.notebook.resolve(note.source)
         changed_files: list[str] = []
         if NoteMetadata.write_category(source_path, note.category.display()):
@@ -454,7 +468,7 @@ class WikiIndex:
                     )
                 )
             try:
-                CategoryPath.parse(entry.category)
+                category = CategoryPath.parse(entry.category)
             except ValueError:
                 issues.append(
                     Issue(
@@ -464,6 +478,14 @@ class WikiIndex:
                     )
                 )
                 continue
+            if not tree.contains(category):
+                issues.append(
+                    Issue(
+                        IssueType.INVALID_CATEGORY,
+                        f"catalog category is not present in the approved tree: {entry.category}",
+                        source=source,
+                    )
+                )
 
         for source in sorted(set(notes) - set(catalog), key=str.casefold):
             issues.append(
@@ -613,7 +635,7 @@ class WikiIndex:
         created = existing.frontmatter.get("created") if existing else None
         modified = existing.frontmatter.get("modified") if existing else None
         timestamp = _utc_now()
-        summary = _compact_summary(path, child_names, notes)
+        summary = _frontmatter_string(existing, "summary")
         synthesis_body = _extract_section(existing.body, "Synthesis") if existing else None
         frontmatter: dict[str, object] = {
             "category": path.display(),
@@ -642,7 +664,6 @@ class WikiIndex:
             path,
             child_names,
             notes,
-            summary,
             existing_synthesis=synthesis_body,
         )
         meta = NoteMetadata(frontmatter, synthesis)
@@ -658,11 +679,10 @@ class WikiIndex:
         path: CategoryPath,
         child_names: tuple[str, ...],
         notes: list[CatalogEntry],
-        summary: str,
         *,
         existing_synthesis: str | None = None,
     ) -> str:
-        """Generate a category body while preserving richer existing synthesis text."""
+        """Generate deterministic category structure while preserving agent prose."""
         depth = len(path.parts)
         lines = [f"# layer{depth}: {path.parts[-1]}", "", "## Layer Path"]
         lines.extend(f"- layer{index}: {part}" for index, part in enumerate(path.parts, start=1))
@@ -677,8 +697,8 @@ class WikiIndex:
             lines.append("- None")
 
         lines.extend(["", "## Synthesis", ""])
-        preserved = _normalize_preserved_synthesis(existing_synthesis, summary)
-        lines.extend(preserved.splitlines() if preserved else [summary])
+        preserved = _preserved_synthesis(existing_synthesis)
+        lines.extend(preserved.splitlines() if preserved else ["- None"])
         lines.extend(["", "## References"])
         references = _render_references(notes)
         lines.extend(references.splitlines() if references else ["- None"])
@@ -760,6 +780,65 @@ def _write_if_changed(path: Path, content: str) -> bool:
     return True
 
 
+def _render_tree_block(categories_dir: Path, paths: set[CategoryPath]) -> str:
+    roots: dict[str, Any] = {}
+    for path in sorted(paths, key=lambda item: item.display().casefold()):
+        current = roots
+        for part in path.parts:
+            current = current.setdefault(part, {})
+
+    lines: list[str] = []
+
+    def walk(children: dict[str, Any], prefix: tuple[str, ...]) -> None:
+        for name in sorted(children, key=str.casefold):
+            path = CategoryPath((*prefix, name))
+            depth = len(path.parts)
+            indent = "  " * (depth - 1)
+            rel = category_page_path(categories_dir, path).relative_to(
+                categories_dir.parent
+            ).as_posix()
+            lines.append(f"{indent}- layer{depth}: [{name}]({rel})")
+            walk(children[name], path.parts)
+
+    walk(roots, ())
+    return "\n".join(lines) if lines else "- None"
+
+
+def _replace_tree_block(index_text: str, tree_block: str) -> str:
+    marker = "## Category Tree"
+    if marker not in index_text:
+        return (
+            "# Wiki Index\n\n"
+            "## Category Tree\n\n"
+            f"{tree_block}\n\n"
+            "---\n\n"
+            "## Skipped System Notes\n- None\n"
+        )
+    before_header, after_marker = index_text.split(marker, 1)
+    body, separator, after_separator = after_marker.partition("\n---\n")
+    prefix_lines = body.splitlines()
+    intro_lines: list[str] = []
+    seen_tree = False
+    for line in prefix_lines:
+        stripped = line.strip()
+        if stripped.startswith("- layer") or stripped == "- None":
+            seen_tree = True
+            continue
+        if seen_tree:
+            continue
+        intro_lines.append(line)
+    intro = "\n".join(intro_lines).strip()
+    replacement = f"{before_header}{marker}\n\n"
+    if intro:
+        replacement += f"{intro}\n\n"
+    replacement += f"{tree_block}\n"
+    if separator:
+        replacement += f"\n---\n{after_separator}"
+    else:
+        replacement += "\n---\n\n## Skipped System Notes\n- None\n"
+    return replacement
+
+
 def _extract_section(body: str, heading: str) -> str | None:
     match = re.search(rf"(?m)^## {re.escape(heading)}\s*$", body)
     if not match:
@@ -772,13 +851,17 @@ def _extract_section(body: str, heading: str) -> str | None:
     return cleaned or None
 
 
-def _normalize_preserved_synthesis(existing_synthesis: str | None, summary: str) -> str:
+def _frontmatter_string(metadata: NoteMetadata | None, key: str) -> str:
+    if metadata is None:
+        return ""
+    value = metadata.frontmatter.get(key)
+    return value if isinstance(value, str) else ""
+
+
+def _preserved_synthesis(existing_synthesis: str | None) -> str:
     if not existing_synthesis:
-        return summary
-    stripped = existing_synthesis.strip()
-    if not stripped or stripped == summary or stripped == "- None":
-        return summary
-    return stripped
+        return ""
+    return existing_synthesis.strip()
 
 
 def _render_references(notes: list[CatalogEntry]) -> str:
@@ -788,36 +871,3 @@ def _render_references(notes: list[CatalogEntry]) -> str:
     for note in sorted(notes, key=lambda item: item.title.casefold()):
         lines.append(f"- [[{note.source}]] - {note.summary}")
     return "\n".join(lines)
-
-
-def _compact_summary(
-    path: CategoryPath,
-    child_names: tuple[str, ...],
-    notes: list[CatalogEntry],
-) -> str:
-    """Generate a short human-facing summary for one category page."""
-    title = path.parts[-1]
-    parent = path.parts[-2] if len(path.parts) > 1 else None
-    if not notes and child_names:
-        if parent:
-            return f"{title} is a branching area under {parent}. This page groups nearby subtopics but still needs a stronger synthesis."
-        return f"{title} is a branching area in the wiki. This page groups nearby subtopics but still needs a stronger synthesis."
-    if not notes:
-        return f"{title} is currently thin and should either be populated with real notes or folded back into a stronger neighboring category."
-
-    if child_names:
-        if title == "AI Agents":
-            return "AI Agents tracks how language-model systems become managed runtimes with memory, tools, retrieval, skills, and operational structure. The strongest notes here are about harness design and the shift from demos to maintained agent systems."
-        if title == "AI Systems":
-            return "AI Systems covers the production layer around models, especially inference, infrastructure, deployment, and training economics. It is the best place to read the vault as an operating stack rather than a set of isolated papers."
-        if title == "Machine Learning":
-            return "Machine Learning links theory, model behavior, language models, and systems concerns into one continuous layer. It helps connect abstract learning ideas to the practical realities of modern model building."
-        if title == "Computer Systems":
-            return "Computer Systems is the grounding layer for the vault. It keeps the AI material honest by emphasizing state, coordination, latency, reliability, and infrastructure constraints."
-        if title == "Knowledge Systems":
-            return "Knowledge Systems focuses on retrieval, indexing, memory structure, and information control. The recurring theme is that good recall depends as much on selection and organization as on search itself."
-        return f"{title} is a synthesis branch that gathers related notes into a broader conceptual area. Use it to understand the main subject first, then drill down into the more specific subcategories."
-
-    if parent:
-        return f"{title} is a focused leaf under {parent}. This page collects the notes that most directly define this topic in the current wiki."
-    return f"{title} is a focused synthesis page for one concrete topic cluster in the wiki."

@@ -41,9 +41,9 @@ When instructed to generate the homepage, perform the following steps:
    TABLE
    category as Category,
    summary as Summary,
-   file.mtime as Updated
+   modified as Updated
    FROM "_WIKI/categories"
-   SORT date(Updated) DESC
+   SORT date(modified) DESC
    LIMIT 30
    ```
 
@@ -55,6 +55,7 @@ When instructed to generate the homepage, perform the following steps:
 
    ```dataview
    TABLE created, category
+   FROM -"_WIKI"
    WHERE category != null AND file.name != "index"
    SORT date(created) DESC
    LIMIT 50

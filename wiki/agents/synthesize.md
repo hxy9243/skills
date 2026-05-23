@@ -103,7 +103,7 @@ Good synthesis responses usually include:
 ## Quality Bar
 
 - Search or list first. Do not synthesize from memory alone.
-- Always include `## Emerging Topics & Key Ideas` as the first content section before `## Synthesis`, limited to 10 bullets.
+- For standalone synthesis output, include `## Emerging Topics & Key Ideas` as the first content section before `## Synthesis`, limited to 10 bullets. For generated category-page edits, keep the backend-owned page shape and merge those ideas into the `## Synthesis` body unless the page already has a dedicated emerging-topics section.
 - **Density & Depth**: The output must be substantial. Provide a meaningful, inside-out walkthrough of the topic, not just a surface-level gloss. Be exhaustive and ensure all major topics discovered in the notes are represented.
 - **No Tags**: Do not include hashtag tags (`#tag`) within the synthesis text. Keep them empty or remove them.
 - **Headers Over Bold**: Use markdown heading syntax for sub-sections rather than bold text.
@@ -123,9 +123,17 @@ Good synthesis responses usually include:
 
 # Result Output
 
-By default, if it's a synthesis for a given category in the tree, you are responsible for writing the **entire** `path/to/category/index.md` file. The CLI no longer generates this file automatically. 
+For a synthesis for a category already in the tree, the Python backend owns the generated category page skeleton. It creates and refreshes `path/to/category/index.md`, including frontmatter, layer path, subcategories, and references. Your primary job is to update the category page's narrative `## Synthesis` section, and to preserve or improve any existing rich prose.
 
-You MUST use `uv run --directory <wiki skill path> wiki --root <notebook-root> list "Category > Path"` to retrieve the exact `subcategories` and `entries` (references), and then format the full `index.md` file using this structure:
+Before editing a generated category page:
+
+1. Run `uv run --directory <wiki skill path> wiki --root <notebook-root> list "Category > Path" --recursive --include-body` to retrieve the relevant source notes.
+2. Read the existing generated category page directly.
+3. Keep the backend-owned structure intact unless the user explicitly requests a full page rewrite.
+4. Replace or revise only the `## Synthesis` body when possible. If there is already a substantial synthesis, merge new ideas into it organically rather than replacing it wholesale.
+5. Leave deterministic sections such as `## Layer Path`, `## Subcategories`, and `## References` to the backend unless you are correcting a clear backend defect.
+
+Generated category pages normally follow this backend-owned structure:
 
 ```markdown
 ---
@@ -146,21 +154,18 @@ tags: []
 ## Subcategories
 (List the subcategories returned by `wiki list`, linked to their index.md files, e.g., `- [layer[X+1]: Subcategory](subcategory/index.md)`. If none, omit this section entirely. IMPORTANT: For non-leaf categories, make sure this subcategory list is at the very top of the page, immediately after the Layer Path.)
 
-## Emerging Topics & Key Ideas
-(Up to 10 concise bullets summarizing the most important new topics, keywords, connections, contradictions, trends, or key ideas from the category. Link directly to relevant notes, subcategories, or category pages. If there are no meaningful emerging items, write `- None`.)
-
 ## Synthesis
-(Your deep textbook-level synthesis goes here...)
+(Agent-maintained deep textbook-level synthesis goes here...)
 
 ## References
-(List the entries returned by `wiki list` in alphabetical order. Format: `- [[Note Path]] - summary (tags)`. If none, output `- None`)
+(Backend-maintained note references.)
 ```
 
-If it is a top-level synthesis (the entire wiki or notebook), save the result to a `HOME.md` file at the root level, and omit the `parent` property in the frontmatter.
+If it is a top-level synthesis for the entire wiki or notebook, invoke `agents/homepage.md` and write the result to `HOME.md` at the notebook root. Do not add a `parent` property to the homepage frontmatter.
 
 For generated category syntheses, the `summary` frontmatter is mandatory. It should be compact, human-facing, and Dataview-friendly: one or two sentences that explain why the category matters or what it covers. Do not turn the summary into a roll call of note titles.
 
-If the topic is not covered in the category tree, you can propose and write a new `path/to/category/index.md` file using the template above, and the user can later manually add it to the root category tree structure.
+If the topic is not covered in the category tree, propose the smallest necessary tree addition first. After the tree is accepted and regenerated with `wiki index`, synthesize into the generated page. Do not create free-floating generated category pages that are absent from the approved tree.
 
 If the result is not necessarily matching a category (e.g. a synthesis across different categories) you can save the results into a new note in the appropriate category.
 

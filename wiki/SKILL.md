@@ -37,19 +37,22 @@ Based on user intent, choose one of the following agent to dispatch the workflow
 1. `agents/setup.md`
 Use when the task is to establish the wiki for the first time by proposing an initial category tree.
 
-1. `agents/add.md`
+2. `agents/add.md`
 Use for targeted note ingestion or when the user wants to add a few notes into the wiki. The agent will also maintain existing concept pages by integrating new information and noting contradictions.
 
-2. `agents/index.md`
+3. `agents/index.md`
 Use for notebook-wide or folder-wide indexing, incremental refreshes, and rebuilds.
 
-3. `agents/search.md`
+4. `agents/search.md`
 Use when the user wants answers or browsing help from the generated wiki.
 
-4. `agents/synthesize.md`
+5. `agents/synthesize.md`
 Use when the user wants a synthesized presentation of a topic assembled from matching notes. The agent can save valuable syntheses back into the user's notebook as new source notes to compound knowledge over time.
 
-5. `agents/lint.md`
+6. `agents/homepage.md`
+Use when the user wants to create or refresh the human-facing `HOME.md`, especially after indexing, synthesis rollups, or lint remediation.
+
+7. `agents/lint.md`
 Use when the user wants validation, cleanup guidance, or integrity checks.
 
 ## Config Contract
@@ -88,13 +91,13 @@ Model choice is not part of the backend config. Subagents should inherit the act
 The generated wiki should default to three hierarchy layers before note leaves, but may add deeper layers when a branch gets crowded or a concept is clearly dense enough to deserve a finer split.
 
 Rule of thumb:
-- Keep each level to roughly 5-20 children.
+- Keep each level to roughly 5-15 children.
 - Prefer broad, durable buckets over narrow one-off branches.
 - Prefer real topics over generic buckets like `Research`, `Papers`, `General`, or `Misc`.
 - Do not shoehorn notes into an existing branch when they point to a clearer topical subtree.
 - Treat fallback branches as explicit review queues, not as real long-term categories.
 - Expand the tree only when a concept clearly does not fit an existing branch.
-- If a branch grows past roughly 20 direct children, or multiple notes form a clear dense cluster, add another layer instead of leaving an overloaded bucket.
+- If a branch grows past roughly 15 direct children, or multiple notes form a clear dense cluster, add another layer instead of leaving an overloaded bucket.
 - Consolidate overlapping systems buckets when they reflect the same browsing intent.
 - Prefix each category row with its depth marker so the tree stays machine- and prompt-friendly.
 
@@ -120,7 +123,7 @@ Small example:
 - When rendering the homepage tree, derive it from the backend `wiki tree` command rather than hand-writing or improvising a parallel structure.
 - `New Syntheses` should prefer a Dataview table built from synthesis-page metadata, especially `category`, `summary`, and `modified`.
 - Generated category pages should include stable metadata fields like `category`, `created`, `modified`, `summary`, optional `parent`, `wiki_role`, `wiki_kind`, `wiki_depth`, `wiki_note_count`, `wiki_child_count`, and `wiki_status` so downstream homepage queries can treat them as synthesis documents.
-- The `summary` field should be a short human-facing highlight of the category itself, usually one or two sentences, not a list of note titles.
+- The `summary` field is agent-maintained. The Python backend preserves it but does not generate semantic summary text. Agents should keep it as a short human-facing highlight of the category itself, usually one or two sentences, not a list of note titles.
 - Synthesis writing belongs to the skill and its agents, not to the deterministic Python backend. Let `wiki.py` preserve existing synthesis text and update deterministic structures like metadata, subcategory lists, and references.
 - When a category synthesis needs updating, integrate the new ideas organically into the existing `## Synthesis` prose. Do not replace the whole synthesis with a fresh rewrite unless the user explicitly asks for a full resynthesis.
 - Prefer `index` for broad refreshes and `add` for small targeted updates.

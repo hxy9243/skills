@@ -32,19 +32,21 @@ You can interact with the wiki natively through the agent using natural language
 - `HOME.md`: the human-facing homepage in the notebook root
 - `index.md`: the approved category tree and note placement index
 - `log.md`: append-only add/remove/lint history
-- `categories/`: one generated synthesis page per category node, each with frontmatter metadata like `category`, `created`, `modified`, `summary`, `parent`, `wiki_role`, `wiki_kind`, `wiki_note_count`, and `wiki_child_count`
+- `categories/`: one generated synthesis page per category node, each with deterministic frontmatter metadata like `category`, `created`, `modified`, `parent`, `wiki_role`, `wiki_kind`, `wiki_note_count`, and `wiki_child_count`, plus agent-maintained fields like `summary`
 - `config.json`: notebook-local configuration, typically stored under `_WIKI/`
 - `RULES.md`: category rules, notes, exceptions and overrides from user.
 
 ## Commands
 
 ```bash
-uv run wiki add --packet '{"title":"Delegation","summary":"Delegate work to smaller agents for bounded tasks.","category":"Computer Science > AI Systems > Agents","tags":["#agents"],"source":"Notes/Delegation.md"}'
-uv run wiki index
-uv run wiki search "query"
-uv run wiki synthesize --category "Computer Science > Artificial Intelligence > AI Agents"
-uv run wiki lint
+uv run --directory <wiki skill path> wiki --root <notebook-root> add --json '{"title":"Delegation","summary":"Delegate work to smaller agents for bounded tasks.","category":"Computer Science > AI Systems > Agents","tags":["#agents"],"source":"Notes/Delegation.md"}'
+uv run --directory <wiki skill path> wiki --root <notebook-root> index
+uv run --directory <wiki skill path> wiki --root <notebook-root> search "query"
+uv run --directory <wiki skill path> wiki --root <notebook-root> list "Computer Science > Artificial Intelligence > AI Agents" --recursive --include-body
+uv run --directory <wiki skill path> wiki --root <notebook-root> lint
 ```
+
+`add` accepts one packet argument via `--json`.
 
 ## Testing
 
@@ -117,6 +119,19 @@ The backend resolves config in this order:
 
 Use [`templates/config.json.example`](./templates/config.json.example) as the starter template.
 
+## Blank Notebook Onboarding
+
+1. Create `_WIKI/config.json` from [`templates/config.json.example`](./templates/config.json.example), setting `notebook_root`, `generated_root`, included note folders, and exclusions.
+2. Ask the agent to run setup, for example: `@wiki set up this notebook and propose a category tree`.
+3. Review and approve the category tree written at the top of `_WIKI/index.md`.
+4. Run `uv run --directory <wiki skill path> wiki --root <notebook-root> index` to generate the deterministic index and category page skeletons.
+5. Ask `@wiki synthesize <category>` for important branches so the agent fills the generated category pages with rich `## Synthesis` prose while the backend preserves metadata, subcategories, and references.
+6. Ask `@wiki homepage` to create or refresh `HOME.md`.
+
+## Obsidian Dataview
+
+The generated homepage is readable as Markdown, but its `New Syntheses` and `Recent Notes` sections are designed to render best with the Obsidian Dataview community plugin installed. Without Dataview, those sections appear as normal fenced code blocks.
+
 ## Homepage Preferences
 
 - Write the human-facing homepage to `HOME.md` in the notebook root, not under `_WIKI/`.
@@ -124,6 +139,7 @@ Use [`templates/config.json.example`](./templates/config.json.example) as the st
 - Render the homepage tree from the deterministic `wiki tree` backend command, not from a hand-written parallel structure.
 - Prefer tables mainly for `New Syntheses` and `Recent Notes`, not every section.
 - For `New Syntheses`, prefer a Dataview table that uses `category`, `summary`, and `modified` from generated synthesis metadata.
+- For `Recent Notes`, scope Dataview with `FROM -"_WIKI"` so generated wiki files never appear in source-note recency lists.
 
 ## Generated Category Page Metadata
 
@@ -133,7 +149,7 @@ Expected metadata includes:
 - `category`: canonical display path like `Computer Science > Artificial Intelligence > AI Agents`
 - `created`: first generation timestamp, preserved across rebuilds when possible
 - `modified`: latest regeneration timestamp
-- `summary`: a short human-facing highlight of the category, usually one or two sentences
+- `summary`: agent-maintained short human-facing highlight of the category, usually one or two sentences; the backend preserves it but does not generate semantic summary text
 - `parent`: optional relative wiki link to the immediate parent category page
 - `tags`: include at least `#wiki` and `#synthesis`
 - `wiki_role: synthesis`
@@ -143,18 +159,18 @@ Expected metadata includes:
 - `wiki_child_count`: integer count of direct child categories
 - `wiki_status`: `active` or `empty`
 
-This metadata exists to support cleaner Dataview queries, better browsing, and future promotion logic for homepage sections like `New Syntheses`. In particular, `summary` is meant to power homepage tables without forcing manual annotation.
+This metadata exists to support cleaner Dataview queries, better browsing, and future promotion logic for homepage sections like `New Syntheses`. The `summary` field powers homepage tables after an agent has written it; the deterministic backend leaves it empty until then.
 
 ## Category Rules
 
 If the user has specific classification preferences, they should be documented in `RULES.md` in the wiki root. Subagents should consult `RULES.md` alongside the approved category tree when classifying notes.
 
 - Keep three layers as the default starting point, but add deeper layers when a branch gets crowded or conceptually dense.
-- Aim for roughly 5-10 children per layer.
+- Aim for roughly 5-15 children per layer.
 - Prefer durable topic branches over generic buckets like `Research`, `Papers`, `General`, or `Misc`.
 - Do not shoehorn notes into an existing branch when the note clearly points to a better topic-shaped subtree.
 - Treat fallback branches as review queues only. Reclassify them into topic branches as soon as the right subtree is clear.
-- Split branches once they pass roughly 12 direct children or clearly contain subclusters.
+- Split branches once they pass roughly 15 direct children or clearly contain subclusters.
 - Consolidate overlapping systems buckets when they represent the same browsing intent.
 - Prefer retrieval-first grouping over folder-first grouping. Notes from different source folders can still belong in the same concept subtree.
 

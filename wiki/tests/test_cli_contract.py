@@ -150,6 +150,72 @@ class CliContractTests(unittest.TestCase):
         self.assertIn('wiki_note_count: 1', category_text)
         self.assertIn('tags:', category_text)
 
+    def test_add_allow_undeclared_expands_tree_before_rebuild(self) -> None:
+        self.write_note("Notes/Tools.md", "# Tools\n\nTool use for agents.")
+        packet = json.dumps(
+            {
+                "title": "Tools",
+                "summary": "Tool use for agents.",
+                "category": "Computer Science > AI Systems > Tools",
+                "tags": ["#agents"],
+                "source": "Notes/Tools.md",
+            }
+        )
+
+        rejected_rc, rejected_payload = self.run_cli_json("add", "--json", packet)
+        accepted_rc, accepted_payload = self.run_cli_json(
+            "add", "--json", packet, "--allow-undeclared"
+        )
+
+        self.assertEqual(rejected_rc, 1)
+        self.assertEqual(
+            rejected_payload["issues"][0]["code"], "category_not_approved"
+        )
+        self.assertEqual(accepted_rc, 0)
+        self.assertEqual(accepted_payload["ok"], True)
+        self.assertIn(
+            "- layer3: [Tools](categories/computer-science/ai-systems/tools/index.md)",
+            (self.generated / "index.md").read_text(encoding="utf-8"),
+        )
+        self.assertTrue(
+            (
+                self.generated
+                / "categories"
+                / "computer-science"
+                / "ai-systems"
+                / "tools"
+                / "index.md"
+            ).exists()
+        )
+
+    def test_lint_flags_catalog_category_outside_tree(self) -> None:
+        note = self.write_note("Notes/Tools.md", "# Tools\n\nTool use for agents.")
+        self.generated.joinpath("log.md").write_text(
+            "# Wiki Log\n\n"
+            "- "
+            + json.dumps(
+                {
+                    "timestamp": "2026-05-23T00:00:00Z",
+                    "action": "add",
+                    "title": "Tools",
+                    "summary": "Tool use for agents.",
+                    "category": "Computer Science > AI Systems > Tools",
+                    "tags": ["#agents"],
+                    "source": "Notes/Tools.md",
+                    "source_mtime_ns": note.stat().st_mtime_ns,
+                },
+                sort_keys=True,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+        rc, payload = self.run_cli_json("lint", "--filter", "invalid_category")
+
+        self.assertEqual(rc, 1)
+        self.assertEqual(payload["issues"][0]["code"], "invalid_category")
+        self.assertIn("not present", payload["issues"][0]["message"])
+
     def test_rebuild_preserves_rich_category_synthesis(self) -> None:
         self.test_add_indexes_note_and_renders_generated_files()
         category_page = (
@@ -161,17 +227,18 @@ class CliContractTests(unittest.TestCase):
             / "index.md"
         )
         original = category_page.read_text(encoding="utf-8")
-        compact = (
-            "Agents is a focused leaf under AI Systems. This page collects the notes "
-            "that most directly define this topic in the current wiki."
-        )
+        compact = "- None"
         rich_synthesis = (
             "Agents pages track runtime design for model-backed workers.\n\n"
             "They emphasize how memory, tools, and prompt programs turn isolated "
             "model calls into maintained systems."
         )
         category_page.write_text(
-            original.replace(f"\n{compact}\n", f"\n{rich_synthesis}\n", 1),
+            original.replace(
+                f"## Synthesis\n\n{compact}\n",
+                f"## Synthesis\n\n{rich_synthesis}\n",
+                1,
+            ),
             encoding="utf-8",
         )
         self.write_note("Notes/Reflexion.md", "# Reflexion\n\nSelf-critique loops.")
@@ -194,7 +261,7 @@ class CliContractTests(unittest.TestCase):
         self.assertEqual(payload["ok"], True)
         category_text = category_page.read_text(encoding="utf-8")
         self.assertIn(rich_synthesis, category_text)
-        self.assertNotIn(f"\n{compact}\n", category_text)
+        self.assertNotIn(f"## Synthesis\n\n{compact}\n", category_text)
         self.assertIn(
             "[[Notes/DSPy.md]] - Prompt optimization for agents.",
             category_text,

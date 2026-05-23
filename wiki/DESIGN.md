@@ -34,9 +34,9 @@ The implementation should be designed from first principles, but kept small. Avo
 - `log.md` remains append-only event history, stored as one JSON object per markdown bullet line.
 - Commands must print valid JSON on both success and known integrity failures.
 - Command ordering must be stable: paths sorted by normalized POSIX path, categories sorted by normalized display name, search ties sorted by source path.
-- The backend must never invent semantic categories or summaries.
+- The backend must never invent semantic categories, summaries, or synthesis prose. It preserves agent-authored summary fields and synthesis sections while rendering deterministic structure.
 - `lint` should be read-only. Automated repair is out of scope for the first rewrite.
-- Existing command names should keep working: `add`, `index`, `reconcile`, `search`, `synthesize`, `lint`.
+- Existing command names should keep working: `add`, `index`, `tree`, `list`, `search`, and `lint`. Removed legacy commands such as `reconcile` and `synthesize` should fail parsing.
 
 ## Review Of Current Implementation
 
@@ -394,7 +394,7 @@ Do not update frontmatter, append events, or rewrite generated pages from `lint`
 
 ### Existing commands to preserve
 
-- `wiki add --packet JSON`
+- `wiki add --json JSON`
   - Parse packet.
   - Validate source exists and is inside notebook.
   - Validate category path against approved leaf paths.
@@ -403,7 +403,7 @@ Do not update frontmatter, append events, or rewrite generated pages from `lint`
   - Rebuild generated artifacts.
   - Return added packet, changed files, issues, and indexed count.
 
-- `wiki index` / `wiki reconcile`
+- `wiki index`
   - Scan notebook.
   - Replay catalog.
   - Append remove events for missing indexed notes only if this behavior is intentionally retained.
@@ -415,8 +415,9 @@ Do not update frontmatter, append events, or rewrite generated pages from `lint`
   - Return merged results with hierarchy, reasons, snippets, and stable score.
   - Return non-zero only when no results or fatal input/config error.
 
-- `wiki synthesize`
-  - Return a deterministic note bundle for agent synthesis.
+- `wiki list [CATEGORY] --recursive --include-body`
+  - Return subcategories and catalog entries for browsing or agent synthesis.
+  - Include cleaned source-note body text when requested.
   - This command should not produce prose synthesis itself.
 
 - `wiki lint`
@@ -442,7 +443,7 @@ Future TODO:
 
 - Back up the original implementation, for example to `src/wikicli_old/` or an ignored archive directory.
 - Back up or copy current tests before replacing them.
-- Capture expected JSON behavior for `add`, `index`/`reconcile`, `search`, `synthesize`, and `lint`.
+- Capture expected JSON behavior for `add`, `index`, `tree`, `list`, `search`, and `lint`.
 - Treat old code as read-only reference, not as source to refactor.
 
 Review gate:

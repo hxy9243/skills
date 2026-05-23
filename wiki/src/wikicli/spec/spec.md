@@ -120,12 +120,12 @@ readable markdown output unless `--format json` is passed.
 Adds one classified packet to the wiki.
 
 ```bash
-wiki add --packet '{"title":"DSPy","summary":"Prompt optimization","category":"Computer Science > AI Systems","tags":["#ai"],"search_terms":["dspy"],"source":"Notes/DSPy.md"}'
+wiki add --json '{"title":"DSPy","summary":"Prompt optimization","category":"Computer Science > AI Systems","tags":["#ai"],"search_terms":["dspy"],"source":"Notes/DSPy.md"}'
 ```
 
 Options:
 
-- `--packet`: required JSON object.
+- `--json`: required JSON object.
 - `--allow-undeclared`: allow a packet category outside the approved leaf
   category tree.
 
@@ -155,14 +155,6 @@ Behavior:
 - Reports modified and unindexed notes.
 - Rebuilds `index.md` and category pages.
 
-### `wiki reconcile`
-
-Alias for `wiki index`.
-
-```bash
-wiki reconcile
-```
-
 ### `wiki search`
 
 Searches indexed wiki notes.
@@ -184,25 +176,25 @@ Behavior:
 - Returns ranked JSON results.
 - Exits with code `1` when no results are found.
 
-### `wiki synthesize`
+### `wiki list`
 
-Returns a deterministic note bundle for agent-written synthesis.
+Returns catalog entries and optional note bodies for agent-written synthesis.
 
 ```bash
-wiki synthesize --category "Computer Science > AI Systems" --tag '#ai' --limit 10 --include-body
+wiki list "Computer Science > AI Systems" --recursive --include-body
 ```
 
 Options:
 
-- `--category`: filter by exact category display string.
-- `--tag`: repeatable tag filter.
-- `--limit`: maximum entries, default `10`.
+- `category`: optional category display string.
+- `--recursive`: include all entries under the category subtree.
+- `--limit`: maximum entries.
 - `--include-body`: include cleaned source-note body text.
 
 Behavior:
 
 - Reads active catalog entries.
-- Applies category and tag filters.
+- Returns direct child categories and matching entries.
 - Optionally loads cleaned note bodies for downstream synthesis.
 
 ### `wiki lint`
@@ -543,4 +535,3 @@ The most important contract tests should cover:
 - generated index/category rendering.
 - search ranking determinism.
 - lint issue reporting.
-

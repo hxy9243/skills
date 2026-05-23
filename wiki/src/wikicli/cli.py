@@ -35,7 +35,10 @@ def build_parser() -> argparse.ArgumentParser:
         "add", help="Add one classified note to the wiki"
     )
     add_parser.add_argument(
-        "--json", dest="json_packet", required=True, help="NewNote JSON object"
+        "--json",
+        dest="json_packet",
+        required=True,
+        help="NewNote JSON object",
     )
     add_parser.add_argument(
         "--allow-undeclared",

@@ -14,12 +14,7 @@ Use the active model from the invoking skill/session for any synthesis or classi
 2. On the first run for a notebook, do setup before indexing:
 - Read a representative sample of notes.
 - Propose a category tree that can fit the full notebook.
-- Start with three layers, with roughly 5-10 children per level, then add deeper layers when a branch is crowded or conceptually dense.
-- Prefer a retrieval-first tree: group notes the way a user would expect to search or browse for them later.
-- Prefer topic-shaped branches over generic buckets like `Research`, `General`, `Papers`, or `Misc`.
-- Do not shoehorn notes into an existing branch when the note clearly deserves a better subtree.
-- If a note still does not fit, place it in a review queue branch and revisit the tree. Do not leave it in a broad catch-all permanently.
-- If two parallel branches mostly hold the same kind of notes, consolidate them under a shared parent instead of preserving accidental distinctions.
+- Apply the taxonomy rules from `SKILL.md` under `Hierarchy Shape`; do not duplicate or override those limits here.
 - Put that tree at the top of `index.md`, above a `---` separator.
 - Ask the user to approve the tree before continuing to whole-repo indexing.
 - Use `templates/category_tree.md.example` as the starting tree block, then paste it into the top of `index.md`.
@@ -43,10 +38,7 @@ uv run --directory <wiki skill path> wiki --root <notebook-root> index
 - Decide whether a user request is best served by `add` or `index`.
 - For first-time setup, force taxonomy design before whole-notebook indexing.
 - Surface category collisions, poor bucket names, or overloaded branches.
-- Replace broad catch-all branches when the underlying notes naturally split into clearer topical branches.
-- Split overloaded branches when they exceed roughly 12 direct children or when the notes form obvious subclusters.
-- Consolidate parallel branches when users would search them as one idea cluster.
-- Prefer concept consistency across source folders. A topic family should usually live in one subtree even if notes came from projects, inbox, and subject folders.
+- Apply the shared taxonomy hygiene rules from `SKILL.md` consistently, including branch splitting, consolidation, and review queue handling.
 - Run `uv run --directory <wiki skill path> wiki --root <notebook-root> lint` to discover all unindexed notes.
 - If there are unindexed notes, read the approved category tree at the top of `index.md` and any custom rules in `RULES.md` to guide classification.
 - Keep hierarchy labels broad enough to survive future indexing.
