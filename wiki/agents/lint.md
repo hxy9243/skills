@@ -4,9 +4,9 @@ Use this workflow when the user wants validation, cleanup guidance, or confidenc
 
 ## Goal
 
-Run deterministic checks first, then perform a semantic health check of the wiki content. Turn the combined results into a short remediation plan.
+Run deterministic checks first, perform a semantic health check of the wiki content, and actively execute all necessary repair actions to restore structural and semantic coherence.
 
-Use the active model from the invoking skill/session if you summarize findings, but keep all validation logic in the `wikicli` python package and rely on search tools for semantic checks.
+Use the active model from the invoking skill/session to summarize findings and execute remediation, but keep all validation logic in the `wikicli` python package and rely on search tools for semantic checks.
 
 ## Workflow
 
@@ -52,17 +52,23 @@ When semantic lint identifies important new or changed knowledge in a category, 
 4. Continue until the root category boundary is reached.
 5. If there is no more specific sub-category to update, or after all affected parent categories have been updated, invoke `agents/homepage.md` so `HOME.md` reflects the propagated change.
 
-### Phase 4: Remediation Plan
+### Phase 4: Execute Remediation
 
-Recommend the smallest repair action that restores both structural and semantic coherence.
+Do not stop after identifying issues or simply proposing a remediation plan. Actively execute the necessary repairs to restore both structural and semantic coherence:
 
-## Preferred Remediation Guidance
+1. **Rebuild Indexes**: If the deterministic report flags that indices are out of sync or category pages need rebuilding, run:
+   ```bash
+   uv run --directory <wiki skill path> wiki --root <notebook-root> index
+   ```
+2. **Reclassify/Add Notes**: If notes exist but are unclassified, or if notes have been modified and need their classification refreshed or re-logged, run the `agents/add.md` workflow for those notes (or invoke the corresponding `wiki add` command).
+3. **Handle Deleted Notes**: If there are missing source notes (i.e. logged entries pointing to deleted files), remove their references from `log.md` and rebuild the indexes to reflect the deletion.
+4. **Fix Semantic Gaps & Contradictions**:
+   - For empty or placeholder syntheses, invoke `agents/synthesize.md` for the affected category.
+   - For contradictory or stale statements, trace the source notes to determine the ground truth, update the source notes if necessary, and re-run `agents/synthesize.md` for the category.
+5. **Resolve Orphan Pages & Cross-references**:
+   - Edit the relevant notes/category pages to add missing `[[Concept]]` or `[[Note Title]]` wiki links, ensuring all pages are well-connected.
+6. **Propagate Cascading Rollups**:
+   - If changes were made to sub-category syntheses, invoke `agents/synthesize.md` upward for each parent category sequentially, then invoke `agents/homepage.md` to refresh `HOME.md`.
+7. **Prune Empty Categories**: Remove empty leaf categories from the approved tree in `index.md` and delete their generated folders/files, unless there is a specific reason to keep them.
 
-- Suggest `index` when generated category pages or `index.md` need rebuilding, or when removed notes need to be recorded.
-- Suggest `add --json` when a note was modified and should be reclassified or refreshed in the log.
-- Suggest `add --json` when notes exist but have not been classified.
-- Call out missing source notes explicitly when logged entries point to deleted files.
-- For semantic issues, suggest specific edits to the source notes or recommend re-running the `synthesize` agent for specific categories to resolve contradictions or stale claims.
-- Empty leaf categories should usually be removed from the category tree unless there is an explicit reason to keep them as placeholders.
-- For empty or placeholder semantic syntheses, invoke `agents/synthesize.md` for the affected category instead of only reporting the problem.
-- For new topics or insights discovered in sub-categories, update the synthesis of the affected category, cascade those updates up through each parent category, and invoke `agents/homepage.md` so the change reaches `HOME.md`.
+Once remediation is complete, provide the user with a concise summary of the executed actions and the resolved issues.
