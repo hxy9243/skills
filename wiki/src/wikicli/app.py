@@ -183,7 +183,7 @@ class WikiCli:
             else 0,
         )
 
-    def tree(self) -> CommandResult:
+    def tree(self, *, depth: int | None = None) -> CommandResult:
         """Return a deterministic category tree derived from wiki state."""
         index = WikiIndex(self.config, self._notebook)
-        return CommandResult(True, "tree", data=index.tree())
+        return CommandResult(True, "tree", data=index.tree(depth=depth))

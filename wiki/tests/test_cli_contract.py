@@ -436,10 +436,12 @@ class CliContractTests(unittest.TestCase):
 
         self.assertEqual(first_rc, 0)
         self.assertEqual(second_rc, 0)
-        self.assertEqual(first_payload["data"]["changed_files"], ["_WIKI/index.md"])
+        self.assertEqual(first_payload["data"]["changed_files"], [])
         self.assertEqual(second_payload["data"]["changed_files"], [])
 
-    def test_add_and_index_refresh_homepage(self) -> None:
+    def test_python_backend_never_writes_homepage(self) -> None:
+        homepage = self.notebook / "HOME.md"
+        homepage.write_text("# Human homepage\n\nKeep me.\n", encoding="utf-8")
         self.write_note("Notes/DSPy.md", "# DSPy\n\nPrompt optimization for agents.")
 
         rc, payload = self.run_cli_json(
@@ -457,18 +459,15 @@ class CliContractTests(unittest.TestCase):
         )
 
         self.assertEqual(rc, 0)
-        self.assertIn("HOME.md", payload["data"]["changed_files"])
-        homepage = (self.notebook / "HOME.md").read_text(encoding="utf-8")
-        self.assertIn("## Category Tree", homepage)
-        self.assertIn("[layer1: Computer Science]", homepage)
-        self.assertIn("[layer3: Agents]", homepage)
+        self.assertNotIn("HOME.md", payload["data"]["changed_files"])
+        self.assertEqual(homepage.read_text(encoding="utf-8"), "# Human homepage\n\nKeep me.\n")
 
-        original = homepage
+        original = homepage.read_text(encoding="utf-8")
         time.sleep(1.1)
         rc, payload = self.run_cli_json("index")
         self.assertEqual(rc, 0)
-        self.assertEqual(payload["data"]["changed_files"], ["_WIKI/index.md"])
-        self.assertEqual((self.notebook / "HOME.md").read_text(encoding="utf-8"), original)
+        self.assertNotIn("HOME.md", payload["data"]["changed_files"])
+        self.assertEqual(homepage.read_text(encoding="utf-8"), original)
 
     def test_lint_is_read_only_and_reports_unindexed_notes(self) -> None:
         self.write_note("Notes/Loose.md", "# Loose\n\nUnindexed.")
@@ -505,6 +504,20 @@ class CliContractTests(unittest.TestCase):
         self.assertTrue(agents["leaf"])
         self.assertEqual(agents["note_count"], 1)
         self.assertEqual(agents["notes"][0]["source"], "Notes/DSPy.md")
+
+    def test_tree_depth_flag_limits_display_depth(self) -> None:
+        self.test_add_indexes_note_and_renders_generated_files()
+
+        rc, payload = self.run_cli_json("tree", "--depth", "2")
+
+        self.assertEqual(rc, 0)
+        roots = payload["data"]["roots"]
+        computer_science = roots[0]
+        ai_systems = computer_science["children"][0]
+        self.assertEqual(ai_systems["depth"], 2)
+        self.assertEqual(ai_systems["children"], [])
+        self.assertEqual(ai_systems["note_count"], 1)
+        self.assertEqual(ai_systems["notes"][0]["source"], "Notes/DSPy.md")
 
     def test_tree_and_category_pages_follow_current_note_frontmatter_when_log_is_stale(self) -> None:
         self.generated.joinpath("index.md").write_text(

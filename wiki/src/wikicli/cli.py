@@ -52,7 +52,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     # --- tree ---
-    subparsers.add_parser("tree", help="Show deterministic category tree")
+    tree_parser = subparsers.add_parser("tree", help="Show deterministic category tree")
+    tree_parser.add_argument(
+        "--depth",
+        type=int,
+        default=None,
+        help="Maximum category depth to display. Default is full tree.",
+    )
 
     # --- list ---
     list_parser = subparsers.add_parser("list", help="List catalog entries")
@@ -220,7 +226,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         elif command == "index":
             result = app.index()
         elif command == "tree":
-            result = app.tree()
+            result = app.tree(depth=args.depth)
         elif command == "list":
             result = app.list(
                 args.category,

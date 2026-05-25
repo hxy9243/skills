@@ -108,7 +108,7 @@ class WikiIndex:
             self.config.index_path.read_text(encoding="utf-8")
         )
 
-    def tree(self) -> dict[str, Any]:
+    def tree(self, *, depth: int | None = None) -> dict[str, Any]:
         """Return a deterministic category tree with note counts and leaf notes."""
         tree = self.read_tree()
         grouped = self._grouped_catalog_entries()
@@ -116,11 +116,14 @@ class WikiIndex:
         def render_node(node: Any, prefix: tuple[str, ...]) -> dict[str, Any]:
             path = CategoryPath((*prefix, node.name))
             notes = sorted(grouped.get(path, ()), key=lambda item: item.source.casefold())
-            children = [render_node(child, path.parts) for child in node.children]
+            current_depth = len(path.parts)
+            include_children = depth is None or current_depth < depth
+            children = [render_node(child, path.parts) for child in node.children] if include_children else []
+            is_leaf_view = not node.children or not include_children
             return {
                 "name": node.name,
                 "path": path.display(),
-                "depth": len(path.parts),
+                "depth": current_depth,
                 "page": str(category_page_path(self.config.categories_dir, path).relative_to(self.config.notebook_root)),
                 "note_count": len(notes),
                 "leaf": len(node.children) == 0,
@@ -131,7 +134,7 @@ class WikiIndex:
                         "summary": entry.summary,
                     }
                     for entry in notes
-                ] if len(node.children) == 0 else [],
+                ] if is_leaf_view else [],
                 "children": children,
             }
 
@@ -573,10 +576,6 @@ class WikiIndex:
         if _write_if_changed(self.config.index_path, index_content):
             changed_files.append(str(self.config.index_path.relative_to(self.config.notebook_root)))
 
-        homepage_content = self._render_homepage(tree, grouped)
-        if _write_if_changed(self.config.homepage_path, homepage_content):
-            changed_files.append(str(self.config.homepage_path.relative_to(self.config.notebook_root)))
-
         return {
             "category_pages": len(valid_pages),
             "changed_files": changed_files,
@@ -707,45 +706,6 @@ class WikiIndex:
         references = _render_references(notes)
         lines.extend(references.splitlines() if references else ["- None"])
         return "\n".join(lines).rstrip() + "\n"
-
-    def _render_homepage(
-        self,
-        tree: WikiCategoryTree,
-        grouped: dict[CategoryPath, list[CatalogEntry]],
-    ) -> str:
-        """Render the human-facing homepage deterministically from wiki state."""
-        lines = [
-            "# Wiki Home",
-            "",
-            "Welcome to the notebook wiki. This page is regenerated from the current category tree and indexed notes.",
-            "",
-            "## Category Tree",
-            "",
-        ]
-        if not tree.roots:
-            lines.append("- None")
-        else:
-            for root in tree.roots:
-                self._append_home_tree_lines(lines, root, (), grouped)
-        return "\n".join(lines).rstrip() + "\n"
-
-    def _append_home_tree_lines(
-        self,
-        lines: list[str],
-        node: Any,
-        prefix: tuple[str, ...],
-        grouped: dict[CategoryPath, list[CatalogEntry]],
-    ) -> None:
-        """Render one category subtree into the homepage."""
-        current = CategoryPath((*prefix, node.name))
-        depth = len(current.parts)
-        indent = "  " * (depth - 1)
-        rel = category_page_path(self.config.categories_dir, current).relative_to(self.config.notebook_root).as_posix()
-        note_count = len(grouped.get(current, ()))
-        suffix = f" ({note_count})" if note_count else ""
-        lines.append(f"{indent}- [layer{depth}: {node.name}]({rel}){suffix}")
-        for child in node.children:
-            self._append_home_tree_lines(lines, child, current.parts, grouped)
 
     def _grouped_catalog_entries(self) -> dict[CategoryPath, list[CatalogEntry]]:
         """Group active catalog entries under every ancestor path.
