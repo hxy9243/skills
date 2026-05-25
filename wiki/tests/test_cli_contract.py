@@ -227,18 +227,17 @@ class CliContractTests(unittest.TestCase):
             / "index.md"
         )
         original = category_page.read_text(encoding="utf-8")
-        compact = "- None"
+        compact = (
+            "Agents is a focused leaf under AI Systems. This page collects the notes "
+            "that most directly define this topic in the current wiki."
+        )
         rich_synthesis = (
             "Agents pages track runtime design for model-backed workers.\n\n"
             "They emphasize how memory, tools, and prompt programs turn isolated "
             "model calls into maintained systems."
         )
         category_page.write_text(
-            original.replace(
-                f"## Synthesis\n\n{compact}\n",
-                f"## Synthesis\n\n{rich_synthesis}\n",
-                1,
-            ),
+            original.replace(f"\n{compact}\n", f"\n{rich_synthesis}\n", 1),
             encoding="utf-8",
         )
         self.write_note("Notes/Reflexion.md", "# Reflexion\n\nSelf-critique loops.")
@@ -261,7 +260,7 @@ class CliContractTests(unittest.TestCase):
         self.assertEqual(payload["ok"], True)
         category_text = category_page.read_text(encoding="utf-8")
         self.assertIn(rich_synthesis, category_text)
-        self.assertNotIn(f"## Synthesis\n\n{compact}\n", category_text)
+        self.assertNotIn(f"\n{compact}\n", category_text)
         self.assertIn(
             "[[Notes/DSPy.md]] - Prompt optimization for agents.",
             category_text,
@@ -437,8 +436,39 @@ class CliContractTests(unittest.TestCase):
 
         self.assertEqual(first_rc, 0)
         self.assertEqual(second_rc, 0)
-        self.assertEqual(first_payload["data"]["changed_files"], [])
+        self.assertEqual(first_payload["data"]["changed_files"], ["_WIKI/index.md"])
         self.assertEqual(second_payload["data"]["changed_files"], [])
+
+    def test_add_and_index_refresh_homepage(self) -> None:
+        self.write_note("Notes/DSPy.md", "# DSPy\n\nPrompt optimization for agents.")
+
+        rc, payload = self.run_cli_json(
+            "add",
+            "--json",
+            json.dumps(
+                {
+                    "title": "DSPy",
+                    "summary": "Prompt optimization for agents.",
+                    "category": "Computer Science > AI Systems > Agents",
+                    "tags": ["#agents"],
+                    "source": "Notes/DSPy.md",
+                }
+            ),
+        )
+
+        self.assertEqual(rc, 0)
+        self.assertIn("HOME.md", payload["data"]["changed_files"])
+        homepage = (self.notebook / "HOME.md").read_text(encoding="utf-8")
+        self.assertIn("## Category Tree", homepage)
+        self.assertIn("[layer1: Computer Science]", homepage)
+        self.assertIn("[layer3: Agents]", homepage)
+
+        original = homepage
+        time.sleep(1.1)
+        rc, payload = self.run_cli_json("index")
+        self.assertEqual(rc, 0)
+        self.assertEqual(payload["data"]["changed_files"], ["_WIKI/index.md"])
+        self.assertEqual((self.notebook / "HOME.md").read_text(encoding="utf-8"), original)
 
     def test_lint_is_read_only_and_reports_unindexed_notes(self) -> None:
         self.write_note("Notes/Loose.md", "# Loose\n\nUnindexed.")
@@ -475,6 +505,71 @@ class CliContractTests(unittest.TestCase):
         self.assertTrue(agents["leaf"])
         self.assertEqual(agents["note_count"], 1)
         self.assertEqual(agents["notes"][0]["source"], "Notes/DSPy.md")
+
+    def test_tree_and_category_pages_follow_current_note_frontmatter_when_log_is_stale(self) -> None:
+        self.generated.joinpath("index.md").write_text(
+            "# Wiki Index\n\n"
+            "## Category Tree\n\n"
+            "- layer1: [Computer Science](categories/computer-science/index.md)\n"
+            "  - layer2: [AI Systems](categories/computer-science/ai-systems/index.md)\n"
+            "    - layer3: [Agents](categories/computer-science/ai-systems/agents/index.md)\n"
+            "  - layer2: [Operating System](categories/computer-science/operating-system/index.md)\n"
+            "\n---\n\n"
+            "## Skipped System Notes\n- None\n",
+            encoding="utf-8",
+        )
+        stale_note = self.write_note(
+            "Notes/Homelab.md",
+            "---\ncategory: \"Computer Science > Operating System\"\nsummary: \"Homelab setup ideas.\"\ntags:\n- homelab\n---\n# Homelab\n\nMachines.\n",
+        )
+        self.generated.joinpath("log.md").write_text(
+            "# Wiki Log\n\n"
+            + "- "
+            + json.dumps(
+                {
+                    "action": "add",
+                    "title": "Homelab",
+                    "summary": "Wrong old category.",
+                    "category": "Computer Science > AI Systems > Agents",
+                    "tags": ["#homelab"],
+                    "search_terms": [],
+                    "source": "Notes/Homelab.md",
+                    "source_mtime_ns": stale_note.stat().st_mtime_ns - 1,
+                    "timestamp": "2026-05-01T00:00:00Z",
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+        rc, tree_payload = self.run_cli_json("tree")
+        self.assertEqual(rc, 0)
+        roots = tree_payload["data"]["roots"]
+        computer_science = roots[0]
+        operating_system = next(
+            child for child in computer_science["children"] if child["name"] == "Operating System"
+        )
+        ai_systems = next(
+            child for child in computer_science["children"] if child["name"] == "AI Systems"
+        )
+        self.assertEqual(operating_system["note_count"], 1)
+        self.assertEqual(operating_system["notes"][0]["source"], "Notes/Homelab.md")
+        self.assertEqual(ai_systems["note_count"], 0)
+
+        rc, index_payload = self.run_cli_json("index")
+        self.assertEqual(rc, 0)
+        self.assertIn("Notes/Homelab.md", index_payload["data"]["modified_notes"])
+
+        category_page = (
+            self.generated
+            / "categories"
+            / "computer-science"
+            / "operating-system"
+            / "index.md"
+        )
+        category_text = category_page.read_text(encoding="utf-8")
+        self.assertIn("[[Notes/Homelab.md]] - Homelab setup ideas.", category_text)
+        self.assertNotIn("Wrong old category.", category_text)
 
     def test_removed_commands_fail(self) -> None:
         """Removed commands (show, status, synthesize, reconcile) should not parse."""

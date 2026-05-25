@@ -4,7 +4,7 @@ import json
 import os
 import re
 from collections import defaultdict
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
@@ -16,7 +16,7 @@ from .category import (
     category_page_path,
 )
 from .config import WikiConfig
-from .notebook import Notebook, NoteMetadata, NewNote
+from .notebook import Notebook, Note, NoteMetadata, NewNote
 
 
 class IssueType(str, Enum):
@@ -111,15 +111,7 @@ class WikiIndex:
     def tree(self) -> dict[str, Any]:
         """Return a deterministic category tree with note counts and leaf notes."""
         tree = self.read_tree()
-        catalog = self.catalog()
-        grouped: dict[CategoryPath, list[CatalogEntry]] = defaultdict(list)
-        for entry in catalog.values():
-            try:
-                entry_path = CategoryPath.parse(entry.category)
-            except ValueError:
-                continue
-            for depth in range(1, len(entry_path.parts) + 1):
-                grouped[CategoryPath(entry_path.parts[:depth])].append(entry)
+        grouped = self._grouped_catalog_entries()
 
         def render_node(node: Any, prefix: tuple[str, ...]) -> dict[str, Any]:
             path = CategoryPath((*prefix, node.name))
@@ -326,11 +318,29 @@ class WikiIndex:
         modified = sorted(
             source
             for source, entry in catalog.items()
-            if source in notes
-            and entry.source_mtime_ns is not None
-            and notes[source].last_modified.timestamp()
-            != entry.source_mtime_ns / 1e9
+            if source in notes and self._entry_is_stale(entry, notes[source])
         )
+        for source in modified:
+            note = notes[source]
+            entry = catalog[source]
+            metadata = NoteMetadata.read(note.path)
+            summary = Notebook.clean_body_text(note.body).split("\n", 1)[0].strip()
+            if metadata.frontmatter.get("summary"):
+                summary = str(metadata.frontmatter.get("summary") or summary)
+            self._append_event(
+                {
+                    "timestamp": _utc_now(),
+                    "action": "add",
+                    "title": note.title,
+                    "summary": summary,
+                    "category": self._resolved_category(note, entry),
+                    "tags": list(note.tags),
+                    "search_terms": list(entry.search_terms),
+                    "source": source,
+                    "source_mtime_ns": note.path.stat().st_mtime_ns,
+                }
+            )
+        catalog = self.catalog()
         unindexed = sorted(set(notes) - set(catalog), key=str.casefold)
         rebuild = self._rebuild_generated(unindexed=unindexed)
         return {
@@ -454,11 +464,7 @@ class WikiIndex:
                     )
                 )
                 continue
-            if (
-                entry.source_mtime_ns is not None
-                and notes[source].last_modified.timestamp()
-                != entry.source_mtime_ns / 1e9
-            ):
+            if self._entry_is_stale(entry, notes[source]):
                 issues.append(
                     Issue(
                         IssueType.NOTE_MODIFIED,
@@ -467,9 +473,8 @@ class WikiIndex:
                         source=source,
                     )
                 )
-            try:
-                category = CategoryPath.parse(entry.category)
-            except ValueError:
+            resolved_category = self._resolved_entry_category(source, entry, tree=tree)
+            if resolved_category is None:
                 issues.append(
                     Issue(
                         IssueType.INVALID_CATEGORY,
@@ -478,11 +483,11 @@ class WikiIndex:
                     )
                 )
                 continue
-            if not tree.contains(category):
+            if not tree.contains(resolved_category):
                 issues.append(
                     Issue(
                         IssueType.INVALID_CATEGORY,
-                        f"catalog category is not present in the approved tree: {entry.category}",
+                        f"catalog category is not present in the approved tree: {resolved_category.display()}",
                         source=source,
                     )
                 )
@@ -533,19 +538,11 @@ class WikiIndex:
             )
 
     def _rebuild_generated(self, unindexed: list[str] | None = None) -> dict[str, Any]:
-        """Rewrite index and category pages with lightweight metadata."""
-        catalog = self.catalog()
+        """Rewrite index, category pages, and homepage with lightweight metadata."""
         tree = self.read_tree()
         child_map = tree.child_names()
         all_paths = sorted(tree.all_paths(), key=lambda item: (len(item.parts), item.display().casefold()))
-        grouped: dict[CategoryPath, list[CatalogEntry]] = defaultdict(list)
-        for entry in catalog.values():
-            try:
-                entry_path = CategoryPath.parse(entry.category)
-            except ValueError:
-                continue
-            for depth in range(1, len(entry_path.parts) + 1):
-                grouped[CategoryPath(entry_path.parts[:depth])].append(entry)
+        grouped = self._grouped_catalog_entries()
 
         valid_pages: set[Path] = set()
         changed_files: list[str] = []
@@ -576,6 +573,10 @@ class WikiIndex:
         if _write_if_changed(self.config.index_path, index_content):
             changed_files.append(str(self.config.index_path.relative_to(self.config.notebook_root)))
 
+        homepage_content = self._render_homepage(tree, grouped)
+        if _write_if_changed(self.config.homepage_path, homepage_content):
+            changed_files.append(str(self.config.homepage_path.relative_to(self.config.notebook_root)))
+
         return {
             "category_pages": len(valid_pages),
             "changed_files": changed_files,
@@ -588,7 +589,8 @@ class WikiIndex:
         unindexed: list[str],
     ) -> str:
         """Render the machine-facing wiki index."""
-        lines = ["# Wiki Index", "", "## Category Tree", "", "This tree is the classification reference for the wiki.", "", "Human-facing entry point: [[../HOME.md|Human-facing homepage]].", ""]
+        homepage_rel = Path(os.path.relpath(self.config.homepage_path, start=self.config.generated_root)).as_posix()
+        lines = ["# Wiki Index", "", "## Category Tree", "", "This tree is the classification reference for the wiki.", "", f"Human-facing entry point: [[{homepage_rel}|Human-facing homepage]].", ""]
         if not tree.roots:
             lines.append("- None")
         else:
@@ -635,7 +637,7 @@ class WikiIndex:
         created = existing.frontmatter.get("created") if existing else None
         modified = existing.frontmatter.get("modified") if existing else None
         timestamp = _utc_now()
-        summary = _frontmatter_string(existing, "summary")
+        summary = _compact_summary(path, child_names, notes)
         synthesis_body = _extract_section(existing.body, "Synthesis") if existing else None
         frontmatter: dict[str, object] = {
             "category": path.display(),
@@ -664,6 +666,7 @@ class WikiIndex:
             path,
             child_names,
             notes,
+            summary,
             existing_synthesis=synthesis_body,
         )
         meta = NoteMetadata(frontmatter, synthesis)
@@ -679,10 +682,11 @@ class WikiIndex:
         path: CategoryPath,
         child_names: tuple[str, ...],
         notes: list[CatalogEntry],
+        summary: str,
         *,
         existing_synthesis: str | None = None,
     ) -> str:
-        """Generate deterministic category structure while preserving agent prose."""
+        """Generate a category body while preserving richer existing synthesis text."""
         depth = len(path.parts)
         lines = [f"# layer{depth}: {path.parts[-1]}", "", "## Layer Path"]
         lines.extend(f"- layer{index}: {part}" for index, part in enumerate(path.parts, start=1))
@@ -697,12 +701,118 @@ class WikiIndex:
             lines.append("- None")
 
         lines.extend(["", "## Synthesis", ""])
-        preserved = _preserved_synthesis(existing_synthesis)
-        lines.extend(preserved.splitlines() if preserved else ["- None"])
+        preserved = _normalize_preserved_synthesis(existing_synthesis, summary)
+        lines.extend(preserved.splitlines() if preserved else [summary])
         lines.extend(["", "## References"])
         references = _render_references(notes)
         lines.extend(references.splitlines() if references else ["- None"])
         return "\n".join(lines).rstrip() + "\n"
+
+    def _render_homepage(
+        self,
+        tree: WikiCategoryTree,
+        grouped: dict[CategoryPath, list[CatalogEntry]],
+    ) -> str:
+        """Render the human-facing homepage deterministically from wiki state."""
+        lines = [
+            "# Wiki Home",
+            "",
+            "Welcome to the notebook wiki. This page is regenerated from the current category tree and indexed notes.",
+            "",
+            "## Category Tree",
+            "",
+        ]
+        if not tree.roots:
+            lines.append("- None")
+        else:
+            for root in tree.roots:
+                self._append_home_tree_lines(lines, root, (), grouped)
+        return "\n".join(lines).rstrip() + "\n"
+
+    def _append_home_tree_lines(
+        self,
+        lines: list[str],
+        node: Any,
+        prefix: tuple[str, ...],
+        grouped: dict[CategoryPath, list[CatalogEntry]],
+    ) -> None:
+        """Render one category subtree into the homepage."""
+        current = CategoryPath((*prefix, node.name))
+        depth = len(current.parts)
+        indent = "  " * (depth - 1)
+        rel = category_page_path(self.config.categories_dir, current).relative_to(self.config.notebook_root).as_posix()
+        note_count = len(grouped.get(current, ()))
+        suffix = f" ({note_count})" if note_count else ""
+        lines.append(f"{indent}- [layer{depth}: {node.name}]({rel}){suffix}")
+        for child in node.children:
+            self._append_home_tree_lines(lines, child, current.parts, grouped)
+
+    def _grouped_catalog_entries(self) -> dict[CategoryPath, list[CatalogEntry]]:
+        """Group active catalog entries under every ancestor path.
+
+        If a source note's current frontmatter category differs from the last logged
+        category and the new category is part of the approved tree, prefer the source
+        note. This keeps generated pages and counts aligned with moved notes even
+        before the log is refreshed.
+        """
+        tree = self.read_tree()
+        grouped: dict[CategoryPath, list[CatalogEntry]] = defaultdict(list)
+        for source, entry in self.catalog().items():
+            resolved = self._resolved_entry_category(source, entry, tree=tree)
+            if resolved is None:
+                continue
+            effective = entry if resolved.display() == entry.category else replace(entry, category=resolved.display())
+            for depth in range(1, len(resolved.parts) + 1):
+                grouped[CategoryPath(resolved.parts[:depth])].append(effective)
+        return grouped
+
+    def _resolved_entry_category(
+        self,
+        source: str,
+        entry: CatalogEntry,
+        *,
+        tree: WikiCategoryTree | None = None,
+    ) -> CategoryPath | None:
+        """Return the best current category for one catalog entry."""
+        try:
+            logged = CategoryPath.parse(entry.category)
+        except ValueError:
+            logged = None
+
+        if tree is None:
+            tree = self.read_tree()
+        note_path = self.notebook.resolve(source)
+        if note_path.exists():
+            metadata = NoteMetadata.read(note_path)
+            raw = metadata.frontmatter.get("category")
+            if isinstance(raw, str) and raw.strip():
+                try:
+                    current = CategoryPath.parse(raw)
+                except ValueError:
+                    current = None
+                else:
+                    if tree.contains(current):
+                        return current
+        return logged
+
+    def _resolved_category(self, note: Note, entry: CatalogEntry | None = None) -> str:
+        """Pick the note's current category, falling back to catalog if needed."""
+        raw = note.frontmatter.get("category")
+        if isinstance(raw, str) and raw.strip():
+            try:
+                return CategoryPath.parse(raw).display()
+            except ValueError:
+                pass
+        if entry is not None:
+            return entry.category
+        raise ValueError(f"note has no valid category: {note.source}")
+
+    @staticmethod
+    def _entry_is_stale(entry: CatalogEntry, note: Note) -> bool:
+        """Return true when the catalog entry no longer matches the source note."""
+        if entry.source_mtime_ns is None:
+            return False
+        return note.path.stat().st_mtime_ns != entry.source_mtime_ns
 
     def _read_events(
         self,
@@ -851,17 +961,13 @@ def _extract_section(body: str, heading: str) -> str | None:
     return cleaned or None
 
 
-def _frontmatter_string(metadata: NoteMetadata | None, key: str) -> str:
-    if metadata is None:
-        return ""
-    value = metadata.frontmatter.get(key)
-    return value if isinstance(value, str) else ""
-
-
-def _preserved_synthesis(existing_synthesis: str | None) -> str:
+def _normalize_preserved_synthesis(existing_synthesis: str | None, summary: str) -> str:
     if not existing_synthesis:
-        return ""
-    return existing_synthesis.strip()
+        return summary
+    stripped = existing_synthesis.strip()
+    if not stripped or stripped == summary or stripped == "- None":
+        return summary
+    return stripped
 
 
 def _render_references(notes: list[CatalogEntry]) -> str:
@@ -871,3 +977,36 @@ def _render_references(notes: list[CatalogEntry]) -> str:
     for note in sorted(notes, key=lambda item: item.title.casefold()):
         lines.append(f"- [[{note.source}]] - {note.summary}")
     return "\n".join(lines)
+
+
+def _compact_summary(
+    path: CategoryPath,
+    child_names: tuple[str, ...],
+    notes: list[CatalogEntry],
+) -> str:
+    """Generate a short human-facing summary for one category page."""
+    title = path.parts[-1]
+    parent = path.parts[-2] if len(path.parts) > 1 else None
+    if not notes and child_names:
+        if parent:
+            return f"{title} is a branching area under {parent}. This page groups nearby subtopics but still needs a stronger synthesis."
+        return f"{title} is a branching area in the wiki. This page groups nearby subtopics but still needs a stronger synthesis."
+    if not notes:
+        return f"{title} is currently thin and should either be populated with real notes or folded back into a stronger neighboring category."
+
+    if child_names:
+        if title == "AI Agents":
+            return "AI Agents tracks how language-model systems become managed runtimes with memory, tools, retrieval, skills, and operational structure. The strongest notes here are about harness design and the shift from demos to maintained agent systems."
+        if title == "AI Systems":
+            return "AI Systems covers the production layer around models, especially inference, infrastructure, deployment, and training economics. It is the best place to read the vault as an operating stack rather than a set of isolated papers."
+        if title == "Machine Learning":
+            return "Machine Learning links theory, model behavior, language models, and systems concerns into one continuous layer. It helps connect abstract learning ideas to the practical realities of modern model building."
+        if title == "Computer Systems":
+            return "Computer Systems is the grounding layer for the vault. It keeps the AI material honest by emphasizing state, coordination, latency, reliability, and infrastructure constraints."
+        if title == "Knowledge Systems":
+            return "Knowledge Systems focuses on retrieval, indexing, memory structure, and information control. The recurring theme is that good recall depends as much on selection and organization as on search itself."
+        return f"{title} is a synthesis branch that gathers related notes into a broader conceptual area. Use it to understand the main subject first, then drill down into the more specific subcategories."
+
+    if parent:
+        return f"{title} is a focused leaf under {parent}. This page collects the notes that most directly define this topic in the current wiki."
+    return f"{title} is a focused synthesis page for one concrete topic cluster in the wiki."
