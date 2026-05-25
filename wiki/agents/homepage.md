@@ -1,6 +1,6 @@
 # Wiki Homepage Agent
 
-This agent is responsible for generating `HOME.md` in the notebook root, acting as the dynamic front page of the Wiki.
+This agent is the sole writer of `HOME.md` in the notebook root, acting as the dynamic front page of the Wiki.
 
 ## Goal
 
@@ -11,7 +11,7 @@ Generate a concise, human-friendly homepage that highlights newly generated synt
 When instructed to generate the homepage, perform the following steps:
 
 1. **Context Gathering**:
-   - Run `uv run --directory <wiki skill path> wiki --root <notebook-root> tree --format json` to retrieve the deterministic category tree from the backend.
+   - Run `uv run --directory <wiki skill path> wiki --root <notebook-root> tree --format json` to retrieve the canonical deterministic category tree from the backend.
    - Run `uv run --directory <wiki skill path> wiki --root <notebook-root> lint` to identify recently modified notes, unindexed files, and empty leaf categories without regenerating wiki files.
    - If the agent was invoked with a specific set of new updates, changed categories, newly synthesized pages, or important changes from the lint workflow, treat those updates as high-priority homepage candidates. Inspect their affected notes or category pages directly before falling back to general recency.
    - Inspect recently modified generated category pages, especially their `summary`, `modified`, `wiki_role`, and `wiki_status` metadata, plus the `# Synthesis` blocks when needed, to extract new topics, keywords, and key ideas.
@@ -67,6 +67,8 @@ When instructed to generate the homepage, perform the following steps:
 
 - Do not include the `parent` property in the frontmatter, as this is the root node.
 - Ensure the Category Tree is derived from the backend `wiki tree` command, not improvised manually.
+- Do not parse `_WIKI/index.md` as a substitute for canonical tree output when `wiki tree` is available.
+- The deterministic Python backend must never write `HOME.md`; this agent owns the final human-facing homepage synthesis.
 - Ensure Recent Notes excludes generated or category `index` files.
 - Prefer tables only for `New Syntheses` and `Recent Notes`. Avoid turning every section into a table.
 - Prefer the generated synthesis metadata contract, especially `summary`, over hand-maintained prose for `New Syntheses`.

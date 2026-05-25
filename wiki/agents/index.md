@@ -28,10 +28,12 @@ Use the active model from the invoking skill/session for any synthesis or classi
 uv run --directory <wiki skill path> wiki --root <notebook-root> index
 ```
 
-8. **Cascading Bottom-Up Synthesis**: After rebuilding, ensure that synthesis is rolled up at *each* category level. For any given category level, read the synthesis notes of its immediate depth-1 children to construct and update the synthesis of the current level. Repeat this process up to the root to create and update a `HOME.md` file that represents the top-level synthesis of the entire wiki.
-9. When a category page already has a substantial `## Synthesis` section, preserve and update that body organically instead of replacing it with the short metadata `summary`. New ideas should be woven into the existing prose rather than dropped in as a full rewrite, unless the user explicitly wants a full resynthesis.
-10. Keep this synthesis work in the skill workflow, not in the deterministic Python backend. `wiki.py` should update metadata, references, and structure, while the agent owns narrative synthesis edits.
-11. If notes still need classification, generate packets and feed them through `add --json` before rebuilding.
+8. **Cascading Bottom-Up Synthesis**: After rebuilding, ensure that synthesis is rolled up at *each* category level. For any given category level, read the synthesis notes of its immediate depth-1 children to construct and update the synthesis of the current level.
+9. Repeat that rollup process upward until the root boundary is reached.
+10. After category rollups are complete, invoke `agents/homepage.md` as the final homepage-writing step so `HOME.md` reflects the updated wiki state.
+11. When a category page already has a substantial `## Synthesis` section, preserve and update that body organically instead of replacing it with the short metadata `summary`. New ideas should be woven into the existing prose rather than dropped in as a full rewrite, unless the user explicitly wants a full resynthesis.
+12. Keep this synthesis work in the skill workflow, not in the deterministic Python backend. `wiki.py` should update metadata, references, and structure, while the agent owns narrative synthesis edits and the final `HOME.md` synthesis.
+13. If notes still need classification, generate packets and feed them through `add --json` before rebuilding.
 
 ## Responsibilities
 

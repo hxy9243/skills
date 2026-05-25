@@ -51,6 +51,7 @@ When semantic lint identifies important new or changed knowledge in a category, 
 3. Re-run `agents/synthesize.md` for each parent category in order, using the updated child category page as part of the evidence considered by the parent synthesis.
 4. Continue until the root category boundary is reached.
 5. If there is no more specific sub-category to update, or after all affected parent categories have been updated, invoke `agents/homepage.md` so `HOME.md` reflects the propagated change.
+6. Treat `HOME.md` as agent-owned output. Do not rely on the deterministic Python backend to write or repair it.
 
 ### Phase 4: Execute Remediation
 
@@ -68,7 +69,7 @@ Do not stop after identifying issues or simply proposing a remediation plan. Act
 5. **Resolve Orphan Pages & Cross-references**:
    - Edit the relevant notes/category pages to add missing `[[Concept]]` or `[[Note Title]]` wiki links, ensuring all pages are well-connected.
 6. **Propagate Cascading Rollups**:
-   - If changes were made to sub-category syntheses, invoke `agents/synthesize.md` upward for each parent category sequentially, then invoke `agents/homepage.md` to refresh `HOME.md`.
+   - If changes were made to sub-category syntheses, invoke `agents/synthesize.md` upward for each parent category sequentially, then invoke `agents/homepage.md` to refresh `HOME.md` as the final human-facing pass.
 7. **Prune Empty Categories**: Remove empty leaf categories from the approved tree in `index.md` and delete their generated folders/files, unless there is a specific reason to keep them.
 
 Once remediation is complete, provide the user with a concise summary of the executed actions and the resolved issues.
