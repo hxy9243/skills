@@ -170,7 +170,13 @@ class WikiCli:
         return CommandResult(
             not any(issue.severity == "error" for issue in issues),
             "lint",
-            data={"checked": True, "phase": "skeleton"},
+            data={
+                "checked": True,
+                "phase": "workspace",
+                "issue_count": len(issues),
+                "error_count": sum(1 for issue in issues if issue.severity == "error"),
+                "warning_count": sum(1 for issue in issues if issue.severity == "warning"),
+            },
             issues=issues,
             exit_code=1
             if any(issue.severity == "error" for issue in issues)
