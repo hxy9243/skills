@@ -24,7 +24,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--format",
-        choices=["json", "text"],
+        choices=["json", "text", "markdown"],
         default="text",
         help="Output format (default: text)",
     )
@@ -142,20 +142,43 @@ def print_result(result: CommandResult) -> None:
     print(json.dumps(result.to_json(), sort_keys=True, separators=(",", ":")))
 
 
+def _render_tree_text(roots: list[dict[str, object]]) -> str:
+    if not roots:
+        return "No tree nodes found."
+    lines: list[str] = []
+    def walk(nodes: list[dict[str, object]], indent: int = 0) -> None:
+        for node in nodes:
+            name = str(node.get("name", ""))
+            note_count = int(node.get("note_count", 0))
+            lines.append(f"{'  ' * indent}- {name} ({note_count})")
+            walk(list(node.get("children", [])), indent + 1)
+    walk(list(roots))
+    return "\n".join(lines)
+
+
+def _render_tree_markdown(roots: list[dict[str, object]]) -> str:
+    if not roots:
+        return "No tree nodes found."
+    lines: list[str] = []
+    def walk(nodes: list[dict[str, object]], indent: int = 0) -> None:
+        for node in nodes:
+            name = str(node.get("name", ""))
+            note_count = int(node.get("note_count", 0))
+            path = str(node.get("path", "")).strip()
+            suffix = f" ({note_count})" if note_count else ""
+            if path:
+                lines.append(f"{'  ' * indent}- [[{path}|{name}]]{suffix}")
+            else:
+                lines.append(f"{'  ' * indent}- {name}{suffix}")
+            walk(list(node.get("children", [])), indent + 1)
+    walk(list(roots))
+    return "\n".join(lines)
+
+
 def print_text_output(result: CommandResult) -> None:
     """Print human-facing text for commands that support it."""
     if result.ok and result.command == "tree":
-        roots = result.data.get("roots", [])
-        if not roots:
-            print("No tree nodes found.")
-        else:
-            def walk(nodes: list[dict[str, object]], indent: int = 0) -> None:
-                for node in nodes:
-                    name = str(node.get("name", ""))
-                    note_count = int(node.get("note_count", 0))
-                    print(f"{'  ' * indent}- {name} ({note_count})")
-                    walk(list(node.get("children", [])), indent + 1)
-            walk(list(roots))
+        print(_render_tree_text(list(result.data.get("roots", []))))
         return
     if result.ok and result.command == "list":
         subcats = result.data.get("subcategories", [])
@@ -250,6 +273,8 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     if args.format == "json":
         print_result(result)
+    elif args.format == "markdown" and result.command == "tree":
+        print(_render_tree_markdown(list(result.data.get("roots", []))))
     else:
         print_text_output(result)
     return result.exit_code

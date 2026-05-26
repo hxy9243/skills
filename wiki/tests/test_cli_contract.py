@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import os
+import subprocess
 import sys
 import tempfile
 import time
@@ -501,6 +503,8 @@ class CliContractTests(unittest.TestCase):
         self.assertEqual(ai_systems["name"], "AI Systems")
         agents = ai_systems["children"][0]
         self.assertEqual(agents["name"], "Agents")
+        self.assertEqual(agents["path"], "_WIKI/categories/computer-science/ai-systems/agents/index.md")
+        self.assertEqual(agents["category"], "Computer Science > AI Systems > Agents")
         self.assertTrue(agents["leaf"])
         self.assertEqual(agents["note_count"], 1)
         self.assertEqual(agents["notes"][0]["source"], "Notes/DSPy.md")
@@ -518,6 +522,40 @@ class CliContractTests(unittest.TestCase):
         self.assertEqual(ai_systems["children"], [])
         self.assertEqual(ai_systems["note_count"], 1)
         self.assertEqual(ai_systems["notes"][0]["source"], "Notes/DSPy.md")
+
+    def test_tree_markdown_format_uses_canonical_category_paths(self) -> None:
+        self.test_add_indexes_note_and_renders_generated_files()
+
+        env = dict(os.environ)
+        src_path = str(Path(__file__).resolve().parents[1] / "src")
+        env["PYTHONPATH"] = src_path + (":" + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "wikicli.cli",
+                "--config",
+                str(self.config_path),
+                "--format",
+                "markdown",
+                "tree",
+            ],
+            cwd=self.root,
+            capture_output=True,
+            text=True,
+            check=False,
+            env=env,
+        )
+
+        self.assertEqual(result.returncode, 0)
+        self.assertIn(
+            "[[_WIKI/categories/computer-science/index.md|Computer Science]]",
+            result.stdout,
+        )
+        self.assertIn(
+            "[[_WIKI/categories/computer-science/ai-systems/agents/index.md|Agents]]",
+            result.stdout,
+        )
 
     def test_tree_and_category_pages_follow_current_note_frontmatter_when_log_is_stale(self) -> None:
         self.generated.joinpath("index.md").write_text(

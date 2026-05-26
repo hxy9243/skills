@@ -120,11 +120,14 @@ class WikiIndex:
             include_children = depth is None or current_depth < depth
             children = [render_node(child, path.parts) for child in node.children] if include_children else []
             is_leaf_view = not node.children or not include_children
+            page_path = category_page_path(self.config.categories_dir, path)
+            page_rel = str(page_path.relative_to(self.config.notebook_root))
             return {
                 "name": node.name,
-                "path": path.display(),
+                "path": page_rel,
+                "category": path.display(),
                 "depth": current_depth,
-                "page": str(category_page_path(self.config.categories_dir, path).relative_to(self.config.notebook_root)),
+                "page": page_rel,
                 "note_count": len(notes),
                 "leaf": len(node.children) == 0,
                 "notes": [
