@@ -127,6 +127,7 @@ Small example:
 - The `summary` field is agent-maintained. The Python backend preserves it but does not generate semantic summary text. Agents should keep it as a short human-facing highlight of the category itself, usually one or two sentences, not a list of note titles.
 - Synthesis writing belongs to the skill and its agents, not to the deterministic Python backend. Let `wiki.py` preserve existing synthesis text and update deterministic structures like metadata, subcategory lists, references, and machine-facing indexes.
 - The backend may emit deterministic tree, lint, list, search, and index outputs, but agents should read those outputs and synthesize the final human-facing homepage from them plus the relevant notes/category pages.
+- Lint and synthesis workflows are not fully complete until they refresh `HOME.md` whenever their changes affect navigation, summaries, topic framing, or the user's front-door view of the notebook.
 - When a category synthesis needs updating, integrate the new ideas organically into the existing `## Synthesis` prose. Do not replace the whole synthesis with a fresh rewrite unless the user explicitly asks for a full resynthesis.
 - Prefer `index` for broad refreshes and `add` for small targeted updates.
 - `lint` evaluates source synchronization (missing notes, modified notes, unindexed notes) and should also flag empty leaf categories as taxonomy cleanup candidates. Agents should enforce category hygiene when calling `add`.

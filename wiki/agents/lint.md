@@ -44,7 +44,7 @@ After structural validation, perform a content-aware health check:
 
 ### Phase 3: Cascading Rollup
 
-When semantic lint identifies important new or changed knowledge in a category, propagate the change upward instead of stopping at the leaf page:
+When semantic lint identifies important new or changed knowledge in a category, propagate the change upward instead of stopping at the leaf page. The lint workflow is not complete until the human-facing homepage has also been refreshed when synthesis or category structure changed:
 
 1. Start with the most specific affected category.
 2. Invoke `agents/synthesize.md` for that category if its synthesis is missing, empty, stale, or does not reflect the important change.
@@ -52,6 +52,7 @@ When semantic lint identifies important new or changed knowledge in a category, 
 4. Continue until the root category boundary is reached.
 5. If there is no more specific sub-category to update, or after all affected parent categories have been updated, invoke `agents/homepage.md` so `HOME.md` reflects the propagated change.
 6. Treat `HOME.md` as agent-owned output. Do not rely on the deterministic Python backend to write or repair it.
+7. If lint-driven remediation changed the approved tree, category assignments, generated synthesis pages, or any branch summaries that affect navigation, refreshing `HOME.md` is mandatory before considering the workflow done.
 
 ### Phase 4: Execute Remediation
 
@@ -70,6 +71,7 @@ Do not stop after identifying issues or simply proposing a remediation plan. Act
    - Edit the relevant notes/category pages to add missing `[[Concept]]` or `[[Note Title]]` wiki links, ensuring all pages are well-connected.
 6. **Propagate Cascading Rollups**:
    - If changes were made to sub-category syntheses, invoke `agents/synthesize.md` upward for each parent category sequentially, then invoke `agents/homepage.md` to refresh `HOME.md` as the final human-facing pass.
+   - If structural remediation happened without obvious synthesis edits, still refresh `HOME.md` whenever the tree, counts, subcategories, or homepage-worthy summaries changed. Structural correctness alone is not enough if the front door is stale.
 7. **Prune Empty Categories**: Remove empty leaf categories from the approved tree in `index.md` and delete their generated folders/files, unless there is a specific reason to keep them.
 
-Once remediation is complete, provide the user with a concise summary of the executed actions and the resolved issues.
+Once remediation is complete, provide the user with a concise summary of the executed actions and the resolved issues. If synthesis or category/tree changes happened, explicitly confirm that `HOME.md` was refreshed as part of completion.

@@ -29,7 +29,7 @@ When instructed to generate the homepage, perform the following steps:
    # Wiki Homepage
 
    ## Category Tree
-   (Render this from `wiki tree --format json`, not by inventing or hand-curating a separate tree. Keep it readable. Use wikilinks to the generated category pages, and include note counts when helpful.)
+   (Render this from `wiki tree --format json`, not by inventing or hand-curating a separate tree. Keep it readable and deterministic. Use wikilinks that point to the generated category `index.md` pages under `_WIKI/categories/...`, and include note counts when helpful.)
 
    ## New Syntheses
    (Use an Obsidian Dataview table driven by generated synthesis-page metadata. Prefer columns like `Synthesis`, `Category`, `Summary`, and `Updated`. Do not
@@ -67,6 +67,8 @@ When instructed to generate the homepage, perform the following steps:
 
 - Do not include the `parent` property in the frontmatter, as this is the root node.
 - Ensure the Category Tree is derived from the backend `wiki tree` command, not improvised manually.
+- Category-tree links in `HOME.md` must target the actual generated category pages under `_WIKI/categories/.../index.md`, not bare category names or shadow note titles.
+- Prefer using the canonical path fields from `wiki tree --format json` directly. Do not reconstruct category links heuristically when deterministic backend paths are already available.
 - Do not parse `_WIKI/index.md` as a substitute for canonical tree output when `wiki tree` is available.
 - The deterministic Python backend must never write `HOME.md`; this agent owns the final human-facing homepage synthesis.
 - Ensure Recent Notes excludes generated or category `index` files.

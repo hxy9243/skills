@@ -163,6 +163,8 @@ tags: []
 
 If it is a top-level synthesis for the entire wiki or notebook, invoke `agents/homepage.md` and write the result to `HOME.md` at the notebook root. Do not add a `parent` property to the homepage frontmatter.
 
+If you update a category synthesis in a way that materially changes the notebook's front-door understanding, such as new subcategory splits, major summary rewrites, important emerging topics, or branch-level reframing, follow through by refreshing `HOME.md` via `agents/homepage.md` before declaring the workflow complete.
+
 For generated category syntheses, the `summary` frontmatter is mandatory. It should be compact, human-facing, and Dataview-friendly: one or two sentences that explain why the category matters or what it covers. Do not turn the summary into a roll call of note titles.
 
 If the topic is not covered in the category tree, propose the smallest necessary tree addition first. After the tree is accepted and regenerated with `wiki index`, synthesize into the generated page. Do not create free-floating generated category pages that are absent from the approved tree.
