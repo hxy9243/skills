@@ -854,26 +854,21 @@ def _write_if_changed(path: Path, content: str) -> bool:
 
 
 def _render_tree_block(categories_dir: Path, paths: set[CategoryPath]) -> str:
-    roots: dict[str, Any] = {}
-    for path in sorted(paths, key=lambda item: item.display().casefold()):
-        current = roots
-        for part in path.parts:
-            current = current.setdefault(part, {})
-
+    canonical_tree = WikiCategoryTree.from_paths(paths)
     lines: list[str] = []
 
-    def walk(children: dict[str, Any], prefix: tuple[str, ...]) -> None:
-        for name in sorted(children, key=str.casefold):
-            path = CategoryPath((*prefix, name))
+    def walk(nodes: tuple[Any, ...], prefix: tuple[str, ...]) -> None:
+        for node in nodes:
+            path = CategoryPath((*prefix, node.name))
             depth = len(path.parts)
             indent = "  " * (depth - 1)
             rel = category_page_path(categories_dir, path).relative_to(
                 categories_dir.parent
             ).as_posix()
-            lines.append(f"{indent}- layer{depth}: [{name}]({rel})")
-            walk(children[name], path.parts)
+            lines.append(f"{indent}- layer{depth}: [{node.name}]({rel})")
+            walk(node.children, path.parts)
 
-    walk(roots, ())
+    walk(canonical_tree.roots, ())
     return "\n".join(lines) if lines else "- None"
 
 

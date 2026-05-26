@@ -557,6 +557,27 @@ class CliContractTests(unittest.TestCase):
             result.stdout,
         )
 
+    def test_duplicate_tree_lines_collapse_to_one_canonical_node(self) -> None:
+        self.generated.joinpath("index.md").write_text(
+            "# Wiki Index\n\n"
+            "## Category Tree\n\n"
+            "- layer1: [Technology](categories/technology/index.md)\n"
+            "  - layer2: [General](categories/technology/general/index.md)\n"
+            "  - layer2: [General](categories/technology/general/index.md)\n"
+            "\n---\n\n"
+            "## Skipped System Notes\n- None\n",
+            encoding="utf-8",
+        )
+
+        rc, payload = self.run_cli_json("tree")
+
+        self.assertEqual(rc, 0)
+        roots = payload["data"]["roots"]
+        self.assertEqual(len(roots), 1)
+        self.assertEqual(roots[0]["name"], "Technology")
+        self.assertEqual(len(roots[0]["children"]), 1)
+        self.assertEqual(roots[0]["children"][0]["name"], "General")
+
     def test_tree_and_category_pages_follow_current_note_frontmatter_when_log_is_stale(self) -> None:
         self.generated.joinpath("index.md").write_text(
             "# Wiki Index\n\n"

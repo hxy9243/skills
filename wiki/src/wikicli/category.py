@@ -69,27 +69,34 @@ class WikiCategoryTree:
     def parse(cls, markdown: str) -> "WikiCategoryTree":
         """Parse `layerN:` bullets from index markdown into a category tree."""
         tree_section = _extract_tree_section(markdown)
-        nodes: list[dict[str, Any]] = []
-        stack: list[dict[str, Any]] = []
+        paths: set[CategoryPath] = set()
+        stack: list[str] = []
         for raw_line in tree_section.splitlines():
             match = _LAYER_RE.match(raw_line.lstrip())
             if not match:
                 continue
             depth = max(1, int(match.group("depth")))
-            node: dict[str, Any] = {
-                "name": _markdown_label(match.group("label")),
-                "children": [],
-            }
-            if depth == 1:
-                nodes.append(node)
-                stack = [node]
-                continue
+            name = _markdown_label(match.group("label"))
             while len(stack) >= depth:
                 stack.pop()
-            if stack:
-                stack[-1]["children"].append(node)
-                stack.append(node)
-        return cls(_dict_list_to_nodes(nodes))
+            if depth == 1:
+                stack = [name]
+            elif stack:
+                stack.append(name)
+            else:
+                continue
+            paths.add(CategoryPath(tuple(stack)))
+        return cls.from_paths(paths)
+
+    @classmethod
+    def from_paths(cls, paths: set[CategoryPath]) -> "WikiCategoryTree":
+        """Build a canonical tree from full category paths."""
+        roots: dict[str, Any] = {}
+        for path in sorted(paths, key=lambda item: item.display().casefold()):
+            current = roots
+            for part in path.parts:
+                current = current.setdefault(part, {})
+        return cls(_dict_tree_to_nodes(roots))
 
     def is_leaf(self, path: CategoryPath) -> bool:
         """Return true if the path exists and has no children."""
@@ -227,14 +234,14 @@ def _markdown_label(value: str) -> str:
     return label.strip()
 
 
-def _dict_list_to_nodes(items: list[dict[str, Any]]) -> tuple[CategoryNode, ...]:
-    """Convert the raw parsed dict tree into frozen CategoryNode tuples."""
+def _dict_tree_to_nodes(items: dict[str, Any]) -> tuple[CategoryNode, ...]:
+    """Convert a nested mapping tree into frozen CategoryNode tuples."""
     return tuple(
         CategoryNode(
-            name=str(item["name"]),
-            children=_dict_list_to_nodes(item.get("children", [])),
+            name=str(name),
+            children=_dict_tree_to_nodes(children),
         )
-        for item in items
+        for name, children in sorted(items.items(), key=lambda item: str(item[0]).casefold())
     )
 
 
