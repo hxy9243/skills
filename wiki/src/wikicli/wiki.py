@@ -25,6 +25,7 @@ class IssueType(str, Enum):
     UNINDEXED = "unindexed"
     INVALID_CATEGORY = "invalid_category"
     EMPTY_CATEGORY = "empty_category"
+    NEW_CATEGORY = "new_category"
 
 
 @dataclass(frozen=True)
@@ -101,12 +102,8 @@ class WikiIndex:
     # --- tree ---
 
     def read_tree(self) -> WikiCategoryTree:
-        """Parse the approved category tree from `index.md`."""
-        if not self.config.index_path.exists():
-            return WikiCategoryTree.empty()
-        return WikiCategoryTree.parse(
-            self.config.index_path.read_text(encoding="utf-8")
-        )
+        """Build the live category tree from source-note frontmatter metadata."""
+        return self._tree_from_notes()
 
     def tree(self, *, depth: int | None = None) -> dict[str, Any]:
         """Return a deterministic category tree with note counts and leaf notes."""
@@ -145,22 +142,9 @@ class WikiIndex:
         return {"roots": roots}
 
     def add_category(self, path: str | CategoryPath) -> WikiCategoryTree:
-        """Add a category path to the tree in index.md."""
+        """Compatibility shim. Categories now emerge from note frontmatter."""
         if isinstance(path, str):
             path = CategoryPath.parse(path)
-        self._ensure_layout()
-        tree = self.read_tree()
-        if tree.contains(path):
-            return tree
-
-        paths = set(tree.all_paths())
-        for depth in range(1, len(path.parts) + 1):
-            paths.add(CategoryPath(path.parts[:depth]))
-
-        original = self.config.index_path.read_text(encoding="utf-8")
-        tree_block = _render_tree_block(self.config.categories_dir, paths)
-        updated = _replace_tree_block(original, tree_block)
-        _write_if_changed(self.config.index_path, updated)
         return self.read_tree()
 
     # --- catalog ---
@@ -272,8 +256,6 @@ class WikiIndex:
     ) -> dict[str, Any]:
         """Apply an accepted new note: update frontmatter, append log, render views."""
         self._ensure_layout()
-        if allow_undeclared and not self.read_tree().contains(note.category):
-            self.add_category(note.category)
         source_path = self.notebook.resolve(note.source)
         changed_files: list[str] = []
         if NoteMetadata.write_category(source_path, note.category.display()):
@@ -297,11 +279,22 @@ class WikiIndex:
         rebuild = self._rebuild_generated()
         changed_files.extend(rebuild["changed_files"])
         catalog = self.catalog()
+        warnings: list[dict[str, Any]] = []
+        if not allow_undeclared:
+            warnings.append(
+                Issue(
+                    IssueType.NEW_CATEGORY,
+                    f"category was accepted without prior declaration: {note.category.display()}",
+                    severity="warning",
+                    source=note.source,
+                ).to_json()
+            )
         return {
             "packet": note.to_json(),
             "changed_files": sorted(set(changed_files)),
             "indexed_count": len(catalog),
             "category_pages": rebuild["category_pages"],
+            "warnings": warnings,
         }
 
     def index(self) -> dict[str, Any]:
@@ -489,14 +482,6 @@ class WikiIndex:
                     )
                 )
                 continue
-            if not tree.contains(resolved_category):
-                issues.append(
-                    Issue(
-                        IssueType.INVALID_CATEGORY,
-                        f"catalog category is not present in the approved tree: {resolved_category.display()}",
-                        source=source,
-                    )
-                )
 
         for source in sorted(set(notes) - set(catalog), key=str.casefold):
             issues.append(
@@ -519,9 +504,58 @@ class WikiIndex:
                     path=str(category_page_path(self.config.categories_dir, category)),
                 )
             )
+
+        seen_categories: set[str] = set()
+        for note in notes.values():
+            raw = note.frontmatter.get("category")
+            if raw is None or str(raw).strip() == "":
+                issues.append(
+                    Issue(
+                        IssueType.INVALID_CATEGORY,
+                        f"source note is missing category frontmatter: {note.source}",
+                        source=note.source,
+                    )
+                )
+                continue
+            try:
+                category = CategoryPath.parse(str(raw)).display()
+            except ValueError:
+                issues.append(
+                    Issue(
+                        IssueType.INVALID_CATEGORY,
+                        f"source note has malformed category frontmatter: {note.source}",
+                        source=note.source,
+                    )
+                )
+                continue
+            if category not in seen_categories:
+                issues.append(
+                    Issue(
+                        IssueType.NEW_CATEGORY,
+                        f"category is emergent from note metadata: {category}",
+                        severity="warning",
+                        source=note.source,
+                    )
+                )
+                seen_categories.add(category)
         return tuple(issues)
 
     # --- private helpers ---
+
+    def _tree_from_notes(self) -> WikiCategoryTree:
+        """Build the canonical category tree from note frontmatter metadata."""
+        paths: set[CategoryPath] = set()
+        for note in self.notebook.discover():
+            raw = note.frontmatter.get("category")
+            if not isinstance(raw, str) or not raw.strip():
+                continue
+            try:
+                category = CategoryPath.parse(raw)
+            except ValueError:
+                continue
+            for depth in range(1, len(category.parts) + 1):
+                paths.add(CategoryPath(category.parts[:depth]))
+        return WikiCategoryTree.from_paths(paths)
 
     def _ensure_layout(self) -> None:
         """Create the generated wiki directory and required files."""
@@ -713,10 +747,8 @@ class WikiIndex:
     def _grouped_catalog_entries(self) -> dict[CategoryPath, list[CatalogEntry]]:
         """Group active catalog entries under every ancestor path.
 
-        If a source note's current frontmatter category differs from the last logged
-        category and the new category is part of the approved tree, prefer the source
-        note. This keeps generated pages and counts aligned with moved notes even
-        before the log is refreshed.
+        Source-note frontmatter is the canonical truth for category placement.
+        Catalog/log placement is fallback and tracing only.
         """
         tree = self.read_tree()
         grouped: dict[CategoryPath, list[CatalogEntry]] = defaultdict(list)
@@ -754,8 +786,7 @@ class WikiIndex:
                 except ValueError:
                     current = None
                 else:
-                    if tree.contains(current):
-                        return current
+                    return current
         return logged
 
     def _resolved_category(self, note: Note, entry: CatalogEntry | None = None) -> str:

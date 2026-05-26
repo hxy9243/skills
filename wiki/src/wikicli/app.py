@@ -80,20 +80,6 @@ class WikiCli:
                 ),
                 exit_code=1,
             )
-        tree = index.read_tree()
-        leafs = tree.leaf_paths()
-        if note.category not in leafs and not allow_undeclared:
-            return CommandResult(
-                False,
-                "add",
-                issues=(
-                    Issue(
-                        "category_not_approved",
-                        f"category is not an approved leaf: {note.category.display()}",
-                    ),
-                ),
-                exit_code=1,
-            )
         data = index.add_note(note, allow_undeclared=allow_undeclared)
         data["allow_undeclared"] = allow_undeclared
         return CommandResult(True, "add", data=data)

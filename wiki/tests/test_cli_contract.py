@@ -152,7 +152,7 @@ class CliContractTests(unittest.TestCase):
         self.assertIn('wiki_note_count: 1', category_text)
         self.assertIn('tags:', category_text)
 
-    def test_add_allow_undeclared_expands_tree_before_rebuild(self) -> None:
+    def test_add_new_category_is_accepted_and_warned(self) -> None:
         self.write_note("Notes/Tools.md", "# Tools\n\nTool use for agents.")
         packet = json.dumps(
             {
@@ -164,17 +164,11 @@ class CliContractTests(unittest.TestCase):
             }
         )
 
-        rejected_rc, rejected_payload = self.run_cli_json("add", "--json", packet)
-        accepted_rc, accepted_payload = self.run_cli_json(
-            "add", "--json", packet, "--allow-undeclared"
-        )
+        rc, payload = self.run_cli_json("add", "--json", packet)
 
-        self.assertEqual(rejected_rc, 1)
-        self.assertEqual(
-            rejected_payload["issues"][0]["code"], "category_not_approved"
-        )
-        self.assertEqual(accepted_rc, 0)
-        self.assertEqual(accepted_payload["ok"], True)
+        self.assertEqual(rc, 0)
+        self.assertEqual(payload["ok"], True)
+        self.assertEqual(payload["data"]["warnings"][0]["code"], "new_category")
         self.assertIn(
             "- layer3: [Tools](categories/computer-science/ai-systems/tools/index.md)",
             (self.generated / "index.md").read_text(encoding="utf-8"),
@@ -190,8 +184,11 @@ class CliContractTests(unittest.TestCase):
             ).exists()
         )
 
-    def test_lint_flags_catalog_category_outside_tree(self) -> None:
-        note = self.write_note("Notes/Tools.md", "# Tools\n\nTool use for agents.")
+    def test_lint_prefers_frontmatter_truth_over_old_tree(self) -> None:
+        note = self.write_note(
+            "Notes/Tools.md",
+            "---\ncategory: \"Computer Science > AI Systems > Tools\"\n---\n# Tools\n\nTool use for agents.",
+        )
         self.generated.joinpath("log.md").write_text(
             "# Wiki Log\n\n"
             "- "
@@ -214,9 +211,8 @@ class CliContractTests(unittest.TestCase):
 
         rc, payload = self.run_cli_json("lint", "--filter", "invalid_category")
 
-        self.assertEqual(rc, 1)
-        self.assertEqual(payload["issues"][0]["code"], "invalid_category")
-        self.assertIn("not present", payload["issues"][0]["message"])
+        self.assertEqual(rc, 0)
+        self.assertEqual(payload["issues"], [])
 
     def test_rebuild_preserves_rich_category_synthesis(self) -> None:
         self.test_add_indexes_note_and_renders_generated_files()
@@ -351,7 +347,7 @@ class CliContractTests(unittest.TestCase):
         )
         self.assertEqual(rc, 0)
         self.assertIn("Agents", payload["data"]["subcategories"])
-        self.assertIn("Memory", payload["data"]["subcategories"])
+        self.assertNotIn("Memory", payload["data"]["subcategories"])
 
     def test_list_leaf_shows_entries(self) -> None:
         self.test_add_indexes_note_and_renders_generated_files()
@@ -472,7 +468,10 @@ class CliContractTests(unittest.TestCase):
         self.assertEqual(homepage.read_text(encoding="utf-8"), original)
 
     def test_lint_is_read_only_and_reports_unindexed_notes(self) -> None:
-        self.write_note("Notes/Loose.md", "# Loose\n\nUnindexed.")
+        self.write_note(
+            "Notes/Loose.md",
+            "---\ncategory: \"Computer Science > AI Systems > Loose\"\n---\n# Loose\n\nUnindexed.",
+        )
 
         rc, payload = self.run_cli_json("lint")
 
@@ -485,10 +484,7 @@ class CliContractTests(unittest.TestCase):
 
         self.assertEqual(rc, 0)
         self.assertEqual(payload["ok"], True)
-        self.assertEqual(
-            [issue["code"] for issue in payload["issues"]],
-            ["empty_category", "empty_category"],
-        )
+        self.assertEqual(payload["issues"], [])
 
     def test_tree_returns_deterministic_structure(self) -> None:
         self.test_add_indexes_note_and_renders_generated_files()
@@ -558,6 +554,10 @@ class CliContractTests(unittest.TestCase):
         )
 
     def test_duplicate_tree_lines_collapse_to_one_canonical_node(self) -> None:
+        self.write_note(
+            "Notes/General.md",
+            "---\ncategory: \"Technology > General\"\nsummary: \"General technology notes.\"\n---\n# General\n\nTech.",
+        )
         self.generated.joinpath("index.md").write_text(
             "# Wiki Index\n\n"
             "## Category Tree\n\n"
@@ -621,12 +621,12 @@ class CliContractTests(unittest.TestCase):
         operating_system = next(
             child for child in computer_science["children"] if child["name"] == "Operating System"
         )
-        ai_systems = next(
-            child for child in computer_science["children"] if child["name"] == "AI Systems"
-        )
         self.assertEqual(operating_system["note_count"], 1)
         self.assertEqual(operating_system["notes"][0]["source"], "Notes/Homelab.md")
-        self.assertEqual(ai_systems["note_count"], 0)
+        self.assertNotIn(
+            "AI Systems",
+            [child["name"] for child in computer_science["children"]],
+        )
 
         rc, index_payload = self.run_cli_json("index")
         self.assertEqual(rc, 0)
