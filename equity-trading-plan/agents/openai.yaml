@@ -1,0 +1,4 @@
+interface:
+  display_name: "Equity Trading Plan"
+  short_description: "Conservative equity-only trading plan for news and volatility."
+  default_prompt: "Run a U.S. equity market scan, summarize news, and produce a risk-managed equity-only trading plan."
