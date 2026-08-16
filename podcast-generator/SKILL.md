@@ -27,8 +27,10 @@ This skill streamlines the creation of audio briefings and podcasts, ensuring cl
           ~/.openclaw/media/temp_voice.mp3 \
           ./assets/music/vladislav_zavorin-ambient-techno-405559.mp3 \
           ~/.openclaw/media/output_briefing.mp3 \
-          --volume 0.08
+          --volume 0.08 \
+          --outro-seconds 5
         ```
+    - The background track loops if needed. Once the narration ends, keep the music for five seconds and fade it smoothly to silence. Do not cut it abruptly.
 
 4.  **Deliver**:
     -   If an openclaw helper, delivery the final result to the default or specified channel. Otherwise save to the workspace and return the file path.
@@ -44,4 +46,5 @@ If specific background tracks are needed, search for and download Creative Commo
 ## Constraints
 - **Relative Paths**: Use relative paths where possible or `~` expansion to avoid hardcoded environment strings.
 - **Volume**: Keep background music at `0.08` for voice clarity.
+- **Outro**: For narration with music, default to a five-second music-only fade-out after the voice ends. Use `--outro-seconds` to override it when the user requests a different ending.
 - **Cleanup**: Temp files should be overwritten or cleaned up to save space.
