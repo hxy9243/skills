@@ -9,6 +9,7 @@ A collection of AI agent skills for productivity and knowledge management.
 -   **[Zettel Link](./zettel-link/)**: A suite of tools to maintain note embeddings for semantic search and discovering connections between notes.
 -   **[Startup Researcher](./startup-researcher/)**: An AI-powered research assistant that generates comprehensive market intelligence reports for startups.
 -   **[Podcast Generator](./podcast-generator/)**: A complete pipeline for drafting, narrating (via TTS), and mixing high-quality audio podcasts or briefings with background music.
+-   **[Project Tracker](./project-tracker/)**: A lightweight plaintext progress tracker maintaining concise `Project.md` state notes and `history.jsonl` checkpoint logs.
 
 ## Usage
 
