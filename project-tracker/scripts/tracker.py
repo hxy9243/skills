@@ -463,9 +463,13 @@ def cmd_checkpoint(args: argparse.Namespace) -> int:
 
     actions: List[str] = []
     if args.action:
-        actions.extend(args.action)
-    if args.actions:
-        actions.extend([a.strip() for a in re.split(r"[,;]\s*", args.actions) if a.strip()])
+        actions.extend([a.strip() for a in args.action if a.strip()])
+    elif args.actions:
+        # Prefer semicolon splitting, fallback to comma if no semicolon
+        if ";" in args.actions:
+            actions.extend([a.strip() for a in args.actions.split(";") if a.strip()])
+        else:
+            actions.extend([a.strip() for a in args.actions.split(",") if a.strip()])
 
     max_attempts = 2
     attempt = 0
