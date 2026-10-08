@@ -1,6 +1,6 @@
 {
-  "zettel_dir": "/home/kevin/Documents/kevinhusnotes/40_Zettelkasten",
-  "output_dir": "/home/kevin/Documents/kevinhusnotes/00_Inbox",
+  "zettel_dir": "~/Documents/Obsidian/Zettelkasten",
+  "output_dir": "~/Documents/Obsidian/Inbox",
   "models": {
     "fast": "openai-codex/gpt-5.3-codex",
     "deep": "openai-codex/gpt-5.2"
