@@ -17,7 +17,9 @@ def _cosine(left: list[float], right: list[float]) -> float:
     return sum(a * b for a, b in zip(left, right))
 
 def _get_cache_dir() -> Path:
-    d = Path("/home/kevin/Workspace/skills/zettel-eval/output/.cache")
+    # Resolve independently of the caller's working directory.
+    default = Path(__file__).resolve().parents[3] / "output" / ".cache"
+    d = Path(os.environ.get("ZETTEL_EVAL_CACHE_DIR") or default).expanduser()
     d.mkdir(parents=True, exist_ok=True)
     return d
 
