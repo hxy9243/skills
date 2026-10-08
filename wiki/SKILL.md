@@ -66,7 +66,7 @@ The backend resolves config in this order:
 
 When running via `uv --directory <wiki skill path>`, always pass `--root <notebook-root>` or `--config <notebook-root>/_WIKI/config.json`. `uv --directory` changes the process working directory to the skill package, so cwd auto-discovery will otherwise look for the wrong `_WIKI/config.json`.
 
-Use [`templates/config.json.example`](/home/kevin/Workspace/skills/wiki/templates/config.json.example) as the starting template.
+Use [`templates/config.json.example`](templates/config.json.example) as the starting template.
 
 Supported config fields:
 
