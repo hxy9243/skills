@@ -56,22 +56,32 @@ When semantic lint identifies important new or changed knowledge in a category, 
 
 ### Phase 4: Execute Remediation
 
-Do not stop after identifying issues or simply proposing a remediation plan. Actively execute the necessary repairs to restore both structural and semantic coherence:
+Perform only additive repairs within the preservation contract. Propose destructive cleanup or changes to existing information for explicit user approval:
 
 1. **Rebuild Indexes**: If the deterministic report flags that indices are out of sync or category pages need rebuilding, run:
    ```bash
    uv run --directory <wiki skill path> wiki --root <notebook-root> index
    ```
 2. **Reclassify/Add Notes**: If notes exist but are unclassified, or if notes have been modified and need their classification refreshed or re-logged, run the `agents/add.md` workflow for those notes (or invoke the corresponding `wiki add` command).
-3. **Handle Deleted Notes**: If there are missing source notes (i.e. logged entries pointing to deleted files), remove their references from `log.md` and rebuild the indexes to reflect the deletion.
+3. **Handle Deleted Notes**: If there are missing source notes (i.e. logged entries pointing to deleted files), run `wiki index` to append removal events; never edit old log entries or erase authored references.
 4. **Fix Semantic Gaps & Contradictions**:
    - For empty or placeholder syntheses, invoke `agents/synthesize.md` for the affected category.
-   - For contradictory or stale statements, trace the source notes to determine the ground truth, update the source notes if necessary, and re-run `agents/synthesize.md` for the category.
+   - For contradictory or stale statements, trace the source notes to determine the ground truth, append a sourced correction without deleting the original statement, and re-run `agents/synthesize.md` for the category.
 5. **Resolve Orphan Pages & Cross-references**:
    - Edit the relevant notes/category pages to add missing `[[Concept]]` or `[[Note Title]]` wiki links, ensuring all pages are well-connected.
 6. **Propagate Cascading Rollups**:
    - If changes were made to sub-category syntheses, invoke `agents/synthesize.md` upward for each parent category sequentially, then invoke `agents/homepage.md` to refresh `HOME.md` as the final human-facing pass.
    - If structural remediation happened without obvious synthesis edits, still refresh `HOME.md` whenever the tree, counts, subcategories, or homepage-worthy summaries changed. Structural correctness alone is not enough if the front door is stale.
-7. **Prune Empty Categories**: Remove empty leaf categories from the approved tree in `index.md` and delete their generated folders/files, unless there is a specific reason to keep them.
+7. **Review Empty Categories**: Report empty or orphaned categories. Retain their tree entries, folders, files, and authored syntheses unless the user explicitly approves a specific cleanup.
 
 Once remediation is complete, provide the user with a concise summary of the executed actions and the resolved issues. If synthesis or category/tree changes happened, explicitly confirm that `HOME.md` was refreshed as part of completion.
+
+
+
+## Preservation Contract
+
+All wiki workflows are additive by default. Keep existing source notes, YAML values and comments, category summaries, synthesis prose, extra sections, tree annotations, and homepage content. Add missing information without duplicating it; do not replace, normalize, prune, rename, or delete existing information unless the user explicitly requests that specific change. Surface conflicting categories for review rather than reclassifying silently.
+
+The backend adds missing metadata and navigation/reference lines. Existing metadata, including `modified` and counts, is retained as a snapshot; use `wiki tree --format json` and `wiki list` for current structure and counts. Old placeholders and stale links are retained for review, not automatically erased. Orphan category pages remain on disk and are reported by `index`, `add`, and `lint`. `HOME.md` is never written by the backend.
+
+Source metadata updates preserve the original text and add only a missing property. Conflicting values, malformed or ambiguous YAML, output-path collisions, and symlink writes fail safely. `log.md` is append-only. Repeating the same operation must not duplicate material or rewrite unchanged files. Concurrent edits detected during a prepared write cause an error; stop and retry after other writers finish.

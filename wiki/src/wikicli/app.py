@@ -59,7 +59,6 @@ class WikiCli:
         """
         notebook = self._notebook
         index = WikiIndex(self.config, notebook)
-        index._ensure_layout()
 
         note, issues = notebook.parse_new_note(raw_json)
         if issues:
@@ -94,14 +93,20 @@ class WikiCli:
                 ),
                 exit_code=1,
             )
-        data = index.add_note(note, allow_undeclared=allow_undeclared)
+        try:
+            data = index.add_note(note, allow_undeclared=allow_undeclared)
+        except (ValueError, OSError) as exc:
+            return CommandResult(False, "add", issues=(Issue("preservation_conflict", str(exc)),), exit_code=1)
         data["allow_undeclared"] = allow_undeclared
         return CommandResult(True, "add", data=data)
 
     def index(self) -> CommandResult:
         """Reconcile notebook state and generated wiki files."""
         index = WikiIndex(self.config, self._notebook)
-        return CommandResult(True, "index", data=index.index())
+        try:
+            return CommandResult(True, "index", data=index.index())
+        except (ValueError, OSError) as exc:
+            return CommandResult(False, "index", issues=(Issue("preservation_conflict", str(exc)),), exit_code=1)
 
     def list(
         self,
@@ -187,3 +192,4 @@ class WikiCli:
         """Return a deterministic category tree derived from wiki state."""
         index = WikiIndex(self.config, self._notebook)
         return CommandResult(True, "tree", data=index.tree(depth=depth))
+

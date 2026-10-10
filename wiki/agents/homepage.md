@@ -77,3 +77,13 @@ When instructed to generate the homepage, perform the following steps:
 - When invoked with explicit updates from lint or synthesis rollups, consider those updates for `Emerging Topics & Key Ideas` even if they are not among the most recently created notes.
 - Limit `Emerging Topics & Key Ideas` to 10 bullets.
 - Do not run `wiki index` to overwrite files, use `wiki tree`, `wiki list`, `wiki lint`, filesystem metadata, and direct reads of generated category pages to gather metadata.
+
+
+
+## Preservation Contract
+
+All wiki workflows are additive by default. Keep existing source notes, YAML values and comments, category summaries, synthesis prose, extra sections, tree annotations, and homepage content. Add missing information without duplicating it; do not replace, normalize, prune, rename, or delete existing information unless the user explicitly requests that specific change. Surface conflicting categories for review rather than reclassifying silently.
+
+The backend adds missing metadata and navigation/reference lines. Existing metadata, including `modified` and counts, is retained as a snapshot; use `wiki tree --format json` and `wiki list` for current structure and counts. Old placeholders and stale links are retained for review, not automatically erased. Orphan category pages remain on disk and are reported by `index`, `add`, and `lint`. `HOME.md` is never written by the backend.
+
+Source metadata updates preserve the original text and add only a missing property. Conflicting values, malformed or ambiguous YAML, output-path collisions, and symlink writes fail safely. `log.md` is append-only. Repeating the same operation must not duplicate material or rewrite unchanged files. Concurrent edits detected during a prepared write cause an error; stop and retry after other writers finish.

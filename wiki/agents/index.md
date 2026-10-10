@@ -46,7 +46,7 @@ uv run --directory <wiki skill path> wiki --root <notebook-root> index
 - Keep hierarchy labels broad enough to survive future indexing.
 - Keep the approved category tree in `index.md` updated when genuinely new subtrees are needed.
 - Preserve existing rich category synthesis pages during rebuild-oriented workflows. Do not treat a one or two sentence summary as a full synthesis replacement.
-- When synthesis needs to evolve, revise the existing prose in place. Prefer organic integration of new material over detached appendices or complete rewrites.
+- When synthesis needs to evolve, append distinct supporting information beside relevant prose while retaining every existing passage. Ask before rewriting.
 - Use the deterministic `layer1:`, `layer2:`, `layer3:`, and deeper `layerN:` labels when proposing or editing branch names.
 - For bulk indexing, use note-level subagents as the classification workers and keep the run bounded to 8 concurrent workers.
 
@@ -57,3 +57,13 @@ uv run --directory <wiki skill path> wiki --root <notebook-root> index
 - Do not hardcode provider-specific model behavior into the backend.
 - Do not index the whole notebook before the user has accepted a category tree.
 - Do not keep notes in a generic branch just because it already exists. Create or propose a better branch when the topic warrants it.
+
+
+
+## Preservation Contract
+
+All wiki workflows are additive by default. Keep existing source notes, YAML values and comments, category summaries, synthesis prose, extra sections, tree annotations, and homepage content. Add missing information without duplicating it; do not replace, normalize, prune, rename, or delete existing information unless the user explicitly requests that specific change. Surface conflicting categories for review rather than reclassifying silently.
+
+The backend adds missing metadata and navigation/reference lines. Existing metadata, including `modified` and counts, is retained as a snapshot; use `wiki tree --format json` and `wiki list` for current structure and counts. Old placeholders and stale links are retained for review, not automatically erased. Orphan category pages remain on disk and are reported by `index`, `add`, and `lint`. `HOME.md` is never written by the backend.
+
+Source metadata updates preserve the original text and add only a missing property. Conflicting values, malformed or ambiguous YAML, output-path collisions, and symlink writes fail safely. `log.md` is append-only. Repeating the same operation must not duplicate material or rewrite unchanged files. Concurrent edits detected during a prepared write cause an error; stop and retry after other writers finish.

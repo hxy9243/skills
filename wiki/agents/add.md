@@ -32,7 +32,7 @@ The backend keeps this packet shape lightweight and deterministic. `wiki add` ac
 2. Read the approved category tree from the top of `index.md` and infer the best-fitting branch to the best of your effort instead of defaulting to "Needs Review". Check `RULES.md` in the wiki root if it exists to apply any custom user rules. If you are truly not sure of the category, ask the user before adding.
 3. Normalize it into one concept packet unless there is a strong reason to split it.
 4. **Entity & Concept Page Maintenance**: Check whether the target category already has a generated or maintained category synthesis page. If it exists and contains a real multi-paragraph `## Synthesis` section, treat that prose as durable content. Do not collapse it back into the short frontmatter `summary`.
-5. When new information materially strengthens an existing category synthesis, update the existing `## Synthesis` body by integrating the new idea, nuance, example, or contradiction into the current prose. Wrap new material organically into the existing synthesis instead of dropping in a detached replacement block.
+5. When new information materially strengthens an existing category synthesis, append the new idea, nuance, example, or contradiction beside the relevant existing material, without rewriting earlier prose. Check for duplicates first.
 6. Treat the short `summary` field as homepage and metadata fuel only. It should remain a compact 1 to 2 sentence highlight of the category, but it must not overwrite a richer existing category synthesis body.
 7. Let the deterministic Python backend handle metadata and references only. Do not push synthesis merge logic down into `wiki.py`; synthesis upkeep belongs in the skill workflow and should be performed through deliberate file edits.
 8. Choose the branch that would make this note easiest to rediscover later through natural search queries.
@@ -41,7 +41,7 @@ The backend keeps this packet shape lightweight and deterministic. `wiki add` ac
 11. Keep concept families consistent across folders. If an AI note in `10_Projects` and an AI note in `20_Subjects` belong together for search, place them together.
 12. Prefer stable concept titles over catchy phrasing.
 13. Pull reusable tags from frontmatter when available and normalize them into short search-friendly tags.
-14. **Rich Frontmatter**: Before calling the add command, ensure the source note has rich YAML frontmatter to fully leverage Obsidian tools like Dataview and Graph View. Use your file editing tools to add or update `tags`, `date` (if missing), and any relevant `entity_links` to other notes. If you updated a concept page in steps 4 to 5, also ensure its `source_count` or `related_notes` is updated.
+14. **Rich Frontmatter**: Before calling the add command, ensure the source note has rich YAML frontmatter to fully leverage Obsidian tools like Dataview and Graph View. Add missing properties only; preserve existing values and YAML formatting. Propose conflicting changes separately. Keep live counts in backend query output rather than overwriting authored metadata.
 15. Call the add command with the packet as an inline JSON string:
 
 ```bash
@@ -59,3 +59,13 @@ uv run --directory <wiki skill path> wiki --root <notebook-root> add --json '{"t
 - Tags should be short and reusable.
 - Source note paths must be relative to the notebook root.
 - New subtrees should be rare and justified by repeated concept pressure, not a single quirky note.
+
+
+
+## Preservation Contract
+
+All wiki workflows are additive by default. Keep existing source notes, YAML values and comments, category summaries, synthesis prose, extra sections, tree annotations, and homepage content. Add missing information without duplicating it; do not replace, normalize, prune, rename, or delete existing information unless the user explicitly requests that specific change. Surface conflicting categories for review rather than reclassifying silently.
+
+The backend adds missing metadata and navigation/reference lines. Existing metadata, including `modified` and counts, is retained as a snapshot; use `wiki tree --format json` and `wiki list` for current structure and counts. Old placeholders and stale links are retained for review, not automatically erased. Orphan category pages remain on disk and are reported by `index`, `add`, and `lint`. `HOME.md` is never written by the backend.
+
+Source metadata updates preserve the original text and add only a missing property. Conflicting values, malformed or ambiguous YAML, output-path collisions, and symlink writes fail safely. `log.md` is append-only. Repeating the same operation must not duplicate material or rewrite unchanged files. Concurrent edits detected during a prepared write cause an error; stop and retry after other writers finish.

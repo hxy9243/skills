@@ -123,14 +123,14 @@ Good synthesis responses usually include:
 
 # Result Output
 
-For a synthesis for a category already in the tree, the Python backend owns the generated category page skeleton. It creates and refreshes `path/to/category/index.md`, including frontmatter, layer path, subcategories, and references. Your primary job is to update the category page's narrative `## Synthesis` section, and to preserve or improve any existing rich prose.
+For a synthesis for a category already in the tree, the Python backend owns the generated category page skeleton. It creates missing pages and adds missing metadata, subcategories, and references. Existing fields and prose remain intact. Your job is to append distinct, sourced information to `## Synthesis` without replacing earlier writing.
 
 Before editing a generated category page:
 
 1. Run `uv run --directory <wiki skill path> wiki --root <notebook-root> list "Category > Path" --recursive --include-body` to retrieve the relevant source notes.
 2. Read the existing generated category page directly.
 3. Keep the backend-owned structure intact unless the user explicitly requests a full page rewrite.
-4. Replace or revise only the `## Synthesis` body when possible. If there is already a substantial synthesis, merge new ideas into it organically rather than replacing it wholesale.
+4. Add distinct information within `## Synthesis`; preserve existing wording, headings, and conclusions. Request explicit approval before revisions or replacements.
 5. Leave deterministic sections such as `## Layer Path`, `## Subcategories`, and `## References` to the backend unless you are correcting a clear backend defect.
 
 Generated category pages normally follow this backend-owned structure:
@@ -177,7 +177,17 @@ If the synthesis represents a highly valuable new concept, deep analysis, or com
 
 To save a synthesis:
 1. Create a new markdown file in the user's notebook (e.g., alongside related source notes or in a `Syntheses/` folder).
-2. **Rich Frontmatter**: Include rich YAML frontmatter to fully leverage Obsidian tools like Dataview and Graph View. You must include `date`, `modified`, `tags`, `source_count` (number of notes synthesized), and `entity_links` (direct wikilinks to the core notes used). Always update the `modified` timestamp when updating an existing synthesis.
+2. **Rich Frontmatter**: Include rich YAML frontmatter to fully leverage Obsidian tools like Dataview and Graph View. You must include `date`, `modified`, `tags`, `source_count` (number of notes synthesized), and `entity_links` (direct wikilinks to the core notes used). Preserve the existing `modified` timestamp unless the user explicitly approves changing it; do not automatically update it when updating an existing synthesis.
 3. When necessary, use rich representations to better present your ideas, like a mermaid flowchart, table, or lists.
 4. Write the synthesized content into the file.
 5. Build a single add packet for the new note, then run `uv run --directory <wiki skill path> wiki --root <notebook-root> add --json '<json-packet>'` to index it back into the wiki.
+
+
+
+## Preservation Contract
+
+All wiki workflows are additive by default. Keep existing source notes, YAML values and comments, category summaries, synthesis prose, extra sections, tree annotations, and homepage content. Add missing information without duplicating it; do not replace, normalize, prune, rename, or delete existing information unless the user explicitly requests that specific change. Surface conflicting categories for review rather than reclassifying silently.
+
+The backend adds missing metadata and navigation/reference lines. Existing metadata, including `modified` and counts, is retained as a snapshot; use `wiki tree --format json` and `wiki list` for current structure and counts. Old placeholders and stale links are retained for review, not automatically erased. Orphan category pages remain on disk and are reported by `index`, `add`, and `lint`. `HOME.md` is never written by the backend.
+
+Source metadata updates preserve the original text and add only a missing property. Conflicting values, malformed or ambiguous YAML, output-path collisions, and symlink writes fail safely. `log.md` is append-only. Repeating the same operation must not duplicate material or rewrite unchanged files. Concurrent edits detected during a prepared write cause an error; stop and retry after other writers finish.

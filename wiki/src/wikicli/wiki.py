@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 import os
 import re
+import tempfile
+import stat
 from collections import defaultdict
 from dataclasses import asdict, dataclass, replace
 from datetime import UTC, datetime
@@ -25,6 +27,7 @@ class IssueType(str, Enum):
     UNINDEXED = "unindexed"
     INVALID_CATEGORY = "invalid_category"
     EMPTY_CATEGORY = "empty_category"
+    ORPHAN_PAGE = "orphan_page"
 
 
 @dataclass(frozen=True)
@@ -148,6 +151,7 @@ class WikiIndex:
         """Add a category path to the tree in index.md."""
         if isinstance(path, str):
             path = CategoryPath.parse(path)
+        self._preflight(extra_paths={CategoryPath(path.parts[:depth]) for depth in range(1, len(path.parts) + 1)})
         self._ensure_layout()
         tree = self.read_tree()
         if tree.contains(path):
@@ -157,10 +161,13 @@ class WikiIndex:
         for depth in range(1, len(path.parts) + 1):
             paths.add(CategoryPath(path.parts[:depth]))
 
-        original = self.config.index_path.read_text(encoding="utf-8")
-        tree_block = _render_tree_block(self.config.categories_dir, paths)
-        updated = _replace_tree_block(original, tree_block)
-        _write_if_changed(self.config.index_path, updated)
+        original = _read_text(self.config.index_path)
+        # Append a complete lineage; the parser merges repeated ancestors.
+        # Never replace the user-approved tree or its surrounding annotations.
+        lineage = {CategoryPath(path.parts[:depth]) for depth in range(1, len(path.parts) + 1)}
+        tree_block = _render_tree_block(self.config.categories_dir, lineage)
+        updated = _append_tree_block(original, tree_block)
+        _write_if_changed(self.config.index_path, updated, expected=original)
         return self.read_tree()
 
     # --- catalog ---
@@ -271,29 +278,49 @@ class WikiIndex:
         self, note: NewNote, *, allow_undeclared: bool = False
     ) -> dict[str, Any]:
         """Apply an accepted new note: update frontmatter, append log, render views."""
+        source_path = self.notebook._write_path(note.source)
+        proposed = {CategoryPath(note.category.parts[:depth]) for depth in range(1, len(note.category.parts) + 1)} if allow_undeclared else set()
+        self._preflight(extra_paths=proposed)
+        self.notebook.discover()
+        # Validate all source metadata and category conflicts before any mutation.
+        NoteMetadata.add_property(_read_text(source_path), "category", note.category.display())
+        previous = self.catalog().get(note.source)
+        if previous and previous.category != note.category.display():
+            raise ValueError("existing catalog category differs; explicit recategorization is required")
+        if previous:
+            note = replace(note,
+                title=previous.title,
+                summary=_merge_text(previous.summary, note.summary),
+                tags=tuple(dict.fromkeys((*previous.tags, *note.tags))),
+                search_terms=tuple(dict.fromkeys((*previous.search_terms, *note.search_terms))),
+            )
         self._ensure_layout()
         if allow_undeclared and not self.read_tree().contains(note.category):
             self.add_category(note.category)
-        source_path = self.notebook.resolve(note.source)
+        source_path = self.notebook._write_path(note.source)
         changed_files: list[str] = []
         if NoteMetadata.write_category(source_path, note.category.display()):
             changed_files.append(note.source)
-        self._append_event(
-            {
-                "timestamp": _utc_now(),
-                "action": "add",
-                "title": note.title,
-                "summary": note.summary,
-                "category": note.category.display(),
-                "tags": list(note.tags),
-                "search_terms": list(note.search_terms),
-                "source": note.source,
-                "source_mtime_ns": source_path.stat().st_mtime_ns,
-            },
-        )
-        changed_files.append(
-            str(self.config.log_path.relative_to(self.config.generated_root))
-        )
+        event_needed = not previous or any((
+            previous.title != note.title, previous.summary != note.summary,
+            previous.tags != note.tags, previous.search_terms != note.search_terms,
+            previous.source_mtime_ns != source_path.stat().st_mtime_ns,
+        ))
+        if event_needed:
+            self._append_event(
+                {
+                    "timestamp": _utc_now(),
+                    "action": "add",
+                    "title": note.title,
+                    "summary": note.summary,
+                    "category": note.category.display(),
+                    "tags": list(note.tags),
+                    "search_terms": list(note.search_terms),
+                    "source": note.source,
+                    "source_mtime_ns": source_path.stat().st_mtime_ns,
+                },
+            )
+            changed_files.append(str(self.config.log_path.relative_to(self.config.notebook_root)))
         rebuild = self._rebuild_generated()
         changed_files.extend(rebuild["changed_files"])
         catalog = self.catalog()
@@ -302,15 +329,21 @@ class WikiIndex:
             "changed_files": sorted(set(changed_files)),
             "indexed_count": len(catalog),
             "category_pages": rebuild["category_pages"],
+            "orphan_pages": rebuild["orphan_pages"],
         }
 
     def index(self) -> dict[str, Any]:
         """Scan notebook state, record missing catalog entries, and regenerate views."""
+        self._preflight()
+        # Parse every source before layout, event, or generated-page writes.
+        notes = {note.source: note for note in self.notebook.discover()}
         self._ensure_layout()
         catalog = self.catalog()
-        notes = {note.source: note for note in self.notebook.discover()}
         removed: list[str] = []
         for source in sorted(set(catalog) - set(notes), key=str.casefold):
+            # Excluded or out-of-scope notes still exist; do not remove their catalog history.
+            if self.notebook.resolve(source).exists():
+                continue
             self._append_event(
                 {
                     "timestamp": _utc_now(),
@@ -330,17 +363,15 @@ class WikiIndex:
             note = notes[source]
             entry = catalog[source]
             metadata = NoteMetadata.read(note.path)
-            summary = Notebook.clean_body_text(note.body).split("\n", 1)[0].strip()
-            if metadata.frontmatter.get("summary"):
-                summary = str(metadata.frontmatter.get("summary") or summary)
+            summary = _merge_text(entry.summary, str(metadata.frontmatter.get("summary") or ""))
             self._append_event(
                 {
                     "timestamp": _utc_now(),
                     "action": "add",
-                    "title": note.title,
+                    "title": entry.title,
                     "summary": summary,
                     "category": self._resolved_category(note, entry),
-                    "tags": list(note.tags),
+                    "tags": list(dict.fromkeys((*entry.tags, *note.tags))),
                     "search_terms": list(entry.search_terms),
                     "source": source,
                     "source_mtime_ns": note.path.stat().st_mtime_ns,
@@ -356,6 +387,7 @@ class WikiIndex:
             "unindexed_notes": unindexed,
             "category_pages": rebuild["category_pages"],
             "changed_files": rebuild["changed_files"],
+            "orphan_pages": rebuild["orphan_pages"],
         }
 
     # --- search ---
@@ -519,29 +551,63 @@ class WikiIndex:
                     path=str(category_page_path(self.config.categories_dir, category)),
                 )
             )
+        valid = {category_page_path(self.config.categories_dir, category).resolve() for category in tree.all_paths()}
+        for page in sorted(self.config.categories_dir.rglob("*.md")):
+            if page.resolve() not in valid:
+                issues.append(Issue(IssueType.ORPHAN_PAGE, "page is outside the current tree; retained unchanged", severity="warning", path=str(page.relative_to(self.config.notebook_root))))
         return tuple(issues)
 
     # --- private helpers ---
+
+    def _preflight(self, *, extra_paths: set[CategoryPath] | None = None) -> None:
+        """Reject ambiguous or unsafe inputs before making any workspace changes."""
+        targets = [self.config.generated_root, self.config.index_path, self.config.log_path]
+        seen: dict[Path, CategoryPath] = {}
+        for category in self.read_tree().all_paths() | (extra_paths or set()):
+            target = category_page_path(self.config.categories_dir, category)
+            if target in seen and seen[target] != category:
+                raise ValueError(f"category paths collide: {seen[target].display()} and {category.display()}")
+            if any(not part for part in category.slug_parts()):
+                raise ValueError(f"category has an empty filesystem name: {category.display()}")
+            seen[target] = category
+            targets.append(target)
+        for target in targets:
+            _check_write_path(target, self.config.notebook_root)
+            if target != self.config.generated_root and target.exists() and not target.is_file():
+                raise ValueError(f"expected a file, found another object: {target}")
+            if any(parent.exists() and not parent.is_dir() for parent in target.parents):
+                raise ValueError(f"output parent is not a directory: {target}")
+            if target == self.config.generated_root and target.exists() and not target.is_dir():
+                raise ValueError(f"wiki root is not a directory: {target}")
+            if target.is_file() and target.suffix == ".md":
+                NoteMetadata.parse(_read_text(target))
+        # Rebuild also reads cataloged sources outside today's include roots.
+        self._grouped_catalog_entries()
+        # Even orphaned pages are user content: reject invalid metadata, never delete.
+        for target in self.config.categories_dir.rglob("*.md"):
+            _check_write_path(target, self.config.notebook_root)
+            NoteMetadata.parse(_read_text(target))
 
     def _ensure_layout(self) -> None:
         """Create the generated wiki directory and required files."""
         self.config.generated_root.mkdir(parents=True, exist_ok=True)
         self.config.categories_dir.mkdir(parents=True, exist_ok=True)
         if not self.config.log_path.exists():
-            self.config.log_path.write_text("# Wiki Log\n\n", encoding="utf-8")
+            _create_if_missing(self.config.log_path, "# Wiki Log\n\n")
         if not self.config.index_path.exists():
-            self.config.index_path.write_text(
-                "# Wiki Index\n\n## Category Tree\n\n---\n\n## Skipped System Notes\n- None\n",
-                encoding="utf-8",
-            )
+            _create_if_missing(self.config.index_path,
+                "# Wiki Index\n\n## Category Tree\n\n---\n\n## Skipped System Notes\n- None\n")
 
     def _append_event(self, event: dict[str, Any]) -> None:
         """Append one JSON event to `log.md`."""
         self._ensure_layout()
-        with self.config.log_path.open("a", encoding="utf-8") as handle:
-            handle.write(
-                f"- {json.dumps(event, ensure_ascii=True, sort_keys=True)}\n"
-            )
+        _check_write_path(self.config.log_path, self.config.notebook_root)
+        existing = _read_text(self.config.log_path)
+        newline = "\r\n" if "\r\n" in existing else "\n"
+        with self.config.log_path.open("a", encoding="utf-8", newline="") as handle:
+            if existing and not existing.endswith(("\n", "\r")):
+                handle.write(newline)
+            handle.write(f"- {json.dumps(event, ensure_ascii=True, sort_keys=True)}{newline}")
 
     def _rebuild_generated(self, unindexed: list[str] | None = None) -> dict[str, Any]:
         """Rewrite index, category pages, and homepage with lightweight metadata."""
@@ -555,33 +621,31 @@ class WikiIndex:
         for path in all_paths:
             page = category_page_path(self.config.categories_dir, path)
             page.parent.mkdir(parents=True, exist_ok=True)
+            original = _read_text(page) if page.exists() else None
             content = self._render_category_page(
                 path,
                 child_map.get(path, ()),
                 grouped.get(path, ()),
             )
-            if _write_if_changed(page, content):
+            if _write_if_changed(page, content, expected=original):
                 changed_files.append(str(page.relative_to(self.config.notebook_root)))
             valid_pages.add(page.resolve())
 
-        for path in sorted(self.config.categories_dir.rglob("*.md"), reverse=True):
-            if path.resolve() not in valid_pages:
-                path.unlink()
-                changed_files.append(str(path.relative_to(self.config.notebook_root)))
-        for path in sorted(self.config.categories_dir.rglob("*"), reverse=True):
-            if path.is_dir():
-                try:
-                    path.rmdir()
-                except OSError:
-                    pass
+        orphan_pages = sorted(
+            str(path.relative_to(self.config.notebook_root))
+            for path in self.config.categories_dir.rglob("*.md")
+            if path.resolve() not in valid_pages
+        )
 
+        original_index = _read_text(self.config.index_path)
         index_content = self._render_index(tree, grouped, unindexed or [])
-        if _write_if_changed(self.config.index_path, index_content):
+        if _write_if_changed(self.config.index_path, index_content, expected=original_index):
             changed_files.append(str(self.config.index_path.relative_to(self.config.notebook_root)))
 
         return {
             "category_pages": len(valid_pages),
             "changed_files": changed_files,
+            "orphan_pages": orphan_pages,
         }
 
     def _render_index(
@@ -590,21 +654,18 @@ class WikiIndex:
         grouped: dict[CategoryPath, list[CatalogEntry]],
         unindexed: list[str],
     ) -> str:
-        """Render the machine-facing wiki index."""
-        homepage_rel = Path(os.path.relpath(self.config.homepage_path, start=self.config.generated_root)).as_posix()
-        lines = ["# Wiki Index", "", "## Category Tree", "", "This tree is the classification reference for the wiki.", "", f"Human-facing entry point: [[{homepage_rel}|Human-facing homepage]].", ""]
-        if not tree.roots:
-            lines.append("- None")
-        else:
-            for root in tree.roots:
-                self._append_tree_lines(lines, root, (), grouped)
-        lines.extend(["", "---", "", "## Skipped System Notes"])
-        if unindexed:
-            for source in unindexed:
-                lines.append(f"- [[{source}]]")
-        else:
-            lines.append("- None")
-        return "\n".join(lines).rstrip() + "\n"
+        """Add missing navigation without replacing the approved tree or manual text."""
+        original = _read_text(self.config.index_path) if self.config.index_path.exists() else "# Wiki Index\n"
+        entries = []
+        for category in sorted(grouped, key=lambda item: item.display().casefold()):
+            for entry in grouped[category]:
+                marker = f"[[{entry.source}]]"
+                if marker not in original and all(marker not in row for row in entries):
+                    entries.append(f"- {marker} — {entry.category}")
+        text = _append_section_items(original, "Indexed Notes", entries)
+        return _append_section_items(text, "Skipped System Notes", [
+            f"- [[{source}]]" for source in unindexed if f"[[{source}]]" not in text
+        ])
 
     def _append_tree_lines(
         self,
@@ -631,84 +692,39 @@ class WikiIndex:
         child_names: tuple[str, ...],
         notes: tuple[CatalogEntry, ...] | list[CatalogEntry],
     ) -> str:
-        """Render one generated category page with frontmatter metadata."""
-        notes = list(notes)
+        """Add missing metadata/navigation while preserving every existing byte."""
         page_path = category_page_path(self.config.categories_dir, path)
-        existing = NoteMetadata.read(page_path) if page_path.exists() else None
-        existing_text = page_path.read_text(encoding="utf-8") if page_path.exists() else None
-        created = existing.frontmatter.get("created") if existing else None
-        modified = existing.frontmatter.get("modified") if existing else None
+        notes = list(notes)
         timestamp = _utc_now()
-        summary = _compact_summary(path, child_names, notes)
-        synthesis_body = _extract_section(existing.body, "Synthesis") if existing else None
-        frontmatter: dict[str, object] = {
-            "category": path.display(),
-            "created": created or timestamp,
-            "modified": modified or timestamp,
-            "summary": summary,
-            "tags": ["#wiki", "#synthesis"],
-            "wiki_role": "synthesis",
-            "wiki_depth": len(path.parts),
+        frontmatter = {
+            "category": path.display(), "created": timestamp, "modified": timestamp,
+            "summary": "", "tags": ["#wiki", "#synthesis"],
+            "wiki_role": "synthesis", "wiki_depth": len(path.parts),
             "wiki_kind": "leaf" if not child_names else "branch",
-            "wiki_note_count": len(notes),
-            "wiki_child_count": len(child_names),
+            "wiki_note_count": len(notes), "wiki_child_count": len(child_names),
             "wiki_status": "empty" if not notes else "active",
         }
         if len(path.parts) > 1:
             parent = CategoryPath(path.parts[:-1])
-            parent_rel = Path(
-                os.path.relpath(
-                    category_page_path(self.config.categories_dir, parent),
-                    start=page_path.parent,
-                )
-            ).as_posix()
-            frontmatter["parent"] = f"[[{parent_rel}|{parent.parts[-1]}]]"
-
-        synthesis = self._category_synthesis(
-            path,
-            child_names,
-            notes,
-            summary,
-            existing_synthesis=synthesis_body,
-        )
-        meta = NoteMetadata(frontmatter, synthesis)
-        rendered = meta.render()
-        if existing_text is None or rendered == existing_text:
-            return rendered
-
-        frontmatter["modified"] = timestamp
-        return NoteMetadata(frontmatter, synthesis).render()
-
-    def _category_synthesis(
-        self,
-        path: CategoryPath,
-        child_names: tuple[str, ...],
-        notes: list[CatalogEntry],
-        summary: str,
-        *,
-        existing_synthesis: str | None = None,
-    ) -> str:
-        """Generate a category body while preserving richer existing synthesis text."""
-        depth = len(path.parts)
-        lines = [f"# layer{depth}: {path.parts[-1]}", "", "## Layer Path"]
-        lines.extend(f"- layer{index}: {part}" for index, part in enumerate(path.parts, start=1))
-        lines.extend(["", "## Subcategories"])
-        page_path = category_page_path(self.config.categories_dir, path)
-        if child_names:
-            for child in child_names:
-                child_path = CategoryPath((*path.parts, child))
-                rel = Path(os.path.relpath(category_page_path(self.config.categories_dir, child_path), start=page_path.parent)).as_posix()
-                lines.append(f"- [layer{depth + 1}: {child}]({rel})")
+            rel = Path(os.path.relpath(category_page_path(self.config.categories_dir, parent), start=page_path.parent)).as_posix()
+            frontmatter["parent"] = f"[[{rel}|{parent.parts[-1]}]]"
+        if page_path.exists():
+            text = _read_text(page_path)
+            existing = NoteMetadata.parse(text)
+            for key, value in frontmatter.items():
+                if key not in existing.frontmatter:
+                    text = NoteMetadata.add_property(text, key, value)
         else:
-            lines.append("- None")
-
-        lines.extend(["", "## Synthesis", ""])
-        preserved = _normalize_preserved_synthesis(existing_synthesis, summary)
-        lines.extend(preserved.splitlines() if preserved else [summary])
-        lines.extend(["", "## References"])
-        references = _render_references(notes)
-        lines.extend(references.splitlines() if references else ["- None"])
-        return "\n".join(lines).rstrip() + "\n"
+            text = NoteMetadata(frontmatter, f"# layer{len(path.parts)}: {path.parts[-1]}\n\n## Synthesis\n\n").render()
+        children = []
+        for child in child_names:
+            child_path = CategoryPath((*path.parts, child))
+            rel = Path(os.path.relpath(category_page_path(self.config.categories_dir, child_path), start=page_path.parent)).as_posix()
+            if f"]({rel})" not in text:
+                children.append(f"- [layer{len(path.parts) + 1}: {child}]({rel})")
+        text = _append_section_items(text, "Subcategories", children)
+        references = [f"- [[{entry.source}]] - {entry.summary}" for entry in sorted(notes, key=lambda item: item.title.casefold()) if f"[[{entry.source}]]" not in text]
+        return _append_section_items(text, "References", references)
 
     def _grouped_catalog_entries(self) -> dict[CategoryPath, list[CatalogEntry]]:
         """Group active catalog entries under every ancestor path.
@@ -845,11 +861,40 @@ def _weight(reason: str) -> int:
     }.get(reason, 1)
 
 
-def _write_if_changed(path: Path, content: str) -> bool:
-    """Write only when content changed."""
-    if path.exists() and path.read_text(encoding="utf-8") == content:
+def _create_if_missing(path: Path, content: str) -> None:
+    try:
+        with path.open("x", encoding="utf-8", newline="") as handle:
+            handle.write(content)
+    except FileExistsError:
+        pass
+
+
+def _write_if_changed(path: Path, content: str, *, expected: str | None) -> bool:
+    """Atomically apply a prepared additive edit; reject intervening changes."""
+    if path.is_symlink() or any(parent.is_symlink() for parent in path.parents):
+        raise ValueError(f"refusing to write through a symlink: {path}")
+    current = _read_text(path) if path.exists() else None
+    if current != expected:
+        raise ValueError(f"file changed while preparing wiki update: {path}")
+    if current == content:
         return False
-    path.write_text(content, encoding="utf-8")
+    mode = stat.S_IMODE(path.stat().st_mode) if path.exists() else 0o644
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", newline="", dir=path.parent, delete=False) as handle:
+            temporary = Path(handle.name)
+            handle.write(content)
+            handle.flush()
+            os.fsync(handle.fileno())
+        temporary.chmod(mode)
+        if path.is_symlink() or any(parent.is_symlink() for parent in path.parents):
+            raise ValueError(f"refusing to write through a symlink: {path}")
+        if (_read_text(path) if path.exists() else None) != expected:
+            raise ValueError(f"file changed while preparing wiki update: {path}")
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None and temporary.exists():
+            temporary.unlink()
     return True
 
 
@@ -872,99 +917,53 @@ def _render_tree_block(categories_dir: Path, paths: set[CategoryPath]) -> str:
     return "\n".join(lines) if lines else "- None"
 
 
-def _replace_tree_block(index_text: str, tree_block: str) -> str:
+def _merge_text(existing: str, incoming: str) -> str:
+    """Retain accepted catalog information; append a distinct additional summary."""
+    if not incoming or incoming == existing or f"\n\n{incoming}\n\n" in f"\n\n{existing}\n\n":
+        return existing
+    return f"{existing}\n\n{incoming}" if existing else incoming
+
+
+def _read_text(path: Path) -> str:
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        return handle.read()
+
+
+def _check_write_path(path: Path, root: Path) -> None:
+    if any(part.is_symlink() for part in (path, *path.parents)):
+        raise ValueError(f"refusing to write through a symlink: {path}")
+    try:
+        path.resolve().relative_to(root.resolve())
+    except ValueError as exc:
+        raise ValueError(f"write path escapes notebook root: {path}") from exc
+
+
+def _append_section_items(text: str, heading: str, items: list[str]) -> str:
+    """Insert only absent lines; never replace an existing section or its prose."""
+    items = list(dict.fromkeys(item for item in items if item not in text.splitlines()))
+    if not items:
+        return text
+    newline = "\r\n" if "\r\n" in text else "\n"
+    addition = newline.join(items) + newline
+    match = re.search(rf"(?m)^## {re.escape(heading)}[ \t]*\r?$", text)
+    if match:
+        # Append at the end of this section, without interpreting prose or headings.
+        tail = text[match.end():]
+        end_match = re.search(r"(?m)^##[ \t]+", tail)
+        position = match.end() + end_match.start() if end_match else len(text)
+        prefix = text[:position]
+        return prefix + ("" if prefix.endswith(newline) else newline) + addition + text[position:]
+    return text + ("" if text.endswith(newline) else newline) + newline + f"## {heading}" + newline + newline + addition
+
+
+def _append_tree_block(text: str, block: str) -> str:
+    newline = "\r\n" if "\r\n" in text else "\n"
+    block = block.replace("\n", newline)
     marker = "## Category Tree"
-    if marker not in index_text:
-        return (
-            "# Wiki Index\n\n"
-            "## Category Tree\n\n"
-            f"{tree_block}\n\n"
-            "---\n\n"
-            "## Skipped System Notes\n- None\n"
-        )
-    before_header, after_marker = index_text.split(marker, 1)
-    body, separator, after_separator = after_marker.partition("\n---\n")
-    prefix_lines = body.splitlines()
-    intro_lines: list[str] = []
-    seen_tree = False
-    for line in prefix_lines:
-        stripped = line.strip()
-        if stripped.startswith("- layer") or stripped == "- None":
-            seen_tree = True
-            continue
-        if seen_tree:
-            continue
-        intro_lines.append(line)
-    intro = "\n".join(intro_lines).strip()
-    replacement = f"{before_header}{marker}\n\n"
-    if intro:
-        replacement += f"{intro}\n\n"
-    replacement += f"{tree_block}\n"
-    if separator:
-        replacement += f"\n---\n{after_separator}"
-    else:
-        replacement += "\n---\n\n## Skipped System Notes\n- None\n"
-    return replacement
-
-
-def _extract_section(body: str, heading: str) -> str | None:
-    match = re.search(rf"(?m)^## {re.escape(heading)}\s*$", body)
-    if not match:
-        return None
-    section = body[match.end() :]
-    next_heading = re.search(r"(?m)^##\s+", section)
-    if next_heading:
-        section = section[: next_heading.start()]
-    cleaned = section.strip()
-    return cleaned or None
-
-
-def _normalize_preserved_synthesis(existing_synthesis: str | None, summary: str) -> str:
-    if not existing_synthesis:
-        return summary
-    stripped = existing_synthesis.strip()
-    if not stripped or stripped == summary or stripped == "- None":
-        return summary
-    return stripped
-
-
-def _render_references(notes: list[CatalogEntry]) -> str:
-    if not notes:
-        return "- None"
-    lines = []
-    for note in sorted(notes, key=lambda item: item.title.casefold()):
-        lines.append(f"- [[{note.source}]] - {note.summary}")
-    return "\n".join(lines)
-
-
-def _compact_summary(
-    path: CategoryPath,
-    child_names: tuple[str, ...],
-    notes: list[CatalogEntry],
-) -> str:
-    """Generate a short human-facing summary for one category page."""
-    title = path.parts[-1]
-    parent = path.parts[-2] if len(path.parts) > 1 else None
-    if not notes and child_names:
-        if parent:
-            return f"{title} is a branching area under {parent}. This page groups nearby subtopics but still needs a stronger synthesis."
-        return f"{title} is a branching area in the wiki. This page groups nearby subtopics but still needs a stronger synthesis."
-    if not notes:
-        return f"{title} is currently thin and should either be populated with real notes or folded back into a stronger neighboring category."
-
-    if child_names:
-        if title == "AI Agents":
-            return "AI Agents tracks how language-model systems become managed runtimes with memory, tools, retrieval, skills, and operational structure. The strongest notes here are about harness design and the shift from demos to maintained agent systems."
-        if title == "AI Systems":
-            return "AI Systems covers the production layer around models, especially inference, infrastructure, deployment, and training economics. It is the best place to read the vault as an operating stack rather than a set of isolated papers."
-        if title == "Machine Learning":
-            return "Machine Learning links theory, model behavior, language models, and systems concerns into one continuous layer. It helps connect abstract learning ideas to the practical realities of modern model building."
-        if title == "Computer Systems":
-            return "Computer Systems is the grounding layer for the vault. It keeps the AI material honest by emphasizing state, coordination, latency, reliability, and infrastructure constraints."
-        if title == "Knowledge Systems":
-            return "Knowledge Systems focuses on retrieval, indexing, memory structure, and information control. The recurring theme is that good recall depends as much on selection and organization as on search itself."
-        return f"{title} is a synthesis branch that gathers related notes into a broader conceptual area. Use it to understand the main subject first, then drill down into the more specific subcategories."
-
-    if parent:
-        return f"{title} is a focused leaf under {parent}. This page collects the notes that most directly define this topic in the current wiki."
-    return f"{title} is a focused synthesis page for one concrete topic cluster in the wiki."
+    if marker not in text:
+        return text + ("" if text.endswith(newline) else newline) + newline + marker + newline + newline + block + newline + newline + "---" + newline
+    position = text.find(newline + "---" + newline, text.index(marker))
+    if position < 0:
+        position = len(text)
+    prefix = text[:position]
+    return prefix + ("" if prefix.endswith(newline) else newline) + block + newline + text[position:]

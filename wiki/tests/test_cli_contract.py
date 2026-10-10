@@ -239,7 +239,7 @@ class CliContractTests(unittest.TestCase):
             "model calls into maintained systems."
         )
         category_page.write_text(
-            original.replace(f"\n{compact}\n", f"\n{rich_synthesis}\n", 1),
+            original.replace("## Synthesis\n\n", f"## Synthesis\n\n{rich_synthesis}\n", 1),
             encoding="utf-8",
         )
         self.write_note("Notes/Reflexion.md", "# Reflexion\n\nSelf-critique loops.")
@@ -640,8 +640,8 @@ class CliContractTests(unittest.TestCase):
             / "index.md"
         )
         category_text = category_page.read_text(encoding="utf-8")
-        self.assertIn("[[Notes/Homelab.md]] - Homelab setup ideas.", category_text)
-        self.assertNotIn("Wrong old category.", category_text)
+        self.assertIn("[[Notes/Homelab.md]] - Wrong old category.", category_text)
+        self.assertIn("Homelab setup ideas.", category_text)
 
     def test_removed_commands_fail(self) -> None:
         """Removed commands (show, status, synthesize, reconcile) should not parse."""
@@ -684,3 +684,4 @@ class CliContractTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

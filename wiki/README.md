@@ -148,15 +148,15 @@ Generated category pages should carry lightweight frontmatter so homepage querie
 Expected metadata includes:
 - `category`: canonical display path like `Computer Science > Artificial Intelligence > AI Agents`
 - `created`: first generation timestamp, preserved across rebuilds when possible
-- `modified`: latest regeneration timestamp
+- `modified`: creation or existing authored timestamp, preserved during additive updates
 - `summary`: agent-maintained short human-facing highlight of the category, usually one or two sentences; the backend preserves it but does not generate semantic summary text
 - `parent`: optional relative wiki link to the immediate parent category page
 - `tags`: include at least `#wiki` and `#synthesis`
 - `wiki_role: synthesis`
 - `wiki_kind`: `branch` or `leaf`
 - `wiki_depth`: integer category depth
-- `wiki_note_count`: integer count of indexed notes rolled into the page
-- `wiki_child_count`: integer count of direct child categories
+- `wiki_note_count`: initial snapshot of indexed notes; use `wiki tree` for live counts
+- `wiki_child_count`: initial snapshot of direct child categories; use `wiki tree` for live counts
 - `wiki_status`: `active` or `empty`
 
 This metadata exists to support cleaner Dataview queries, better browsing, and future promotion logic for homepage sections like `New Syntheses`. The `summary` field powers homepage tables after an agent has written it; the deterministic backend leaves it empty until then.
@@ -193,3 +193,13 @@ Use synthesis when the user wants a topic brief built from multiple notes rather
 - Always include references at the end for every materially used note.
 
 When changing this skill, verify it with a clean-slate subagent run instead of relying only on the current session context.
+
+
+
+## Preservation Contract
+
+All wiki workflows are additive by default. Keep existing source notes, YAML values and comments, category summaries, synthesis prose, extra sections, tree annotations, and homepage content. Add missing information without duplicating it; do not replace, normalize, prune, rename, or delete existing information unless the user explicitly requests that specific change. Surface conflicting categories for review rather than reclassifying silently.
+
+The backend adds missing metadata and navigation/reference lines. Existing metadata, including `modified` and counts, is retained as a snapshot; use `wiki tree --format json` and `wiki list` for current structure and counts. Old placeholders and stale links are retained for review, not automatically erased. Orphan category pages remain on disk and are reported by `index`, `add`, and `lint`. `HOME.md` is never written by the backend.
+
+Source metadata updates preserve the original text and add only a missing property. Conflicting values, malformed or ambiguous YAML, output-path collisions, and symlink writes fail safely. `log.md` is append-only. Repeating the same operation must not duplicate material or rewrite unchanged files. Concurrent edits detected during a prepared write cause an error; stop and retry after other writers finish.

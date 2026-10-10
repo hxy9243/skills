@@ -2,11 +2,16 @@ from __future__ import annotations
 
 import fnmatch
 import json
+import os
+import stat
+import tempfile
 import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+
+import yaml
 
 from .category import CategoryPath
 from .config import WikiConfig
@@ -107,26 +112,26 @@ class Notebook:
         return notes
 
     def write(self, source: str, text: str) -> bool:
-        """Write text to a source note, creating directories as needed."""
-        path = self.resolve(source)
+        """Create a source note; never replace differing existing content."""
+        path = self._write_path(source)
+        if path.exists():
+            if _read_text(path) == text:
+                return False
+            raise ValueError(f"refusing to overwrite existing source note: {source}")
         path.parent.mkdir(parents=True, exist_ok=True)
-        if path.exists() and path.read_text(encoding="utf-8") == text:
-            return False
-        path.write_text(text, encoding="utf-8")
+        with path.open("x", encoding="utf-8", newline="") as stream:
+            stream.write(text)
         return True
 
     def update_property(self, source: str, key: str, value: object) -> bool:
-        """Update a single frontmatter property on a source note."""
-        path = self.resolve(source)
-        original = path.read_text(encoding="utf-8")
-        metadata = NoteMetadata.parse(original)
-        frontmatter = dict(metadata.frontmatter)
-        if frontmatter.get(key) == value:
-            return False
-        frontmatter[key] = value
-        updated = NoteMetadata(frontmatter, metadata.body).render()
-        path.write_text(updated, encoding="utf-8")
-        return updated != original
+        """Add a missing property, refusing to replace existing information."""
+        return _add_property_to_path(self._write_path(source), key, value)
+
+    def _write_path(self, source: str) -> Path:
+        normalized = self.normalize_source(source)
+        candidate = self.config.notebook_root / normalized
+        _reject_symlinks(candidate)
+        return self.resolve(source)
 
     # --- discovery ---
 
@@ -350,41 +355,57 @@ class NoteMetadata:
 
     @classmethod
     def parse(cls, text: str) -> "NoteMetadata":
-        """Parse simple Obsidian-style YAML frontmatter and body text."""
-        if not text.startswith("---\n"):
+        """Parse safe YAML without discarding scalar types or nested values."""
+        bounds = _frontmatter_bounds(text)
+        if bounds is None:
             return cls({}, text)
-        raw_frontmatter, sep, body = text.partition("\n---\n")
-        if not sep:
-            return cls({}, text)
-
-        frontmatter: dict[str, object] = {}
-        current_list_key: str | None = None
-        for line in raw_frontmatter.splitlines()[1:]:
-            if not line.strip():
-                current_list_key = None
-                continue
-            if current_list_key and line.lstrip().startswith("- "):
-                values = frontmatter.setdefault(current_list_key, [])
-                if isinstance(values, list):
-                    values.append(_unquote(line.split("- ", 1)[1].strip()))
-                continue
-            key, sep, value = line.partition(":")
-            if not sep:
-                continue
-            key = key.strip().lower()
-            value = value.strip()
-            if not value:
-                frontmatter[key] = []
-                current_list_key = key
-            else:
-                frontmatter[key] = _unquote(value)
-                current_list_key = None
-        return cls(frontmatter, body)
+        opening_end, closing_start, closing_end = bounds
+        return cls(_load_frontmatter(text[opening_end:closing_start]), text[closing_end:])
 
     @classmethod
     def read(cls, path: Path) -> "NoteMetadata":
-        """Read and parse metadata from a markdown file."""
-        return cls.parse(path.read_text(encoding="utf-8"))
+        """Read metadata without normalizing the note's line endings."""
+        return cls.parse(_read_text(path))
+
+    @staticmethod
+    def read_text(path: Path) -> str:
+        """Read exact note text, preserving CRLF and any UTF-8 BOM."""
+        return _read_text(path)
+
+    @classmethod
+    def add_property(cls, text: str, key: str, value: object) -> str:
+        """Return an additive edit, or raise before altering existing information."""
+        if not isinstance(key, str) or not key:
+            raise ValueError("frontmatter property names must be nonempty strings")
+        metadata = cls.parse(text)
+        if key in metadata.frontmatter:
+            if _same_value(metadata.frontmatter[key], value):
+                return text
+            raise ValueError(f"refusing to overwrite existing frontmatter property: {key}")
+        try:
+            # JSON strings are also YAML strings, including escaped newlines.
+            plain_key = (
+                re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", key)
+                and isinstance(yaml.safe_load(key), str)
+            )
+            rendered_key = key if plain_key else json.dumps(key)
+            rendered_value = json.dumps(value, ensure_ascii=False, allow_nan=False)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("unsupported frontmatter property value") from exc
+        newline = "\r\n" if "\r\n" in text else "\n"
+        property_line = f"{rendered_key}: {rendered_value}{newline}"
+        bounds = _frontmatter_bounds(text)
+        if bounds is None:
+            bom = "\ufeff" if text.startswith("\ufeff") else ""
+            updated = bom + f"---{newline}" + property_line + f"---{newline}" + text[len(bom):]
+        else:
+            opening_end, _, _ = bounds
+            updated = text[:opening_end] + property_line + text[opening_end:]
+        expected = dict(metadata.frontmatter)
+        expected[key] = value
+        if not _same_value(cls.parse(updated).frontmatter, expected):
+            raise ValueError("cannot safely add a property to this frontmatter")
+        return updated
 
     def render(self) -> str:
         """Render frontmatter and body using the supported YAML subset."""
@@ -439,23 +460,107 @@ class NoteMetadata:
 
     @classmethod
     def write_category(cls, path: Path, category: str) -> bool:
-        """Write a source note category frontmatter value if it changed."""
-        original = path.read_text(encoding="utf-8")
-        metadata = cls.parse(original)
-        if metadata.frontmatter.get("category") == category:
-            return False
-        updated = metadata.with_property("category", category).render()
-        path.write_text(updated, encoding="utf-8")
-        return updated != original
+        """Add a missing category without rewriting any existing note content."""
+        return _add_property_to_path(path, "category", category)
 
 
 # --- private helpers ---
 
 
-def _unquote(value: str) -> str:
-    if len(value) >= 2 and value[0] == value[-1] and value[0] in {"'", '"'}:
-        return value[1:-1]
-    return value
+class _StrictSafeLoader(yaml.SafeLoader):
+    """Safe YAML with duplicate keys and aliases rejected rather than lost."""
+
+    def compose_node(self, parent: Any, index: Any) -> Any:
+        if self.check_event(yaml.AliasEvent):
+            raise ValueError("YAML aliases are not supported in note frontmatter")
+        return super().compose_node(parent, index)
+
+    def construct_mapping(self, node: Any, deep: bool = False) -> dict[str, object]:
+        result: dict[str, object] = {}
+        for key_node, value_node in node.value:
+            key = self.construct_object(key_node, deep=deep)
+            if not isinstance(key, str):
+                raise ValueError("frontmatter mapping keys must be strings")
+            if key in result:
+                raise ValueError(f"duplicate frontmatter property: {key}")
+            result[key] = self.construct_object(value_node, deep=deep)
+        return result
+
+
+def _load_frontmatter(raw: str) -> dict[str, object]:
+    try:
+        parsed = yaml.load(raw, Loader=_StrictSafeLoader)
+    except (yaml.YAMLError, RecursionError) as exc:
+        raise ValueError(f"invalid or unsupported YAML frontmatter: {exc}") from exc
+    if parsed is None:
+        return {}
+    if not isinstance(parsed, dict):
+        raise ValueError("frontmatter must be a YAML mapping")
+    return parsed
+
+
+def _frontmatter_bounds(text: str) -> tuple[int, int, int] | None:
+    opening = re.match(r"\A\ufeff?---[ \t]*(?:\r?\n|$)", text)
+    if opening is None:
+        return None
+    closing = re.search(r"^---[ \t]*(?:\r?\n|$)", text[opening.end():], re.MULTILINE)
+    if closing is None:
+        raise ValueError("unterminated YAML frontmatter")
+    return opening.end(), opening.end() + closing.start(), opening.end() + closing.end()
+
+
+def _same_value(left: object, right: object) -> bool:
+    # bool/int and int/float equality must not hide changes to YAML types.
+    if type(left) is not type(right):
+        return False
+    if isinstance(left, dict):
+        return left.keys() == right.keys() and all(_same_value(left[k], right[k]) for k in left)
+    if isinstance(left, (list, tuple)):
+        return len(left) == len(right) and all(_same_value(a, b) for a, b in zip(left, right))
+    return left == right
+
+
+def _read_text(path: Path) -> str:
+    with path.open("r", encoding="utf-8", newline="") as stream:
+        return stream.read()
+
+
+def _reject_symlinks(path: Path) -> None:
+    if any(part.is_symlink() for part in (path, *path.parents)):
+        raise ValueError(f"refusing to write through a symlink: {path}")
+
+
+def _add_property_to_path(path: Path, key: str, value: object) -> bool:
+    _reject_symlinks(path)
+    original = _read_text(path)
+    updated = NoteMetadata.add_property(original, key, value)
+    if updated == original:
+        return False
+    _replace_unchanged(path, original, updated)
+    return True
+
+
+def _replace_unchanged(path: Path, original: str, updated: str) -> None:
+    """Atomically replace unchanged text, preserving permissions.
+
+    The last check detects edits made while preparing the replacement. It is a
+    best-effort concurrency guard, not a filesystem compare-and-swap or lock.
+    """
+    _reject_symlinks(path)
+    mode = stat.S_IMODE(path.stat().st_mode)
+    descriptor, temporary = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+    temporary_path = Path(temporary)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8", newline="") as stream:
+            stream.write(updated)
+            stream.flush()
+            os.fchmod(stream.fileno(), mode)
+        _reject_symlinks(path)
+        if _read_text(path) != original:
+            raise ValueError(f"source note changed while preparing update: {path}")
+        os.replace(temporary_path, path)
+    finally:
+        temporary_path.unlink(missing_ok=True)
 
 
 def _required_string(payload: dict[str, Any], key: str, issues: list[Any]) -> str:
@@ -491,3 +596,4 @@ def _string_tuple(value: Any, key: str, issues: list[Any]) -> tuple[str, ...]:
         )
         return ()
     return tuple(item.strip() for item in value if item.strip())
+

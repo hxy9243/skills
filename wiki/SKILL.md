@@ -128,7 +128,7 @@ Small example:
 - Synthesis writing belongs to the skill and its agents, not to the deterministic Python backend. Let `wiki.py` preserve existing synthesis text and update deterministic structures like metadata, subcategory lists, references, and machine-facing indexes.
 - The backend may emit deterministic tree, lint, list, search, and index outputs, but agents should read those outputs and synthesize the final human-facing homepage from them plus the relevant notes/category pages.
 - Lint and synthesis workflows are not fully complete until they refresh `HOME.md` whenever their changes affect navigation, summaries, topic framing, or the user's front-door view of the notebook.
-- When a category synthesis needs updating, integrate the new ideas organically into the existing `## Synthesis` prose. Do not replace the whole synthesis with a fresh rewrite unless the user explicitly asks for a full resynthesis.
+- When a category synthesis needs updating, add distinct information alongside the existing `## Synthesis` prose without changing earlier text. Ask before any rewrite or deletion.
 - Prefer `index` for broad refreshes and `add` for small targeted updates.
 - `lint` evaluates source synchronization (missing notes, modified notes, unindexed notes) and should also flag empty leaf categories as taxonomy cleanup candidates. Agents should enforce category hygiene when calling `add`.
 - `index` detects missing source notes, reports modified notes via source `mtime`, and rebuilds generated views.
@@ -152,3 +152,13 @@ uv run --directory <path to wiki skill> wiki --root <notebook-root> index
 - Search responses should favor semantic matches with direct evidence over literal-but-weak text matches.
 - Treat source notes as references; do not rewrite them in place.
 - When changing this skill, always test it with a clean-slate subagent run rather than relying only on the current session context.
+
+
+
+## Preservation Contract
+
+All wiki workflows are additive by default. Keep existing source notes, YAML values and comments, category summaries, synthesis prose, extra sections, tree annotations, and homepage content. Add missing information without duplicating it; do not replace, normalize, prune, rename, or delete existing information unless the user explicitly requests that specific change. Surface conflicting categories for review rather than reclassifying silently.
+
+The backend adds missing metadata and navigation/reference lines. Existing metadata, including `modified` and counts, is retained as a snapshot; use `wiki tree --format json` and `wiki list` for current structure and counts. Old placeholders and stale links are retained for review, not automatically erased. Orphan category pages remain on disk and are reported by `index`, `add`, and `lint`. `HOME.md` is never written by the backend.
+
+Source metadata updates preserve the original text and add only a missing property. Conflicting values, malformed or ambiguous YAML, output-path collisions, and symlink writes fail safely. `log.md` is append-only. Repeating the same operation must not duplicate material or rewrite unchanged files. Concurrent edits detected during a prepared write cause an error; stop and retry after other writers finish.
