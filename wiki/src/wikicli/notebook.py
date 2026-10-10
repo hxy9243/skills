@@ -26,6 +26,10 @@ DEFAULT_EXCLUDE_PARTS = {
 }
 TOKEN_RE = re.compile(r"[a-z0-9]+")
 WHITESPACE_RE = re.compile(r"\s+")
+GENERATED_PROPERTIES = frozenset({
+    "wiki_note_count", "wiki_child_count", "wiki_status", "wiki_kind",
+    "wiki_depth", "modified", "wiki_content_hash",
+})
 
 
 @dataclass(frozen=True)
@@ -407,6 +411,68 @@ class NoteMetadata:
             raise ValueError("cannot safely add a property to this frontmatter")
         return updated
 
+    @classmethod
+    def update_generated_properties(cls, text: str, values: dict[str, object]) -> str:
+        """Surgically update only CLI-owned scalar values, preserving other bytes.
+
+        Unsupported YAML shapes fail closed. Parsing and checking the complete
+        result happens before the caller can perform any filesystem write.
+        """
+        for key, value in values.items():
+            if key not in GENERATED_PROPERTIES:
+                raise ValueError(f"not a generated frontmatter property: {key}")
+            if value is not None and type(value) not in (str, bool, int, float):
+                raise ValueError(f"generated frontmatter property must be scalar: {key}")
+        metadata = cls.parse(text)
+        spans = _generated_property_spans(text)
+        edits: list[tuple[int, int, str]] = []
+        for key, value in values.items():
+            if key not in metadata.frontmatter:
+                continue
+            if _same_value(metadata.frontmatter[key], value):
+                continue
+            start, end, style = spans[key]
+            rendered = _render_generated_scalar(value, style)
+            # Empty YAML values have a zero-width mark immediately after ':';
+            # insert a separating space without consuming the original whitespace.
+            if start == end:
+                rendered = " " + rendered
+            edits.append((start, end, rendered))
+        updated = text
+        for start, end, rendered in sorted(edits, reverse=True):
+            updated = updated[:start] + rendered + updated[end:]
+        for key, value in values.items():
+            if key not in metadata.frontmatter:
+                updated = cls.add_property(updated, key, value)
+        expected = {**metadata.frontmatter, **values}
+        parsed = cls.parse(updated)
+        expected_body = metadata.body
+        if values and _frontmatter_bounds(text) is None and text.startswith("\ufeff"):
+            expected_body = expected_body[1:]
+        if not _same_value(parsed.frontmatter, expected) or parsed.body != expected_body:
+            raise ValueError("cannot safely update generated frontmatter properties")
+        return updated
+
+    @classmethod
+    def fingerprint_text(cls, text: str) -> str:
+        """Mask volatile values while retaining all other raw note content.
+
+        Missing tracking fields are normalized just like newly added metadata.
+        """
+        sentinel = "__wiki_fingerprint_ignored__"
+        normalized = cls.update_generated_properties(text, {
+            "modified": sentinel,
+            "wiki_content_hash": sentinel,
+        })
+        # Quoting and original scalar types are part of these ignored values,
+        # too. Canonicalize their spans so date-to-string refreshes are stable.
+        spans = _generated_property_spans(normalized)
+        for start, end, _ in sorted(
+            (spans[key] for key in ("modified", "wiki_content_hash")), reverse=True
+        ):
+            normalized = normalized[:start] + json.dumps(sentinel) + normalized[end:]
+        return normalized
+
     def render(self) -> str:
         """Render frontmatter and body using the supported YAML subset."""
         if not self.frontmatter:
@@ -507,6 +573,54 @@ def _frontmatter_bounds(text: str) -> tuple[int, int, int] | None:
     if closing is None:
         raise ValueError("unterminated YAML frontmatter")
     return opening.end(), opening.end() + closing.start(), opening.end() + closing.end()
+
+
+def _generated_property_spans(text: str) -> dict[str, tuple[int, int, str | None]]:
+    """Return safe, single-line scalar spans for every existing owned field."""
+    bounds = _frontmatter_bounds(text)
+    if bounds is None:
+        return {}
+    opening_end, closing_start, _ = bounds
+    raw = text[opening_end:closing_start]
+    # The public caller has already used the strict safe loader, including its
+    # duplicate-key, alias, and safe-constructor checks.
+    root = yaml.compose(raw, Loader=_StrictSafeLoader)
+    if root is None:
+        return {}
+    if not isinstance(root, yaml.MappingNode):
+        raise ValueError("frontmatter must be a YAML mapping")
+    result: dict[str, tuple[int, int, str | None]] = {}
+    for key_node, value_node in root.value:
+        key = key_node.value
+        if key not in GENERATED_PROPERTIES:
+            continue
+        if not isinstance(value_node, yaml.ScalarNode):
+            raise ValueError(f"generated frontmatter property must be scalar: {key}")
+        start, end = value_node.start_mark.index, value_node.end_mark.index
+        raw_value = raw[start:end]
+        if (value_node.style in ("|", ">") or "\n" in raw_value
+                or "\r" in raw_value or raw_value.startswith(("&", "!"))):
+            raise ValueError(f"cannot safely update complex generated scalar: {key}")
+        result[key] = (opening_end + start, opening_end + end, value_node.style)
+    return result
+
+
+def _render_generated_scalar(value: object, style: str | None) -> str:
+    try:
+        rendered = json.dumps(value, ensure_ascii=False, allow_nan=False)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("unsupported generated frontmatter property value") from exc
+    if isinstance(value, str):
+        if style == "'" and not any(ord(char) < 32 for char in value):
+            return "'" + value.replace("'", "''") + "'"
+        if style is None and value and not any(char in value for char in "\r\n"):
+            # Keep plain scalars plain only when YAML would read the same string.
+            try:
+                if _same_value(yaml.safe_load(value), value):
+                    return value
+            except yaml.YAMLError:
+                pass
+    return rendered
 
 
 def _same_value(left: object, right: object) -> bool:

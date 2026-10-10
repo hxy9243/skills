@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import re
 import tempfile
@@ -28,6 +29,7 @@ class IssueType(str, Enum):
     INVALID_CATEGORY = "invalid_category"
     EMPTY_CATEGORY = "empty_category"
     ORPHAN_PAGE = "orphan_page"
+    EMPTY_SUMMARY = "empty_summary"
 
 
 @dataclass(frozen=True)
@@ -551,6 +553,15 @@ class WikiIndex:
                     path=str(category_page_path(self.config.categories_dir, category)),
                 )
             )
+        for category in sorted(tree.all_paths(), key=lambda item: item.display().casefold()):
+            page = category_page_path(self.config.categories_dir, category)
+            if not page.is_file():
+                continue
+            summary = NoteMetadata.read(page).frontmatter.get("summary")
+            if summary is None or (isinstance(summary, str) and not summary.strip()):
+                issues.append(Issue(IssueType.EMPTY_SUMMARY,
+                    "category summary is empty; add an authored summary",
+                    severity="warning", path=str(page.relative_to(self.config.notebook_root))))
         valid = {category_page_path(self.config.categories_dir, category).resolve() for category in tree.all_paths()}
         for page in sorted(self.config.categories_dir.rglob("*.md")):
             if page.resolve() not in valid:
@@ -582,11 +593,17 @@ class WikiIndex:
             if target.is_file() and target.suffix == ".md":
                 NoteMetadata.parse(_read_text(target))
         # Rebuild also reads cataloged sources outside today's include roots.
-        self._grouped_catalog_entries()
+        grouped = self._grouped_catalog_entries()
+        # Validate complete render plans before source/log writes. This catches
+        # insertion-impossible YAML such as legacy root flow mappings.
+        tree = self.read_tree()
+        children = tree.child_names()
+        for category in tree.all_paths() | (extra_paths or set()):
+            self._render_category_page(category, children.get(category, ()), grouped.get(category, []))
         # Even orphaned pages are user content: reject invalid metadata, never delete.
         for target in self.config.categories_dir.rglob("*.md"):
             _check_write_path(target, self.config.notebook_root)
-            NoteMetadata.parse(_read_text(target))
+            NoteMetadata.update_generated_properties(_read_text(target), {})
 
     def _ensure_layout(self) -> None:
         """Create the generated wiki directory and required files."""
@@ -692,7 +709,7 @@ class WikiIndex:
         child_names: tuple[str, ...],
         notes: tuple[CatalogEntry, ...] | list[CatalogEntry],
     ) -> str:
-        """Add missing metadata/navigation while preserving every existing byte."""
+        """Refresh owned metadata and add navigation without rewriting authored content."""
         page_path = category_page_path(self.config.categories_dir, path)
         notes = list(notes)
         timestamp = _utc_now()
@@ -708,9 +725,14 @@ class WikiIndex:
             parent = CategoryPath(path.parts[:-1])
             rel = Path(os.path.relpath(category_page_path(self.config.categories_dir, parent), start=page_path.parent)).as_posix()
             frontmatter["parent"] = f"[[{rel}|{parent.parts[-1]}]]"
-        if page_path.exists():
-            text = _read_text(page_path)
+        original = _read_text(page_path) if page_path.exists() else None
+        previous_hash = None
+        existing_status = None
+        if original is not None:
+            text = original
             existing = NoteMetadata.parse(text)
+            previous_hash = existing.frontmatter.get("wiki_content_hash")
+            existing_status = existing.frontmatter.get("wiki_status")
             for key, value in frontmatter.items():
                 if key not in existing.frontmatter:
                     text = NoteMetadata.add_property(text, key, value)
@@ -724,7 +746,36 @@ class WikiIndex:
                 children.append(f"- [layer{len(path.parts) + 1}: {child}]({rel})")
         text = _append_section_items(text, "Subcategories", children)
         references = [f"- [[{entry.source}]] - {entry.summary}" for entry in sorted(notes, key=lambda item: item.title.casefold()) if f"[[{entry.source}]]" not in text]
-        return _append_section_items(text, "References", references)
+        text = _append_section_items(text, "References", references)
+        # These fields are backend-owned; all other YAML values remain untouched.
+        owned = {key: frontmatter[key] for key in (
+            "wiki_note_count", "wiki_child_count", "wiki_status", "wiki_kind", "wiki_depth"
+        )}
+        if existing_status is not None and existing_status not in ("active", "empty"):
+            # A custom workflow status is authored information, not our enum.
+            owned.pop("wiki_status")
+        text = NoteMetadata.update_generated_properties(text, owned)
+        fingerprint = self._category_fingerprint(text, notes)
+        if original is None or (previous_hash is not None and previous_hash != fingerprint) or (
+            previous_hash is None and NoteMetadata.fingerprint_text(text) != NoteMetadata.fingerprint_text(original)
+        ):
+            text = NoteMetadata.update_generated_properties(text, {"modified": timestamp})
+        return NoteMetadata.update_generated_properties(text, {"wiki_content_hash": fingerprint})
+
+    def _category_fingerprint(self, text: str, notes: list[CatalogEntry]) -> str:
+        """Track page content and referenced source content, excluding clock-only changes."""
+        sources = []
+        for entry in sorted(notes, key=lambda item: item.source):
+            source = self.notebook.resolve(entry.source)
+            digest = hashlib.sha256(source.read_bytes()).hexdigest() if source.is_file() else None
+            sources.append({
+                "source": entry.source, "content": digest, "title": entry.title,
+                "summary": entry.summary, "category": entry.category,
+                "tags": entry.tags, "search_terms": entry.search_terms,
+            })
+        content = json.dumps({"page": NoteMetadata.fingerprint_text(text), "sources": sources},
+            ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        return hashlib.sha256(content.encode("utf-8")).hexdigest()
 
     def _grouped_catalog_entries(self) -> dict[CategoryPath, list[CatalogEntry]]:
         """Group active catalog entries under every ancestor path.
@@ -832,7 +883,6 @@ def _utc_now() -> str:
     """Return a UTC timestamp suitable for log events."""
     return (
         datetime.now(UTC)
-        .replace(microsecond=0)
         .isoformat()
         .replace("+00:00", "Z")
     )
